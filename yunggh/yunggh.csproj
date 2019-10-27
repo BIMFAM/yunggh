@@ -56,7 +56,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="yungghComponent.cs" />
+    <Compile Include="Bake.cs" />
+    <Compile Include="LargestNumber.cs" />
+    <Compile Include="ReadCSV.cs" />
+    <Compile Include="SelDup.cs" />
+    <Compile Include="SelDupAll.cs" />
+    <Compile Include="SelectPoint.cs" />
+    <Compile Include="SmallestNumber.cs" />
+    <Compile Include="WriteCSV.cs" />
     <Compile Include="yungghInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

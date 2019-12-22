@@ -9,7 +9,7 @@ using Rhino.Geometry;
 // folder in Grasshopper.
 // You can use the _GrasshopperDeveloperSettings Rhino command for that.
 
-namespace GT
+namespace yunggh
 {
     public class Bake : GH_Component
     {

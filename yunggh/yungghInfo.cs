@@ -10,25 +10,26 @@ namespace yunggh
         {
             get
             {
-                return "yunggh";
+                return "yung GH";
             }
         }
+
         public override Bitmap Icon
         {
             get
             {
-                //Return a 24x24 pixel bitmap to represent this GHA library.
-                return null;
+                return Resource.yunggh;
             }
         }
+
         public override string Description
         {
             get
             {
-                //Return a short string describing the purpose of this GHA library.
-                return "";
+                return "This library open source library contains useful Grasshopper components.";
             }
         }
+
         public override Guid Id
         {
             get
@@ -41,17 +42,49 @@ namespace yunggh
         {
             get
             {
-                //Return a string identifying you or your company.
-                return "";
+                return "archgame";
             }
         }
+
         public override string AuthorContact
         {
             get
             {
-                //Return a string representing your preferred contact details.
-                return "";
+                return "@archgame";
             }
         }
     }
+
+    public class yungghCategoryIcon : Grasshopper.Kernel.GH_AssemblyPriority
+    {
+        public override Grasshopper.Kernel.GH_LoadingInstruction PriorityLoad()
+        {
+            Grasshopper.Instances.ComponentServer.AddCategoryIcon("yung GH", Resource.yunggh);
+            Grasshopper.Instances.ComponentServer.AddCategorySymbolName("yung GH", '¥');
+            return Grasshopper.Kernel.GH_LoadingInstruction.Proceed;
+        }
+    }
+
+    //TODO: CombineWorksession
+    //TODO: CreateLayer
+    //TODO: Export
+    //TODO: Import
+    //TODO: ReadAttributes
+    //TODO: RestartComponent
+    //TODO: SelectGeometry
+    //TODO: SelectLayer
+    //TODO: SimpleMeshCube
+    //TODO: SurfaceFit
+    //TODO: UpdateCamera
+    //TODO: ViewportCapture
+    //TODO: CreateSavedView
+    //TODO: WriteAttributes
+    //TODO: Test Developability
+    //TODO: Flatten Sort Pick
+    //TODO: Delay
+    //TODO: Listener
+    //TODO: IFC Import
+    //TODO: IFC Export
+    //TODO: IFC Geometry
+    //TODO: 4D Cube
 }

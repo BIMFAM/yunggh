@@ -78,7 +78,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddAttributes.cs" />
+    <Compile Include="ReadAttributes.cs" />
+    <Compile Include="WriteAttributes.cs" />
     <Compile Include="Bake.cs" />
     <Compile Include="CombineWorksession.cs" />
     <Compile Include="CreateLayer.cs" />
@@ -86,8 +87,14 @@
     <Compile Include="Extremum.cs" />
     <Compile Include="Import.cs" />
     <Compile Include="LargestNumber.cs" />
+    <Compile Include="OrientedBoundingBox.cs" />
     <Compile Include="ReadCSV.cs" />
     <Compile Include="ReadGoogleSheet.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
     <Compile Include="RestartComponent.cs" />
     <Compile Include="SelDup.cs" />
     <Compile Include="SelDupAll.cs" />
@@ -96,6 +103,8 @@
     <Compile Include="SelectPoint.cs" />
     <Compile Include="SimpleMeshCube.cs" />
     <Compile Include="SmallestNumber.cs" />
+    <Compile Include="SplitBrepPlane.cs" />
+    <Compile Include="SplitKeepRemove.cs" />
     <Compile Include="UpdateCamera.cs" />
     <Compile Include="ViewportCapture.cs" />
     <Compile Include="WriteCSV.cs" />
@@ -106,6 +115,41 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Data\LargestNumber.png" />
+    <Content Include="Resources\Data\ReadAttributes.png" />
+    <Content Include="Resources\Data\ReadCSV.png" />
+    <Content Include="Resources\Data\ReadGooglesheet.png" />
+    <Content Include="Resources\Data\SmallestNumber.png" />
+    <Content Include="Resources\Data\WriteAttributes.png" />
+    <Content Include="Resources\Data\WriteCSV.png" />
+    <Content Include="Resources\Data\WriteGooglesheet.png" />
+    <Content Include="Resources\Document\CreateLayer.png" />
+    <Content Include="Resources\Document\RestartComponent.png" />
+    <Content Include="Resources\Document\UpdateCamera.png" />
+    <Content Include="Resources\Document\ViewportCapture.png" />
+    <Content Include="Resources\Format\Bake.png" />
+    <Content Include="Resources\Format\CombineWorksession.png" />
+    <Content Include="Resources\Format\Export.png" />
+    <Content Include="Resources\Format\Import.png" />
+    <Content Include="Resources\Geometry\Extremum.png" />
+    <Content Include="Resources\Geometry\OrientedBoundingBox.png" />
+    <Content Include="Resources\Geometry\SplitBrepPlane.png" />
+    <Content Include="Resources\Geometry\SplitKeepRemove.png" />
+    <Content Include="Resources\Mesh\SimpleMeshCube.png" />
+    <Content Include="Resources\Selection\SelDup.png" />
+    <Content Include="Resources\Selection\SelDupAll.png" />
+    <Content Include="Resources\Selection\SelectGeometry.png" />
+    <Content Include="Resources\Selection\SelectLayer.png" />
+    <Content Include="Resources\Selection\SelectPoint.png" />
+    <Content Include="Resources\yunggh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -115,8 +159,8 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"
-Erase "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>
+Copy "$(TargetDir)$(ProjectName).dll" "$(USERPROFILE)\AppData\Roaming\Grasshopper\Libraries\$(ProjectName).gha"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <FallbackCulture>en-US</FallbackCulture>

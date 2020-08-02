@@ -38,7 +38,7 @@ namespace yunggh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Guids", "ID", "Geometry Guids to select", GH_ParamAccess.tree);
-            pManager.AddIntegerParameter("Prompt", "P", "Prompt user to select geometry.", GH_ParamAccess.item, 10);
+            pManager.AddBooleanParameter("Prompt", "P", "Prompt user to select geometry.", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace yunggh
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Guids", "ID", "Spiral curve", GH_ParamAccess.tree);
-            pManager.AddBooleanParameter("Selected", "S", "Selected Guids", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("Selected", "S", "Selected Guids", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -58,11 +58,11 @@ namespace yunggh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             // Retrieve all data from the input parameters (start by declaring variables and assigning them starting values).
-            GH_Structure<GH_Guid> inputGuids;
+            GH_Structure<IGH_Goo> inputGuids;
             bool run = false;
 
             // guard statement for when data cannot be extracted from a parameter
-            if (!DA.GetDataTree<GH_Guid>(0, out inputGuids)) return;
+            if (!DA.GetDataTree<IGH_Goo>(0, out inputGuids)) return;
             if (!DA.GetData(1, ref run)) return;
 
             // main
@@ -70,10 +70,6 @@ namespace yunggh
             //make sure outputs aren't null
             if (guids == null) { guids = new GH_Structure<GH_Guid>(); }
             if (selected == null) { selected = new GH_Structure<GH_Boolean>(); }
-
-            //Assign the selected geometry guids to the output parameter.
-            DA.SetDataTree(0, guids);
-            DA.SetDataTree(1, selected);
 
             //return when button isn't pressed
             if (!run && !pending) return;
@@ -84,30 +80,37 @@ namespace yunggh
 
             // reset pending to false
             pending = false;
+            guids = new GH_Structure<GH_Guid>();
+            selected = new GH_Structure<GH_Boolean>();
 
             //loop through all the guids
-            foreach (GH_Path path in inputGuids)
+            foreach (GH_Path path in inputGuids.Paths)
             {
-                GH_Guid[] gh_guids = inputGuids[path].ToArray();
+                IGH_Goo[] gh_guids = inputGuids[path].ToArray();
+                List<GH_Guid> appendGuids = new List<GH_Guid>();
+                List<GH_Boolean> appendSelected = new List<GH_Boolean>();
+
                 for (int j = 0; j < gh_guids.Length; j++)
                 {
-                    GH_Guid gh_guid = gh_guids[j];
-                    List<GH_Guid> appendGuids = new List<GH_Guid>();
-                    List<GH_Boolean> appendSelected = new List<GH_Boolean>();
-                    if (gh_guid != null)
+                    GH_Guid gh_guid = (GH_Guid)gh_guids[j];
+                    //if (!gh_guids[j].CastTo<GH_Guid>(out gh_guid)) continue;
+                    if (gh_guid == null) continue;
+
+                    System.Guid guid = gh_guid.Value;
+                    appendGuids.Add(gh_guid);
+                    if (Rhino.RhinoDoc.ActiveDoc.Objects.Select(guid, true, true, true))
                     {
-                        System.Guid guid = gh_guid.Value;
-
-                        Rhino.RhinoDoc.ActiveDoc.Objects.Select(guid, true, true, true);
-                        appendGuids.Add(gh_guid);
                         appendSelected.Add(new GH_Boolean(true));
-                        continue;
                     }
-
-                    GH_Path newPath = new GH_Path(path);
-                    guids.AppendRange(appendGuids, newPath);
-                    selected.AppendRange(appendSelected, newPath);
+                    else
+                    {
+                        appendSelected.Add(new GH_Boolean(false));
+                    }
                 }
+
+                GH_Path newPath = new GH_Path(path);
+                guids.AppendRange(appendGuids, newPath);
+                selected.AppendRange(appendSelected, newPath);
             }
 
             //Assign the selected geometry guids to the output parameter.

@@ -11,7 +11,7 @@ using Rhino.Geometry;
 
 namespace yunggh
 {
-    public class CombineWorksession : GH_Component
+    public class CreateSavedView : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public
@@ -20,10 +20,10 @@ namespace yunggh
         /// Subcategory the panel. If you use non-existing tab or panel names,
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public CombineWorksession()
-          : base("Combine Worksession", "Combine Worksession",
-              "Export current worksessions as single document",
-              "yung gh", "Format")
+        public CreateSavedView()
+          : base("Create Layer", "Create Layer",
+              "Creates a layer.",
+              "yung gh", "Document")
         {
         }
 
@@ -150,7 +150,7 @@ namespace yunggh
         {
             get
             {
-                return Resource.CombineWorksession;
+                return Resource.CreateSavedView;
             }
         }
 
@@ -161,7 +161,7 @@ namespace yunggh
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("43d68cf2-f346-4467-a302-96162f0bd550"); }
+            get { return new Guid("4ead7047-a1f5-4b41-a73d-7ea818fc1f73"); }
         }
     }
 }

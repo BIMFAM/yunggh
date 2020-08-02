@@ -66,20 +66,15 @@ namespace yunggh
     }
 
     //TODO: CombineWorksession
-    //TODO: CreateLayer
-    //TODO: Export
+    //TODO: Export, add geometry bake and remove
     //TODO: Import
     //TODO: ReadAttributes, graft name output, simplify tree
     //TODO: RestartComponent
-    //TODO: SelectGeometry
-    //TODO: SelectLayer
-    //TODO: SimpleMeshCube
     //TODO: SurfaceFit
+    //TODO: SelectLayer, add selected boolean
     //TODO: UpdateCamera
     //TODO: ViewportCapture
     //TODO: CreateSavedView
-    //TODO: WriteAttributes
-    //TODO: Test Developability
     //TODO: Flatten Sort Pick
     //TODO: Delay
     //TODO: Listener
@@ -90,4 +85,6 @@ namespace yunggh
     //TODO: Deselect
     //TODO: Deselect All
     //TODO: split auto select and prompt select
+    //TODO: Setup Inno
+    //TODO: SplitKeepRemove turns error curves into planes if planar
 }

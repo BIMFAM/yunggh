@@ -1,8 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Grasshopper.Kernel;
+using Rhino;
 using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+using System.IO;
+using System.Linq;
 
 // In order to load the result of this wizard, you will also need to
 // add the output bin/ folder of this project to the list of loaded
@@ -14,10 +22,10 @@ namespace yunggh
     public class Import : GH_Component
     {
         /// <summary>
-        /// Each implementation of GH_Component must provide a public 
+        /// Each implementation of GH_Component must provide a public
         /// constructor without any arguments.
-        /// Category represents the Tab in which the component will appear, 
-        /// Subcategory the panel. If you use non-existing tab or panel names, 
+        /// Category represents the Tab in which the component will appear,
+        /// Subcategory the panel. If you use non-existing tab or panel names,
         /// new tabs/panels will automatically be created.
         /// </summary>
         public Import()
@@ -32,18 +40,8 @@ namespace yunggh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            // Use the pManager object to register your input parameters.
-            // You can often supply default values when creating parameters.
-            // All parameters must have the correct access type. If you want 
-            // to import lists or trees of values, modify the ParamAccess flag.
-            pManager.AddPlaneParameter("Plane", "P", "Base plane for spiral", GH_ParamAccess.item, Plane.WorldXY);
-            pManager.AddNumberParameter("Inner Radius", "R0", "Inner radius for spiral", GH_ParamAccess.item, 1.0);
-            pManager.AddNumberParameter("Outer Radius", "R1", "Outer radius for spiral", GH_ParamAccess.item, 10.0);
-            pManager.AddIntegerParameter("Turns", "T", "Number of turns between radii", GH_ParamAccess.item, 10);
-
-            // If you want to change properties of certain parameters, 
-            // you can use the pManager instance to access them by index:
-            //pManager[0].Optional = true;
+            pManager.AddBooleanParameter("Import", "I", "Use button to import files into Rhino document", GH_ParamAccess.item);
+            pManager.AddTextParameter("Import Files", "F", "File(s) for importing.", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -51,90 +49,152 @@ namespace yunggh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            // Use the pManager object to register your output parameters.
-            // Output parameters do not have default values, but they too must have the correct access type.
-            pManager.AddCurveParameter("Spiral", "S", "Spiral curve", GH_ParamAccess.item);
-
-            // Sometimes you want to hide a specific parameter from the Rhino preview.
-            // You can use the HideParameter() method as a quick way:
-            //pManager.HideParameter(0);
+            pManager.AddGenericParameter("GUID", "ID", "Imported geometry GUID list", GH_ParamAccess.tree);
         }
 
         /// <summary>
         /// This is the method that actually does the work.
         /// </summary>
-        /// <param name="DA">The DA object can be used to retrieve data from input parameters and 
+        /// <param name="DA">The DA object can be used to retrieve data from input parameters and
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            // First, we need to retrieve all data from the input parameters.
-            // We'll start by declaring variables and assigning them starting values.
-            Plane plane = Plane.WorldXY;
-            double radius0 = 0.0;
-            double radius1 = 0.0;
-            int turns = 0;
+            // Retrieve all data from the input parameters (start by declaring variables and assigning them starting values).
+            bool run = false;
+            GH_Structure<GH_String> filepaths;
 
-            // Then we need to access the input parameters individually. 
-            // When data cannot be extracted from a parameter, we should abort this method.
-            if (!DA.GetData(0, ref plane)) return;
-            if (!DA.GetData(1, ref radius0)) return;
-            if (!DA.GetData(2, ref radius1)) return;
-            if (!DA.GetData(3, ref turns)) return;
+            // guard statement for when data cannot be extracted from a parameter
+            if (!DA.GetData(0, ref run)) return;
+            if (!DA.GetDataTree(1, out filepaths)) return;
 
-            // We should now validate the data and warn the user if invalid data is supplied.
-            if (radius0 < 0.0)
+            // main
+            if (guids == null)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Inner radius must be bigger than or equal to zero");
-                return;
-            }
-            if (radius1 <= radius0)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Outer radius must be bigger than the inner radius");
-                return;
-            }
-            if (turns <= 0)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Spiral turn count must be bigger than or equal to one");
-                return;
+                guids = new GH_Structure<GH_Guid>();
             }
 
-            // We're set to create the spiral now. To keep the size of the SolveInstance() method small, 
-            // The actual functionality will be in a different method:
-            Curve spiral = CreateSpiral(plane, radius0, radius1, turns);
+            //return when button isn't pressed
+            if (!run && !pending) return;
 
-            // Finally assign the spiral to the output parameter.
-            DA.SetData(0, spiral);
+            //return & set pending to true
+            if (!pending)
+            { pending = true; return; }
+
+            // reset pending to false
+            pending = false;
+
+            //If we are running, establish a clean data tree
+            guids = new GH_Structure<GH_Guid>();
+
+            //loop through all the filepaths
+            foreach (GH_Path path in filepaths.Paths)
+            {
+                GH_String[] gh_strings = filepaths[path].ToArray();
+
+                foreach (GH_String gh_string in gh_strings)
+                {
+                    string filepath = gh_string.Value;
+
+                    List<System.Guid> newGuids = ImportModel(filepath);
+                    List<GH_Guid> appendGuids = new List<GH_Guid>();
+                    foreach (System.Guid guid in newGuids)
+                    {
+                        appendGuids.Add(new GH_Guid(guid));
+                    }
+
+                    GH_Path newPath = new GH_Path(path);
+
+                    guids.AppendRange(appendGuids, newPath);
+                }
+            }
+
+            //if a button was used, it freezes, so we need to reset it
+            //GrasshopperDocument.SolutionEnd += ResetButtonComponents; //this isn't reseting the canvas
+            //GrasshopperDocument.SolutionEndEventHandler
+
+            //Assign the guid data tree to the output parameter.
+            DA.SetDataTree(0, guids);
         }
 
-        private Curve CreateSpiral(Plane plane, double r0, double r1, Int32 turns)
+        private bool pending = false;
+
+        private List<System.Guid> ImportModel(string filepath)
         {
-            Line l0 = new Line(plane.Origin + r0 * plane.XAxis, plane.Origin + r1 * plane.XAxis);
-            Line l1 = new Line(plane.Origin - r0 * plane.XAxis, plane.Origin - r1 * plane.XAxis);
+            List<System.Guid> importedGuids = new List<System.Guid>();
 
-            Point3d[] p0;
-            Point3d[] p1;
+            //file exist guard statement
+            if (!File.Exists(filepath)) return importedGuids;
 
-            l0.ToNurbsCurve().DivideByCount(turns, true, out p0);
-            l1.ToNurbsCurve().DivideByCount(turns, true, out p1);
+            //rhino okay file type guard statement
+            if (!SupportedImportFileTypes.Contains(Path.GetExtension(filepath))) return importedGuids;
 
-            PolyCurve spiral = new PolyCurve();
+            //get existing objects
+            List<System.Guid> existingGuids = GetGuids();
 
-            for (int i = 0; i < p0.Length - 1; i++)
-            {
-                Arc arc0 = new Arc(p0[i], plane.YAxis, p1[i + 1]);
-                Arc arc1 = new Arc(p1[i + 1], -plane.YAxis, p0[i + 1]);
+            string import = string.Format("_-Import \"{0}\" _Enter", filepath);
+            Rhino.RhinoApp.RunScript(import, false);
 
-                spiral.Append(arc0);
-                spiral.Append(arc1);
-            }
+            importedGuids = GetGuids();
 
-            return spiral;
+            //remove guids existing before the import
+            importedGuids.RemoveAll(x => existingGuids.Contains(x));
+
+            return importedGuids;
         }
+
+        public void ResetButtonComponents(object sender, GH_SolutionEventArgs e)
+        {
+            e.Document.SolutionEnd -= ResetButtonComponents;
+
+            GH_Document doc = this.OnPingDocument();
+
+            foreach (IGH_DocumentObject obj in doc.Objects) //Search all components in the Canvas
+            {
+                //Print(obj.Name);
+                if (obj.Name != "Button") continue;
+
+                //obj.ExpireSolution(true); //recompute this component, this is a way to restart upstream
+                //obj.ExpirePreview(true);
+            }
+        }
+
+        public List<System.Guid> GetGuids()
+        {
+            List<System.Guid> guids = new List<System.Guid>();
+            foreach (Rhino.DocObjects.RhinoObject obj in Rhino.RhinoDoc.ActiveDoc.Objects)
+            {
+                guids.Add(obj.Id);
+            }
+            return guids;
+        }
+
+        public List<string> SupportedImportFileTypes = new List<string>(){
+      ".3dm",".3dmbak",".rws",".3mf",".3ds",".amf",".ai",
+      ".dwg",".dxf",".x",".e57",".dst",".exp",".eps",".off",
+      ".gf",".gft",".gts",".igs",".iges",".lwo",".dgn",".fbx",
+      ".scn",".obj",".pdf",".ply",".asc",".csv",".xyz",".cgo_ascii",
+      ".cgo_asci",".pts",".txt",".raw",".m",".svg",".skp",".slc",
+      ".sldprt",".sldasm",".stp",".step",".stl",".vda",".wrl",
+      ".vrml",".vi",".gdf",".zpr"
+      };
+
+        public List<string> SupportedExportFileTypes = new List<string>(){
+      ".3dm",".3dmbak",".rws",".3mf",".3ds",".amf",".ai",
+      ".dwg",".dxf",".x",
+      ".gf",".gft",".gts",".igs",".iges",".lwo",".dgn",".fbx",
+      ".obj",".pdf",".ply",".csv",
+      ".txt",".raw",".m",".svg",".skp",".slc",
+      ".stp",".step",".stl",".vda",".wrl",
+      ".vrml",".vi",".gdf",".zpr",
+      ".dae",".cd",".emf",".pm",".kmz",".udo",".x_t",".rib",".wmf",".x3dv",".xaml",".xgl"
+      };
+
+        private GH_Structure<GH_Guid> guids;
 
         /// <summary>
-        /// The Exposure property controls where in the panel a component icon 
-        /// will appear. There are seven possible locations (primary to septenary), 
-        /// each of which can be combined with the GH_Exposure.obscure flag, which 
+        /// The Exposure property controls where in the panel a component icon
+        /// will appear. There are seven possible locations (primary to septenary),
+        /// each of which can be combined with the GH_Exposure.obscure flag, which
         /// ensures the component will only be visible on panel dropdowns.
         /// </summary>
         public override GH_Exposure Exposure
@@ -150,15 +210,13 @@ namespace yunggh
         {
             get
             {
-                // You can add image files to your project resources and access them like this:
-                //return Resources.IconForThisComponent;
-                return null;
+                return Resource.Import;
             }
         }
 
         /// <summary>
-        /// Each component must have a unique Guid to identify it. 
-        /// It is vital this Guid doesn't change otherwise old ghx files 
+        /// Each component must have a unique Guid to identify it.
+        /// It is vital this Guid doesn't change otherwise old ghx files
         /// that use the old ID will partially fail during loading.
         /// </summary>
         public override Guid ComponentGuid

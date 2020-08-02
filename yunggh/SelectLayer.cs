@@ -46,7 +46,7 @@ namespace yunggh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Guids", "ID", "Selected Guids", GH_ParamAccess.tree);
+            pManager.AddGenericParameter("Guids", "ID", "Selected Guids", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace yunggh
             if (guids == null) { guids = new GH_Structure<GH_Guid>(); }
 
             //Assign the selected guids to the output parameter.
-            DA.SetData(0, guids);
+            //DA.SetData(0, guids);
 
             //return when button isn't pressed
             if (!run && !pending) return;
@@ -81,9 +81,10 @@ namespace yunggh
 
             // reset pending to false
             pending = false;
+            guids = new GH_Structure<GH_Guid>();
 
             //loop through all the full layer paths
-            foreach (GH_Path path in layers)
+            foreach (GH_Path path in layers.Paths)
             {
                 GH_String[] gh_strings = layers[path].ToArray();
                 List<GH_Guid> appendGuids = new List<GH_Guid>();

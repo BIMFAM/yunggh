@@ -87,4 +87,7 @@ namespace yunggh
     //TODO: IFC Export
     //TODO: IFC Geometry
     //TODO: 4D Cube
+    //TODO: Deselect
+    //TODO: Deselect All
+    //TODO: split auto select and prompt select
 }

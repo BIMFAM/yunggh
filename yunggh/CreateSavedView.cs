@@ -21,10 +21,12 @@ namespace yunggh
         /// new tabs/panels will automatically be created.
         /// </summary>
         public CreateSavedView()
-          : base("Create Layer", "Create Layer",
-              "Creates a layer.",
+          : base("Create Saved View", "VIEW",
+              "Creates or updates a Rhino Saved View.",
               "yung gh", "Document")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

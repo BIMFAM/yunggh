@@ -35,6 +35,8 @@ namespace yunggh
               "Writes data to a google sheet.",
               "yung gh", "Data")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

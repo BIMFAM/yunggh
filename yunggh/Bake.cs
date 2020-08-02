@@ -21,10 +21,12 @@ namespace yunggh
         /// new tabs/panels will automatically be created.
         /// </summary>
         public Bake()
-     : base("Bake", "Bake",
-       "Bake geometry",
-       "yung gh", "Format")
+         : base("Bake", "Bake",
+            "Bake geometry",
+            "yung gh", "Format")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

@@ -28,6 +28,8 @@ namespace yunggh
               "Read CSV",
               "yung gh", "Data")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

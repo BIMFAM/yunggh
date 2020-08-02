@@ -1,6 +1,15 @@
 ﻿using System;
 using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Attributes;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+using Grasshopper.GUI.Canvas;
 
 namespace yunggh
 {
@@ -62,6 +71,40 @@ namespace yunggh
             Grasshopper.Instances.ComponentServer.AddCategoryIcon("yung GH", Resource.yunggh);
             Grasshopper.Instances.ComponentServer.AddCategorySymbolName("yung GH", '¥');
             return Grasshopper.Kernel.GH_LoadingInstruction.Proceed;
+        }
+    }
+
+    public class CustomAttributes : GH_ComponentAttributes
+    {
+        public CustomAttributes(IGH_Component component)
+          : base(component)
+        { }
+
+        protected override void Render(GH_Canvas canvas, Graphics graphics, GH_CanvasChannel channel)
+        {
+            if (channel == GH_CanvasChannel.Objects)
+            {
+                // Cache the existing style.
+                GH_PaletteStyle normalStyle = GH_Skin.palette_normal_standard;
+                GH_PaletteStyle hiddenStyle = GH_Skin.palette_hidden_standard;
+
+                //create colors
+                Color pink = Color.FromArgb(255, 132, 241);
+                Color darkblue = Color.FromArgb(0, 16, 87);
+                Color cyan = Color.FromArgb(134, 200, 251);
+
+                // Swap out palette for normal, unselected components.
+                GH_Skin.palette_normal_standard = new GH_PaletteStyle(pink, darkblue, darkblue);
+                GH_Skin.palette_hidden_standard = new GH_PaletteStyle(cyan, darkblue, darkblue);
+
+                base.Render(canvas, graphics, channel);
+
+                // Put the original style back.
+                GH_Skin.palette_normal_standard = normalStyle;
+                GH_Skin.palette_hidden_standard = normalStyle;
+            }
+            else
+                base.Render(canvas, graphics, channel);
         }
     }
 

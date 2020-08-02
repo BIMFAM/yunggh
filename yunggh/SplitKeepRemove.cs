@@ -25,6 +25,8 @@ namespace yunggh
               "Split brep with curves, using points to decide which splits to keep or remove.",
               "yung gh", "Geometry")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

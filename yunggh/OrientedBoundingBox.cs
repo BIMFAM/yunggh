@@ -25,6 +25,8 @@ namespace yunggh
               "Orients a bounding box for geometric fit",
               "yung gh", "Geometry")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

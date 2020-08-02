@@ -29,6 +29,8 @@ namespace yunggh
               "Write attribute information to rhino objects",
               "yung gh", "Data")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

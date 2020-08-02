@@ -21,10 +21,12 @@ namespace yunggh
         /// new tabs/panels will automatically be created.
         /// </summary>
         public SurfaceFit()
-          : base("Create Layer", "Create Layer",
-              "Creates a layer.",
-              "yung gh", "Document")
+          : base("Surface Fit", "FIT",
+              "Fit developable surfaces to surfaces.",
+              "yung gh", "Geometry")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

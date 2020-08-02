@@ -33,6 +33,8 @@ namespace yunggh
               "Export geometry by file format",
               "yung gh", "Format")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

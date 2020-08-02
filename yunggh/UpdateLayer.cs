@@ -28,6 +28,8 @@ namespace yunggh
               "Creates a layer.",
               "yung gh", "Document")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

@@ -25,6 +25,8 @@ namespace yunggh
               "Finds the extremum minimum or maximum of a brep (points/curves).",
               "yung gh", "Geometry")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>

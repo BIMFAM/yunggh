@@ -78,11 +78,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateSavedView.cs" />
+    <Compile Include="Developability.cs" />
     <Compile Include="ReadAttributes.cs" />
+    <Compile Include="SurfaceFit.cs" />
     <Compile Include="WriteAttributes.cs" />
     <Compile Include="Bake.cs" />
     <Compile Include="CombineWorksession.cs" />
-    <Compile Include="CreateLayer.cs" />
+    <Compile Include="UpdateLayer.cs" />
     <Compile Include="Export.cs" />
     <Compile Include="Extremum.cs" />
     <Compile Include="Import.cs" />
@@ -125,17 +128,21 @@
     <Content Include="Resources\Data\WriteCSV.png" />
     <Content Include="Resources\Data\WriteGooglesheet.png" />
     <Content Include="Resources\Document\CreateLayer.png" />
+    <None Include="Resources\Document\CreateSavedView.png" />
     <Content Include="Resources\Document\RestartComponent.png" />
     <Content Include="Resources\Document\UpdateCamera.png" />
+    <None Include="Resources\Document\UpdateLayer.png" />
     <Content Include="Resources\Document\ViewportCapture.png" />
     <Content Include="Resources\Format\Bake.png" />
     <Content Include="Resources\Format\CombineWorksession.png" />
     <Content Include="Resources\Format\Export.png" />
     <Content Include="Resources\Format\Import.png" />
+    <None Include="Resources\Geometry\Developabilitly.png" />
     <Content Include="Resources\Geometry\Extremum.png" />
     <Content Include="Resources\Geometry\OrientedBoundingBox.png" />
     <Content Include="Resources\Geometry\SplitBrepPlane.png" />
     <Content Include="Resources\Geometry\SplitKeepRemove.png" />
+    <None Include="Resources\Geometry\SurfaceFit.png" />
     <Content Include="Resources\Mesh\SimpleMeshCube.png" />
     <Content Include="Resources\Selection\SelDup.png" />
     <Content Include="Resources\Selection\SelDupAll.png" />

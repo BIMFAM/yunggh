@@ -78,40 +78,40 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateSavedView.cs" />
-    <Compile Include="Developability.cs" />
-    <Compile Include="ReadAttributes.cs" />
-    <Compile Include="SurfaceFit.cs" />
-    <Compile Include="WriteAttributes.cs" />
-    <Compile Include="Bake.cs" />
-    <Compile Include="CombineWorksession.cs" />
-    <Compile Include="UpdateLayer.cs" />
-    <Compile Include="Export.cs" />
-    <Compile Include="Extremum.cs" />
-    <Compile Include="Import.cs" />
-    <Compile Include="LargestNumber.cs" />
-    <Compile Include="OrientedBoundingBox.cs" />
-    <Compile Include="ReadCSV.cs" />
-    <Compile Include="ReadGoogleSheet.cs" />
+    <Compile Include="Components\Document\CreateSavedView.cs" />
+    <Compile Include="Components\Geometry\Developability.cs" />
+    <Compile Include="Components\Data\ReadAttributes.cs" />
+    <Compile Include="Components\Geometry\SurfaceFit.cs" />
+    <Compile Include="Components\Data\WriteAttributes.cs" />
+    <Compile Include="Components\Format\Bake.cs" />
+    <Compile Include="Components\Format\CombineWorksession.cs" />
+    <Compile Include="Components\Document\UpdateLayer.cs" />
+    <Compile Include="Components\Format\Export.cs" />
+    <Compile Include="Components\Geometry\Extremum.cs" />
+    <Compile Include="Components\Format\Import.cs" />
+    <Compile Include="Components\Data\LargestNumber.cs" />
+    <Compile Include="Components\Geometry\OrientedBoundingBox.cs" />
+    <Compile Include="Components\Data\ReadCSV.cs" />
+    <Compile Include="Components\Data\ReadGoogleSheet.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
-    <Compile Include="RestartComponent.cs" />
-    <Compile Include="SelDup.cs" />
-    <Compile Include="SelDupAll.cs" />
-    <Compile Include="SelectGeometry.cs" />
-    <Compile Include="SelectLayer.cs" />
-    <Compile Include="SelectPoint.cs" />
-    <Compile Include="SimpleMeshCube.cs" />
-    <Compile Include="SmallestNumber.cs" />
-    <Compile Include="SplitBrepPlane.cs" />
-    <Compile Include="SplitKeepRemove.cs" />
-    <Compile Include="UpdateCamera.cs" />
-    <Compile Include="ViewportCapture.cs" />
-    <Compile Include="WriteCSV.cs" />
-    <Compile Include="WriteGoogleSheet.cs" />
+    <Compile Include="Components\Document\RestartComponent.cs" />
+    <Compile Include="Components\Selection\SelDup.cs" />
+    <Compile Include="Components\Selection\SelDupAll.cs" />
+    <Compile Include="Components\Selection\SelectGeometry.cs" />
+    <Compile Include="Components\Selection\SelectLayer.cs" />
+    <Compile Include="Components\Selection\SelectPoint.cs" />
+    <Compile Include="Components\Mesh\SimpleMeshCube.cs" />
+    <Compile Include="Components\Data\SmallestNumber.cs" />
+    <Compile Include="Components\Geometry\SplitBrepPlane.cs" />
+    <Compile Include="Components\Geometry\SplitKeepRemove.cs" />
+    <Compile Include="Components\Document\UpdateCamera.cs" />
+    <Compile Include="Components\Document\ViewportCapture.cs" />
+    <Compile Include="Components\Data\WriteCSV.cs" />
+    <Compile Include="Components\Data\WriteGoogleSheet.cs" />
     <Compile Include="yungghInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -157,6 +157,7 @@
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

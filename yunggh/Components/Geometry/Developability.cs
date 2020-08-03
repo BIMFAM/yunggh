@@ -67,52 +67,13 @@ namespace yunggh
             }
 
             // main
+            YungGH yunggh = new YungGH();
             int type = 0;
-            string text = TestSurfaceDevelopability(surface, out type);
+            string text = yunggh.TestSurfaceDevelopability(surface, out type);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, text);
             DA.SetData(1, type);
-        }
-
-        public string TestSurfaceDevelopability(Surface surface, out int type)
-        {
-            //https://discourse.mcneel.com/t/verifying-developable-surfaces/73594
-            //https://discourse.mcneel.com/t/ruling-line-from-edge-curves-twist-check/73952
-
-            double tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
-
-            //planar
-            if (surface.IsPlanar(tolerance)) { type = 0; return "planar"; }
-
-            //cylinder
-            if (surface.IsCylinder(tolerance)) { type = 1; return "cylinder"; }
-
-            //conic
-            if (surface.IsCone(tolerance)) { type = 2; return "conic"; }
-
-            //spheric
-            if (surface.IsSphere(tolerance) || surface.IsTorus(tolerance)) { type = 4; return "double curved"; }
-
-            //ruled surface
-
-            Rhino.Geometry.Unroller unroll = null;
-            Rhino.Geometry.Surface srf = surface;
-            if (srf != null)
-                unroll = new Rhino.Geometry.Unroller(srf);
-
-            Rhino.Geometry.Brep brep = surface.ToBrep();
-
-            if (unroll == null)
-            {
-                type = 4;
-                return "double curved";
-            }
-            else
-            {
-                type = 3;
-                return "ruled surface";
-            }
         }
 
         /// <summary>

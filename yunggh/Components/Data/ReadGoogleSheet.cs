@@ -110,74 +110,12 @@ namespace yunggh
 
             // We're set to create the spiral now. To keep the size of the SolveInstance() method small,
             // The actual functionality will be in a different method:
-            GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> data = ReadGoogleSpreadsheet(authentication, spreadsheet, tab);
+            YungGH yunggh = new YungGH();
+            GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> data = yunggh.ReadGoogleSpreadsheet(authentication, spreadsheet, tab);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, true);
             DA.SetDataTree(1, data);
-        }
-
-        // !!!NOTE: IF MODIFYING SCOPES!!!,
-        // delete your previously saved credentials at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
-        private static string[] Scopes = { SheetsService.Scope.Spreadsheets };
-
-        private static string ApplicationName = "Yung GH";
-
-        private GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> ReadGoogleSpreadsheet(string authentication, String spreadsheetId, string tab)
-        {
-            //credential
-            UserCredential credential;
-            using (var stream =
-                new FileStream(authentication, FileMode.Open, FileAccess.Read))
-            {
-                // The file token.json stores the user's access and refresh tokens, and is created
-                // automatically when the authorization flow completes for the first time.
-                string credPath = "token.json";
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-                Debug.WriteLine("Credential file saved to: " + credPath);
-            }
-
-            // Create Google Sheets API service.
-            var service = new SheetsService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
-
-            // Define request parameters.
-            String range = tab;// + "!A2:E";
-            SpreadsheetsResource.ValuesResource.GetRequest request =
-                    service.Spreadsheets.Values.Get(spreadsheetId, range);
-
-            //Read the cells in a spreadsheet:
-            ValueRange response = request.Execute();
-            IList<IList<Object>> values = response.Values;
-            if (values == null || values.Count == 0)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No data found in spreadsheet.");
-                return null;
-            }
-
-            //convert data
-            Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo>
-                treeArray = new Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo>();
-            int i = 0;
-            foreach (var row in values)
-            {
-                for (int j = 0; j < row.Count; j++)
-                {
-                    Grasshopper.Kernel.Data.GH_Path ghpath = new Grasshopper.Kernel.Data.GH_Path(i);
-                    Grasshopper.Kernel.Types.GH_String cell = new Grasshopper.Kernel.Types.GH_String(row[j].ToString());
-                    treeArray.Append(cell, ghpath);
-                }
-                i++;
-            }
-            return treeArray;
         }
 
         /// <summary>

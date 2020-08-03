@@ -127,7 +127,12 @@ namespace yunggh
     //TODO: 4D Cube
     //TODO: Deselect
     //TODO: Deselect All
-    //TODO: split auto select and prompt select
+    //TODO: split "auto select" and "prompt select"
     //TODO: Setup Inno
-    //TODO: SplitKeepRemove turns error curves into planes if planar
+    //TODO: SplitKeepRemove turns error curves into planes if planar, works without points
+    //TODO: OrientedBoundingBox, turn into function
+    //TODO: Best Fit BoundingBox
+    //TODO: Developability, add max and min curvature
+    //TODO: SelectPoint, SelectGeometry, SelDup, SelDupAll turn into function
+    //TODO: SelectPoint, expand to select filtered geometry, prompt
 }

@@ -91,33 +91,13 @@ namespace yunggh
                 return;
             }
 
-            // We're set to create the spiral now. To keep the size of the SolveInstance() method small,
-            // The actual functionality will be in a different method:
-            GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> data = ImportCSV(filepath, delimiter);
+            // main
+            YungGH yunggh = new YungGH();
+            GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> data = yunggh.ImportCSV(filepath, delimiter);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, true);
             DA.SetDataTree(1, data);
-        }
-
-        private GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> ImportCSV(string filepath, string delimiter)
-        {
-            Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo>
-                treeArray = new Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo>();
-
-            string[] text = System.IO.File.ReadAllLines(filepath);
-
-            for (int i = 0; i < text.Length; i++)
-            {
-                string[] parts = text[i].Split(delimiter[0]); //split row
-                for (int j = 0; j < parts.Length; j++)
-                {
-                    Grasshopper.Kernel.Data.GH_Path ghpath = new Grasshopper.Kernel.Data.GH_Path(i);
-                    Grasshopper.Kernel.Types.GH_String cell = new Grasshopper.Kernel.Types.GH_String(parts[j]);
-                    treeArray.Append(cell, ghpath);
-                }
-            }
-            return treeArray;
         }
 
         /// <summary>

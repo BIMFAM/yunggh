@@ -108,98 +108,12 @@ namespace yunggh
                 return;
             }
 
-            // We're set to create the spiral now. To keep the size of the SolveInstance() method small,
-            // The actual functionality will be in a different method:
-            bool written = WriteGoogleSpreadsheet(authentication, spreadsheet, tab, data);
+            // main
+            YungGH yunggh = new YungGH();
+            bool written = yunggh.WriteGoogleSpreadsheet(authentication, spreadsheet, tab, data);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, written);
-        }
-
-        // !!!NOTE: IF MODIFYING SCOPES!!!,
-        // delete your previously saved credentials at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
-        private static string[] Scopes = { SheetsService.Scope.Spreadsheets };
-
-        private static string ApplicationName = "Yung GH";
-
-        private bool WriteGoogleSpreadsheet(string authentication, String spreadsheetId, string tab, GH_Structure<Grasshopper.Kernel.Types.GH_String> data)
-        {
-            //credential
-            UserCredential credential;
-            using (var stream =
-                new FileStream(authentication, FileMode.Open, FileAccess.Read))
-            {
-                // The file token.json stores the user's access and refresh tokens, and is created
-                // automatically when the authorization flow completes for the first time.
-                string credPath = "token.json";
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None//,
-                //new FileDataStore(credPath, true)
-                ).Result;
-                //Debug.WriteLine("Credential file saved to: " + credPath);
-            }
-
-            // Create Google Sheets API service.
-            var service = new SheetsService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
-
-            //Convert Data
-            IList<IList<object>> convertedData = new List<IList<object>>();
-            foreach (IList<Grasshopper.Kernel.Types.GH_String> list in data.Branches)
-            {
-                IList<object> row = new List<object>();
-                foreach (Grasshopper.Kernel.Types.GH_String text in list)
-                {
-                    row.Add(text.ToString());
-                }
-                convertedData.Add(row);
-            }
-
-            //make sure the document exists
-            SpreadsheetsResource.GetRequest getRequest = service.Spreadsheets.Get(spreadsheetId);
-            Spreadsheet resource = getRequest.Execute();
-
-            //make sure the sheet exists, if not add it.
-            bool sheetExists = false;
-            foreach (Sheet sheet in resource.Sheets) { if (sheet.Properties.Title == tab) { sheetExists = true; } }
-            if (!sheetExists)
-            {
-                AddNewTab(service, spreadsheetId, tab);
-            }
-
-            //Writing
-            ValueRange Update = new ValueRange();
-            Update.Values = convertedData;
-            Update.Range = tab;
-
-            //UPDATE
-            SpreadsheetsResource.ValuesResource.UpdateRequest Updaterequest = service.Spreadsheets.Values.Update(Update, spreadsheetId, tab);
-            Updaterequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
-            UpdateValuesResponse Traderesult = Updaterequest.Execute();
-            return true;
-        }
-
-        private void AddNewTab(SheetsService service, string spreadsheetId, string sheetName)
-        {
-            var addSheetRequest = new AddSheetRequest();
-            addSheetRequest.Properties = new SheetProperties();
-            addSheetRequest.Properties.Title = sheetName;
-            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
-            batchUpdateSpreadsheetRequest.Requests = new List<Request>();
-            batchUpdateSpreadsheetRequest.Requests.Add(new Request
-            {
-                AddSheet = addSheetRequest
-            });
-
-            var batchUpdateRequest = service.Spreadsheets.BatchUpdate(batchUpdateSpreadsheetRequest, spreadsheetId);
-
-            batchUpdateRequest.Execute();
         }
 
         /// <summary>

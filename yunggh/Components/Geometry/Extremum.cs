@@ -71,7 +71,8 @@ namespace yunggh
             }
 
             //main script
-            List<Object> extremums = FindExtremums(brep, directions, minmax);
+            YungGH yunggh = new YungGH();
+            List<Object> extremums = yunggh.FindExtremums(brep, directions, minmax);
 
             DA.SetDataList(0, extremums);
         }
@@ -83,56 +84,6 @@ namespace yunggh
         /// <param name="directions">Extremum normal vector</param>
         /// <param name="minmax">True returns the maximum, False returns the minimum</param>
         /// <returns>List of extremums, either points or curves.</returns>
-        private List<Object> FindExtremums(Brep brep, List<Vector3d> directions, bool minmax)
-        {
-            double tolerance = DocumentTolerance();
-            List<Object> extremums = new List<Object>();
-            //Rhino.Geometry.GeometryBase
-            foreach (Vector3d normal in directions)
-            {
-                Plane plane = new Plane(new Point3d(0, 0, 0), normal);
-
-                //create bounding box
-                Box worldBox;
-                BoundingBox box = brep.GetBoundingBox(plane, out worldBox);
-
-                //using the world box corners, we create top or bottom planes
-                Point3d[] corners = worldBox.GetCorners();
-                Plane intersection = new Plane(corners[0], corners[1], corners[2]); //bottom plane
-                if (!minmax)
-                    intersection = new Plane(corners[4], corners[5], corners[6]); //top plane
-
-                Curve[] crvs;
-                Point3d[] pts;
-                if (!Rhino.Geometry.Intersect.Intersection.BrepPlane(brep, intersection, 0, out crvs, out pts)) { continue; }
-
-                foreach (Curve crv in crvs)
-                    extremums.Add(crv);
-                foreach (Point3d pt in pts)
-                    extremums.Add(pt);
-
-                if (crvs.Length > 0 || pts.Length > 0) continue;
-
-                //if no curve intersections were found, we need to get all the edges of the brep and check for intersections.
-                List<Point3d> Xpts = new List<Point3d>();
-                foreach (Curve edg in brep.Edges)
-                {
-                    Rhino.Geometry.Intersect.CurveIntersections Xcrv = Rhino.Geometry.Intersect.Intersection.CurvePlane(edg, intersection, tolerance);
-                    if (Xcrv == null) continue;
-
-                    for (int i = 0; i < Xcrv.Count; i++)
-                    {
-                        Rhino.Geometry.Intersect.IntersectionEvent crvX = Xcrv[i];
-                        Xpts.Add(crvX.PointA);
-                    }
-                }
-                Point3d[] culledXpts = Point3d.CullDuplicates(Xpts, tolerance);
-                foreach (Point3d pt in culledXpts)
-                    extremums.Add(pt);
-            }
-
-            return extremums;
-        }
 
         /// <summary>
         /// The Exposure property controls where in the panel a component icon

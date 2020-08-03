@@ -90,25 +90,15 @@ namespace yunggh
                 return;
             }
 
+            YungGH yunggh = new YungGH();
             if (run) //recompute or rotate was triggered, we recompute from the "READ_CSV" C# component
             {
                 string[] array = data.ToArray();
-                run = Write(filepath, array); //Export the information if a recompute happened
+                run = yunggh.Write(filepath, array); //Export the information if a recompute happened
             }
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, run);
-        }
-
-        private bool Write(string filepath, string[] data)
-        {
-            //string filename = System.IO.Path.GetFileNameWithoutExtension(filepath);
-            //string folder = System.IO.Path.GetDirectoryName(filepath);
-            //filepath = folder + "\\" + filename + ".csv";
-
-            //writefile
-            System.IO.File.WriteAllText(filepath, string.Join(Environment.NewLine, data), System.Text.Encoding.UTF8);
-            return true;
         }
 
         /// <summary>

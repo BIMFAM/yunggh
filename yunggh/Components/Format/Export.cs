@@ -88,6 +88,7 @@ namespace yunggh
 
             //establish a clean data tree
             filePaths = new GH_Structure<GH_String>();
+            YungGH yunggh = new YungGH();
 
             //loop through all the input filepath paths
             foreach (GH_Path path in inputFilePaths.Paths)
@@ -106,7 +107,7 @@ namespace yunggh
                     guids.Add(guid);
                 }
 
-                Select(Rhino.RhinoDoc.ActiveDoc, guids);
+                yunggh.Select(Rhino.RhinoDoc.ActiveDoc, guids);
 
                 //export objects
                 GH_String[] filepaths = inputFilePaths[path].ToArray();
@@ -115,10 +116,10 @@ namespace yunggh
                     string filepath = filepaths[j].Value;
 
                     //if the file type is not supported, we skip it
-                    if (!SupportedExportFileTypes.Contains(Path.GetExtension(filepath))) continue;
+                    if (!yunggh.SupportedExportFileTypes.Contains(Path.GetExtension(filepath))) continue;
 
                     //export
-                    ExportModel(filepath);
+                    yunggh.ExportModel(filepath);
 
                     GH_Path newPath = new GH_Path(path);
                     filePaths.AppendRange(new List<GH_String>() { new GH_String(filepath) }, newPath);
@@ -134,29 +135,6 @@ namespace yunggh
         private bool pending = false;
 
         private GH_Structure<GH_String> filePaths;
-
-        public void Select(RhinoDoc doc, List<System.Guid> guids)
-        {
-            foreach (System.Guid guid in guids)
-                doc.Objects.Select(guid, true, true, true);
-        }
-
-        public void ExportModel(string filepath)
-        {
-            string scriptExport = string.Format("_-Export \"{0}\" _Enter", filepath);
-            RhinoApp.RunScript(scriptExport, false);
-        }
-
-        public List<string> SupportedExportFileTypes = new List<string>(){
-      ".3dm",".3dmbak",".rws",".3mf",".3ds",".amf",".ai",
-      ".dwg",".dxf",".x",
-      ".gf",".gft",".gts",".igs",".iges",".lwo",".dgn",".fbx",
-      ".obj",".pdf",".ply",".csv",
-      ".txt",".raw",".m",".svg",".skp",".slc",
-      ".stp",".step",".stl",".vda",".wrl",
-      ".vrml",".vi",".gdf",".zpr",
-      ".dae",".cd",".emf",".pm",".kmz",".udo",".x_t",".rib",".wmf",".x3dv",".xaml",".xgl"
-      };
 
         /// <summary>
         /// The Exposure property controls where in the panel a component icon

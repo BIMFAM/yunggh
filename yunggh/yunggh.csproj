@@ -112,6 +112,7 @@
     <Compile Include="Components\Document\ViewportCapture.cs" />
     <Compile Include="Components\Data\WriteCSV.cs" />
     <Compile Include="Components\Data\WriteGoogleSheet.cs" />
+    <Compile Include="YungGH.cs" />
     <Compile Include="yungghInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

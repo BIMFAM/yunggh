@@ -97,7 +97,8 @@ namespace yunggh
             }
 
             // Main
-            Rhino.DocObjects.Layer layer = CreateModify(Rhino.RhinoDoc.ActiveDoc, fullLayerPath, color, locked,
+            YungGH yunggh = new YungGH();
+            Rhino.DocObjects.Layer layer = yunggh.CreateModify(Rhino.RhinoDoc.ActiveDoc, fullLayerPath, color, locked,
                 plotLineType, material, onOff, plotLineColor, plotLineWidth, delete);
 
             string returnPath = "";
@@ -106,113 +107,6 @@ namespace yunggh
 
             // Assign the created or updated full layer path to the output parameter.
             DA.SetData(0, returnPath);
-        }
-
-        private const string layerDelimiter = "::";
-
-        public Rhino.DocObjects.Layer LayerByFullPath(string layerPath)
-        {
-            Rhino.DocObjects.Layer layer = null;
-
-            foreach (Rhino.DocObjects.Layer tempLayer in RhinoDoc.ActiveDoc.Layers)
-            {
-                if (tempLayer.FullPath != layerPath) continue;
-
-                layer = tempLayer;
-                break;
-            }
-
-            return layer;
-        }
-
-        public void DeleteObjectsOnLayer(RhinoDoc doc, Rhino.DocObjects.Layer layer)
-        {
-            Rhino.DocObjects.RhinoObject[] rhobjs = doc.Objects.FindByLayer(layer);
-            foreach (Rhino.DocObjects.RhinoObject rhobj in rhobjs)
-            {
-                doc.Objects.Delete(rhobj, true, true);
-            }
-        }
-
-        private Rhino.DocObjects.Layer CreateModify(RhinoDoc doc, string layerPath, System.Drawing.Color color,
-          bool locked, string lineTypeName,
-          string materialName, bool onOff,
-          System.Drawing.Color printColor, double printWidth, bool delete)
-        {
-            //get layer if already existing
-            Rhino.DocObjects.Layer layer = LayerByFullPath(layerPath);
-
-            //if we want to delete the layer
-            if (delete)
-            {
-                if (layer == null) return null;
-
-                //make sure it's not the current layer
-                if (doc.Layers.CurrentLayer.Index == layer.Index)
-                    doc.Layers.SetCurrentLayerIndex(0, true); //TODO: if they are deleting this layer index it will throw an error
-                DeleteObjectsOnLayer(doc, layer);
-                doc.Layers.Delete(layer.Index, true);
-                return null;
-            }
-
-            //if the target layer does not exist, create it
-            if (layer == null)
-            {
-                //if it is a single layer path
-                if (!layerPath.Contains(layerDelimiter))
-                {
-                    layer = new Rhino.DocObjects.Layer { Id = Guid.NewGuid(), Name = layerPath, Index = doc.Layers.Count };
-                    int index = doc.Layers.Add(layer);
-                }
-                //if the path has tree depth
-                else
-                {
-                    string[] fullPath = layerPath.Split(new string[] { layerDelimiter }, StringSplitOptions.None);
-                    string parent = "";
-                    foreach (string nextPath in fullPath)
-                    {
-                        layer = new Rhino.DocObjects.Layer { Id = Guid.NewGuid(), Name = nextPath, Index = doc.Layers.Count };
-                        if (parent != "")
-                        {
-                            string parentName = parent.Substring(2, parent.Length - 2); //remove the delimiter from the front
-                            Rhino.DocObjects.Layer parentLayer = LayerByFullPath(parentName);
-                            layer.ParentLayerId = parentLayer.Id;
-                        }
-
-                        int index = doc.Layers.Add(layer);
-                        parent += layerDelimiter + nextPath;
-                    }
-                }
-
-                //get layer after it's been added
-                layer = LayerByFullPath(layerPath);
-            }
-
-            if (layer == null) return layer;
-
-            //layer color
-            if (color != null) layer.Color = color;
-
-            //layer is locked
-            layer.IsLocked = locked;
-
-            //layer visibility
-            layer.IsVisible = onOff;
-
-            //linetype
-            Rhino.DocObjects.Linetype lineType = doc.Linetypes.FindName(lineTypeName);
-            if (lineType != null) layer.LinetypeIndex = lineType.LinetypeIndex;
-
-            //layer material
-            layer.RenderMaterialIndex = doc.Materials.Find(materialName, true);
-
-            //print width
-            layer.PlotWeight = printWidth;
-
-            //print color
-            layer.PlotColor = printColor;
-
-            return layer;
         }
 
         /// <summary>

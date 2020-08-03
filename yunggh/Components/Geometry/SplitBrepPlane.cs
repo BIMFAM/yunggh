@@ -65,52 +65,11 @@ namespace yunggh
 
             //main function
             double tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
-            List<Brep> splits = SafeSplit(new List<Brep>() { brep }, planes, tolerance);
+            YungGH yunggh = new YungGH();
+            List<Brep> splits = yunggh.SafeSplit(new List<Brep>() { brep }, planes, tolerance);
 
             //set the splits as the output
             DA.SetDataList(0, splits);
-        }
-
-        /// <summary>
-        /// Recursively splits a list of breps with a list of planes.
-        /// </summary>
-        /// <param name="breps"> List of breps to split.</param>
-        /// <param name="P"> List of planes to split brep with.</param>
-        /// <param name="tolerance"> Tolerance for splitting.</param>
-        /// <returns>List of split breps</returns>
-        private List<Brep> SafeSplit(List<Brep> breps, List<Plane> P, double tolerance)
-        {
-            List<Brep> splits = new List<Brep>();
-
-            //guard statement in case not list is supplied
-            if (P.Count == 0) return breps;
-
-            Plane plane = P[0];
-            P.RemoveAt(0);
-            foreach (Brep brep in breps)
-            {
-                Curve[] intersections;
-                Point3d[] pt;
-                if (!Rhino.Geometry.Intersect.Intersection.BrepPlane(brep, plane, tolerance, out intersections, out pt)) { splits.Add(brep); continue; }
-
-                //if the intersection failed, we keep the original brep
-                if (intersections.Length == 0) { splits.Add(brep); continue; }
-
-                Brep[] test = brep.Split(intersections, tolerance); //it will always only be one intersection at a time
-
-                //if the split failed, we keep the original brep
-                if (test.Length == 0) { splits.Add(brep); continue; }
-
-                //we add each brep output to the list for recursion
-                foreach (Brep b in test) { splits.Add(b); }
-            }
-
-            if (P.Count != 0)
-            {
-                splits = SafeSplit(splits, P, tolerance);
-            }
-
-            return splits;
         }
 
         /// <summary>

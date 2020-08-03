@@ -87,6 +87,7 @@ namespace yunggh
 
             //If we are running, establish a clean data tree
             guids = new GH_Structure<GH_Guid>();
+            YungGH yunggh = new YungGH();
 
             //loop through all the filepaths
             foreach (GH_Path path in filepaths.Paths)
@@ -97,7 +98,7 @@ namespace yunggh
                 {
                     string filepath = gh_string.Value;
 
-                    List<System.Guid> newGuids = ImportModel(filepath);
+                    List<System.Guid> newGuids = yunggh.ImportModel(filepath);
                     List<GH_Guid> appendGuids = new List<GH_Guid>();
                     foreach (System.Guid guid in newGuids)
                     {
@@ -119,77 +120,6 @@ namespace yunggh
         }
 
         private bool pending = false;
-
-        private List<System.Guid> ImportModel(string filepath)
-        {
-            List<System.Guid> importedGuids = new List<System.Guid>();
-
-            //file exist guard statement
-            if (!File.Exists(filepath)) return importedGuids;
-
-            //rhino okay file type guard statement
-            if (!SupportedImportFileTypes.Contains(Path.GetExtension(filepath))) return importedGuids;
-
-            //get existing objects
-            List<System.Guid> existingGuids = GetGuids();
-
-            string import = string.Format("_-Import \"{0}\" _Enter", filepath);
-            Rhino.RhinoApp.RunScript(import, false);
-
-            importedGuids = GetGuids();
-
-            //remove guids existing before the import
-            importedGuids.RemoveAll(x => existingGuids.Contains(x));
-
-            return importedGuids;
-        }
-
-        public void ResetButtonComponents(object sender, GH_SolutionEventArgs e)
-        {
-            e.Document.SolutionEnd -= ResetButtonComponents;
-
-            GH_Document doc = this.OnPingDocument();
-
-            foreach (IGH_DocumentObject obj in doc.Objects) //Search all components in the Canvas
-            {
-                //Print(obj.Name);
-                if (obj.Name != "Button") continue;
-
-                //obj.ExpireSolution(true); //recompute this component, this is a way to restart upstream
-                //obj.ExpirePreview(true);
-            }
-        }
-
-        public List<System.Guid> GetGuids()
-        {
-            List<System.Guid> guids = new List<System.Guid>();
-            foreach (Rhino.DocObjects.RhinoObject obj in Rhino.RhinoDoc.ActiveDoc.Objects)
-            {
-                guids.Add(obj.Id);
-            }
-            return guids;
-        }
-
-        public List<string> SupportedImportFileTypes = new List<string>(){
-      ".3dm",".3dmbak",".rws",".3mf",".3ds",".amf",".ai",
-      ".dwg",".dxf",".x",".e57",".dst",".exp",".eps",".off",
-      ".gf",".gft",".gts",".igs",".iges",".lwo",".dgn",".fbx",
-      ".scn",".obj",".pdf",".ply",".asc",".csv",".xyz",".cgo_ascii",
-      ".cgo_asci",".pts",".txt",".raw",".m",".svg",".skp",".slc",
-      ".sldprt",".sldasm",".stp",".step",".stl",".vda",".wrl",
-      ".vrml",".vi",".gdf",".zpr"
-      };
-
-        public List<string> SupportedExportFileTypes = new List<string>(){
-      ".3dm",".3dmbak",".rws",".3mf",".3ds",".amf",".ai",
-      ".dwg",".dxf",".x",
-      ".gf",".gft",".gts",".igs",".iges",".lwo",".dgn",".fbx",
-      ".obj",".pdf",".ply",".csv",
-      ".txt",".raw",".m",".svg",".skp",".slc",
-      ".stp",".step",".stl",".vda",".wrl",
-      ".vrml",".vi",".gdf",".zpr",
-      ".dae",".cd",".emf",".pm",".kmz",".udo",".x_t",".rib",".wmf",".x3dv",".xaml",".xgl"
-      };
 
         private GH_Structure<GH_Guid> guids;
 

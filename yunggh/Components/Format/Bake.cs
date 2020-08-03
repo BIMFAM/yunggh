@@ -94,80 +94,12 @@ namespace yunggh
             // The actual functionality will be in a different method:
             if (run)
             {
-                BakeGeometry(geometry, layer);
+                YungGH yunggh = new YungGH();
+                yunggh.BakeGeometry(geometry, layer);
             }
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, true);
-        }
-
-        private void BakeGeometry(List<GeometryBase> geometries, List<string> layers)
-        {
-            Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
-            int layer = -1;
-            string name = "";
-
-            for (int i = 0; i < geometries.Count; i++)
-            {
-                //find layer
-                if (i < layers.Count)
-                {
-                    layer = GetLayerIndex(doc, layers[i]);
-                }
-
-                //create attributes
-                Rhino.DocObjects.ObjectAttributes attributes = new Rhino.DocObjects.ObjectAttributes();
-                attributes.LayerIndex = layer;
-                attributes.Name = name;
-                //attributes.ColorSource = ObjectColorSource.ColorFromObject;
-                //attributes.ObjectColor = Color.Black;
-
-                //bake geometry
-                doc.Objects.Add(geometries[i], attributes);
-            }
-        }
-
-        private int GetLayerIndex(Rhino.RhinoDoc doc, string layer)
-        {
-            string layer_name = layer.Trim();
-
-            //does layer name contain data?
-            if (string.IsNullOrEmpty(layer_name))
-            {
-                Rhino.RhinoApp.WriteLine("Layer name cannot be blank.");
-                return -1;
-            }
-
-            // Is the layer name valid?
-            if (!Rhino.DocObjects.Layer.IsValidName(layer_name))
-            {
-                Rhino.RhinoApp.WriteLine(layer_name + " is not a valid layer name.");
-                return -1;
-            }
-
-            // Does a layer with the same name already exist?            
-            Rhino.DocObjects.Layer layer_object = doc.Layers.FindName(layer_name, -1);
-            int layer_index = -1;
-            if (layer_object != null)
-            {
-                layer_index = layer_object.Index;
-            }
-            //int layer_index = doc.Layers.Find(layer_name, true);
-            if (layer_index >= 0)
-            {
-                Rhino.RhinoApp.WriteLine("A layer with the name {0} already exists.", layer_name);
-                return layer_index;
-            }
-
-            // Add a new layer to the document
-            layer_index = doc.Layers.Add(layer_name, System.Drawing.Color.Black);
-            if (layer_index < 0)
-            {
-                Rhino.RhinoApp.WriteLine("Unable to add {0} layer.", layer_name);
-                return -1;
-            }
-            Rhino.RhinoApp.WriteLine("{0} layer added.", layer_name);
-            return layer_index;
         }
 
         /// <summary>

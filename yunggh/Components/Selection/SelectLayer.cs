@@ -84,6 +84,7 @@ namespace yunggh
             // reset pending to false
             pending = false;
             guids = new GH_Structure<GH_Guid>();
+            YungGH yunggh = new YungGH();
 
             //loop through all the full layer paths
             foreach (GH_Path path in layers.Paths)
@@ -93,8 +94,8 @@ namespace yunggh
                 for (int j = 0; j < gh_strings.Length; j++)
                 {
                     string fullLayerPath = gh_strings[j].Value;
-                    Rhino.DocObjects.Layer layer = LayerByFullPath(fullLayerPath);
-                    List<System.Guid> layerObjects = SelectObjectsByLayer(Rhino.RhinoDoc.ActiveDoc, layer);
+                    Rhino.DocObjects.Layer layer = yunggh.LayerByFullPath(fullLayerPath);
+                    List<System.Guid> layerObjects = yunggh.SelectObjectsByLayer(Rhino.RhinoDoc.ActiveDoc, layer);
 
                     foreach (System.Guid guid in layerObjects)
                     {
@@ -113,35 +114,6 @@ namespace yunggh
         private bool pending = false;
 
         private GH_Structure<GH_Guid> guids;
-
-        public List<System.Guid> SelectObjectsByLayer(RhinoDoc doc, Rhino.DocObjects.Layer layer)
-        {
-            List<System.Guid> guids = new List<System.Guid>();
-
-            Rhino.DocObjects.RhinoObject[] rhobjs = doc.Objects.FindByLayer(layer);
-            foreach (Rhino.DocObjects.RhinoObject rhobj in rhobjs)
-            {
-                doc.Objects.Select(rhobj.Id, true, true, true);
-                guids.Add(rhobj.Id);
-            }
-
-            return guids;
-        }
-
-        public Rhino.DocObjects.Layer LayerByFullPath(string layerPath)
-        {
-            Rhino.DocObjects.Layer layer = null;
-
-            foreach (Rhino.DocObjects.Layer tempLayer in RhinoDoc.ActiveDoc.Layers)
-            {
-                if (tempLayer.FullPath != layerPath) continue;
-
-                layer = tempLayer;
-                break;
-            }
-
-            return layer;
-        }
 
         /// <summary>
         /// The Exposure property controls where in the panel a component icon

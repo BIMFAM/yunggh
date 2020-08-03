@@ -77,12 +77,13 @@ namespace yunggh
 
             //get document tolerance for splitting
             double tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            YungGH yunggh = new YungGH();
 
             //split the brep using safe split
-            List<Brep> splits = SafeSplit(new List<Brep>() { brep }, curves, tolerance);
+            List<Brep> splits = yunggh.SafeSplit(new List<Brep>() { brep }, curves, tolerance);
 
             //find out which splits should be kept or removed
-            List<int> keepIndices = BrepPointCheck(splits, points, tolerance);
+            List<int> keepIndices = yunggh.BrepPointCheck(splits, points, tolerance);
 
             //output splits according to selection type
             List<Brep> keepSplits = new List<Brep>();
@@ -99,68 +100,6 @@ namespace yunggh
 
             // Finally assign the spiral to the output parameter.
             DA.SetDataList(0, keepSplits);
-        }
-
-        /// <summary>
-        /// Recursively splits a list of breps with a list of planes.
-        /// </summary>
-        /// <param name="breps"> List of breps to split.</param>
-        /// <param name="C"> List of curves to split brep with.</param>
-        /// <param name="tolerance"> Tolerance for splitting.</param>
-        /// <returns>List of split breps</returns>
-        private List<Brep> SafeSplit(List<Brep> breps, List<Curve> C, double tolerance)
-        {
-            List<Brep> splits = new List<Brep>();
-
-            //guard statement in case not list is supplied
-            if (C.Count == 0) return breps;
-
-            Curve crv = C[0];
-            C.RemoveAt(0);
-            foreach (Brep brep in breps)
-            {
-                Brep[] test = brep.Split(new List<Curve>() { crv }, tolerance); //it will always only be one intersection at a time
-
-                //if the split failed, we keep the original brep
-                if (test.Length == 0) { splits.Add(brep); continue; }
-
-                //we add each brep output to the list for recursion
-                foreach (Brep b in test) { splits.Add(b); }
-            }
-
-            if (C.Count != 0)
-            {
-                splits = SafeSplit(splits, C, tolerance);
-            }
-
-            return splits;
-        }
-
-        /// <summary>
-        /// Checks which breps a list of points is touching
-        /// </summary>
-        /// <param name="breps">List of breps for testing point touch</param>
-        /// <param name="pts">List of points to check if brep is touching</param>
-        /// <param name="tolerance"> Tolerance for point check</param>
-        /// <returns>The indices of the breps touched by points</returns>
-        private List<int> BrepPointCheck(List<Brep> breps, List<Point3d> pts, double tolerance)
-        {
-            List<int> indices = new List<int>();
-
-            foreach (Point3d pt in pts)
-            {
-                for (int i = 0; i < breps.Count; i++)
-                {
-                    Brep brep = breps[i];
-                    Point3d cp = brep.ClosestPoint(pt);
-                    double dist = pt.DistanceTo(cp);
-                    if (dist <= tolerance)
-                    {
-                        indices.Add(i);
-                    }
-                }
-            }
-            return indices;
         }
 
         /// <summary>

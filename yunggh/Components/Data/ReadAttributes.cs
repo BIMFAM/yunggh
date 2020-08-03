@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-using System.Collections.Specialized;
-
 // In order to load the result of this wizard, you will also need to
 // add the output bin/ folder of this project to the list of loaded
 // folder in Grasshopper.
@@ -73,26 +71,13 @@ namespace yunggh
             Rhino.DocObjects.RhinoObject obj = Rhino.RhinoDoc.ActiveDoc.Objects.Find(guid);
             if (obj == null) return;
 
-            Dictionary<string, string> attributes = ReadObjectAttributes(obj);
+            YungGH yunggh = new YungGH();
+            Dictionary<string, string> attributes = yunggh.ReadObjectAttributes(obj);
 
             //Assign the object attributes to the output parameters.
             DA.SetData(0, obj.Name);
             DA.SetDataList(1, attributes.Keys);
             DA.SetDataList(2, attributes.Values);
-        }
-
-        public Dictionary<string, string> ReadObjectAttributes(Rhino.DocObjects.RhinoObject obj)
-        {
-            Dictionary<string, string> attributes = new Dictionary<string, string>();
-            Rhino.DocObjects.ObjectAttributes objattributes = new Rhino.DocObjects.ObjectAttributes();
-            objattributes = obj.Attributes;
-
-            NameValueCollection keyValues = objattributes.GetUserStrings();
-            foreach (string key in keyValues)
-            {
-                attributes.Add(key, keyValues[key]);
-            }
-            return attributes;
         }
 
         /// <summary>

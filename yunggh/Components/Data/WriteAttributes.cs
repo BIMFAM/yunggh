@@ -88,57 +88,11 @@ namespace yunggh
             }
 
             // main
-            Rhino.DocObjects.ObjectAttributes objattributes = WriteObjectAttributes(obj, name, keys, values, clean);
+            YungGH yunggh = new YungGH();
+            Rhino.DocObjects.ObjectAttributes objattributes = yunggh.WriteObjectAttributes(obj, name, keys, values, clean);
 
             //Assign the object attributes to the output parameter.
             DA.SetData(0, objattributes);
-        }
-
-        public Rhino.DocObjects.ObjectAttributes WriteObjectAttributes(object obj, string name, List<string> key, List<string> val, bool clean)
-        {
-            Rhino.DocObjects.ObjectAttributes objattributes = new Rhino.DocObjects.ObjectAttributes();
-
-            if (obj is System.Guid || obj is GH_Guid)
-            {
-                System.Guid guid = System.Guid.Empty;
-                if (obj is System.Guid)
-                    guid = (System.Guid)obj;
-                else
-                {
-                    GH_Guid gh_guid = (GH_Guid)obj;
-                    guid = gh_guid.Value;
-                }
-                Rhino.DocObjects.RhinoObject rhinoObject = Rhino.RhinoDoc.ActiveDoc.Objects.Find(guid);
-
-                //get existing attributes if we are writing clean attributes (meaning we delete the old name and attributes)
-                if (!clean)
-                    objattributes = rhinoObject.Attributes;
-
-                //add name if it isn't null or empty
-                if (!String.IsNullOrEmpty(name) && name != "")
-                    objattributes.Name = name;
-
-                //add attributes
-                for (int i = 0; i < key.Count; i++)
-                {
-                    objattributes.SetUserString(key[i], val[i]);
-                }
-
-                //update object in rhino
-                rhinoObject.Attributes = objattributes;
-                rhinoObject.CommitChanges();
-            }
-            else
-            {
-                //set object attributes
-                objattributes.Name = name;
-                for (int i = 0; i < key.Count; i++)
-                {
-                    objattributes.SetUserString(key[i], val[i]);
-                }
-            }
-
-            return objattributes;
         }
 
         /// <summary>

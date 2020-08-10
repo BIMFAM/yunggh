@@ -28,6 +28,75 @@ namespace yunggh
 {
     public class YungGH
     {
+        public Box FitBoundingBox(Brep B, out Plane plane, out Vector3d normal, out Vector3d forward)
+        {
+            //get surface normal from largest surface of brep
+            Point3d origin = new Point3d(0, 0, 0);
+            normal = new Vector3d(0, 0, 1);
+            double largestArea = 0;
+            bool NoPlanarSurfacesFound = true;
+            foreach (BrepFace brep in B.Faces)
+            {
+                if (!brep.IsPlanar()) continue;// we only want to use planar surfaces
+
+                Rhino.Geometry.AreaMassProperties area = Rhino.Geometry.AreaMassProperties.Compute(brep);
+                if (area.Area < largestArea) continue;
+
+                largestArea = area.Area;
+                origin = Rhino.Geometry.AreaMassProperties.Compute(brep).Centroid;
+
+                double u; double v;
+                brep.ClosestPoint(origin, out u, out v);
+                normal = brep.NormalAt(u, v); //set the normal of the largest surface
+                NoPlanarSurfacesFound = false;
+            }
+
+            if (NoPlanarSurfacesFound)
+            {
+                foreach (BrepFace brep in B.Faces)
+                {
+                    Rhino.Geometry.AreaMassProperties area = Rhino.Geometry.AreaMassProperties.Compute(brep);
+                    if (area.Area <= largestArea) continue;
+
+                    largestArea = area.Area;
+                    origin = Rhino.Geometry.AreaMassProperties.Compute(brep).Centroid;
+
+                    double u; double v;
+                    brep.ClosestPoint(origin, out u, out v);
+                    normal = brep.NormalAt(u, v); //set the normal of the largest surface
+                    NoPlanarSurfacesFound = false;
+                }
+            }
+
+            //get forward direction vector from longest line of brep
+            forward = new Vector3d(0, 0, 0);
+            double longestLength = 0;
+            foreach (Curve crv in B.Edges)
+            {
+                //we are only interested in linear curves
+                if (!crv.IsLinear()) continue;
+
+                double length = crv.GetLength();
+                if (length < longestLength) continue;
+
+                longestLength = length;
+                forward = crv.PointAtEnd - crv.PointAtStart;
+            }
+
+            //contruct orientation plane from normal and forward vector
+            plane = new Plane(origin, normal);
+            forward.Transform(Rhino.Geometry.Transform.PlanarProjection(plane));
+            forward.Unitize();
+            double angle = Vector3d.VectorAngle(plane.YAxis, forward, plane);
+            plane.Rotate(angle, normal);
+
+            //create bounding box
+            Box worldBox;
+            BoundingBox box = B.GetBoundingBox(plane, out worldBox);
+
+            return worldBox;
+        }
+
         public List<System.Guid> SelectObjectsByLayer(RhinoDoc doc, Rhino.DocObjects.Layer layer)
         {
             List<System.Guid> guids = new List<System.Guid>();

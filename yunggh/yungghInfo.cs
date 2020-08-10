@@ -108,6 +108,7 @@ namespace yunggh
         }
     }
 
+    //TODO: YungGH into partial classes - Data, Geometry, Document, Select, Format, Mesh
     //TODO: CombineWorksession
     //TODO: Export, add geometry bake and remove
     //TODO: Import
@@ -131,8 +132,24 @@ namespace yunggh
     //TODO: Setup Inno
     //TODO: SplitKeepRemove turns error curves into planes if planar, works without points
     //TODO: OrientedBoundingBox, turn into function
-    //TODO: Best Fit BoundingBox
+    //TODO: Best Fit BoundingBox (Volume, Area, Length)
     //TODO: Developability, add max and min curvature
     //TODO: SelectPoint, SelectGeometry, SelDup, SelDupAll turn into function
     //TODO: SelectPoint, expand to select filtered geometry, prompt
+    //TODO: Unroll Brep
+    //TODO: Layout Pieces (fabrication tab)
+    //TODO: Read JSON
+    //TODO: Write JSON
+    //TODO: Read XML
+    //TODO: Write XML
+    //TODO: Read Excel (OpenXML)
+    //TODO: Write Excel (OpenXML)
+    //TODO: Convert - CSV, Excel, JSON, XML
+    //TODO: Solid Thicken (constant offset)
+    //TODO: TBone (fabrication)
+    //TODO: Box Packing (fabrication)
+    //TODO: 3D Convex Hull
+    //TODO: Isovist
+    //TODO: Waffle Structure (fabrication) - solids, surfaces, single surface
+    //TODO: Generate Site Model
 }

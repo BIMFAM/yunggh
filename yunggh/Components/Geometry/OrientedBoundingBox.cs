@@ -70,89 +70,18 @@ namespace yunggh
 
             //main function
 
-            //get surface normal from largest surface of brep
+            //declare out variables
             Point3d origin = new Point3d(0, 0, 0);
             Vector3d normal = new Vector3d(0, 0, 1);
-            double largestArea = 0;
-            bool NoPlanarSurfacesFound = true;
-            foreach (Surface srf in brep.Surfaces)
-            {
-                if (!srf.IsPlanar()) continue;// we only want to use planar surfaces
-
-                Rhino.Geometry.AreaMassProperties area = Rhino.Geometry.AreaMassProperties.Compute(srf);
-                if (area.Area < largestArea) continue;
-
-                largestArea = area.Area;
-                origin = Rhino.Geometry.AreaMassProperties.Compute(srf).Centroid;
-
-                double u; double v;
-                srf.ClosestPoint(origin, out u, out v);
-                normal = srf.NormalAt(u, v); //set the normal of the largest surface
-                NoPlanarSurfacesFound = false;
-            }
-            //if no planar surface was found, use largest surface
-            if (NoPlanarSurfacesFound)
-            {
-                foreach (Surface srf in brep.Surfaces)
-                {
-                    Rhino.Geometry.AreaMassProperties area = Rhino.Geometry.AreaMassProperties.Compute(srf);
-                    if (area.Area <= largestArea) continue;
-
-                    largestArea = area.Area;
-                    origin = Rhino.Geometry.AreaMassProperties.Compute(srf).Centroid;
-
-                    double u; double v;
-                    srf.ClosestPoint(origin, out u, out v);
-                    normal = srf.NormalAt(u, v); //set the normal of the largest surface
-                    NoPlanarSurfacesFound = false;
-                }
-            }
-
-            //get forward direction vector from longest line of brep
             Vector3d forward = new Vector3d(0, 0, 0);
-            double longestLength = 0;
-            bool NoLinearCurveFound = true;
-            foreach (Curve crv in brep.Edges)
-            {
-                //we are only interested in linear curves
-                if (!crv.IsLinear()) continue;
-
-                double length = crv.GetLength();
-                if (length < longestLength) continue;
-
-                longestLength = length;
-                forward = crv.PointAtEnd - crv.PointAtStart;
-                NoLinearCurveFound = false;
-            }
-
-            //if no linear curve was found, use longest curve
-            if (NoLinearCurveFound)
-            {
-                foreach (Curve crv in brep.Edges)
-                {
-                    double length = crv.GetLength();
-                    if (length < longestLength) continue;
-                    if (crv.PointAtEnd.DistanceTo(crv.PointAtStart) < DocumentTolerance()) continue;
-
-                    longestLength = length;
-                    forward = crv.PointAtEnd - crv.PointAtStart;
-                    NoLinearCurveFound = false;
-                }
-            }
-
-            //contruct orientation plane from normal and forward vector
             Plane plane = new Plane(origin, normal);
-            forward.Transform(Rhino.Geometry.Transform.PlanarProjection(plane));
-            forward.Unitize();
-            double angle = Vector3d.VectorAngle(plane.YAxis, forward, plane);
-            plane.Rotate(angle, normal);
 
-            //create bounding box
-            Box worldBox;
-            BoundingBox box = brep.GetBoundingBox(plane, out worldBox);
+            //function
+            YungGH yunggh = new YungGH();
+            Box box = yunggh.FitBoundingBox(brep, out plane, out normal, out forward);
 
-            // Finally assign the spiral to the output parameter.
-            DA.SetData(0, worldBox);
+            // Assign the boundingbox, plane, normal, and forward to the output parameters.
+            DA.SetData(0, box);
             DA.SetData(1, plane);
             DA.SetData(2, normal);
             DA.SetData(3, forward);

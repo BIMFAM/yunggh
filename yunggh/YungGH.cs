@@ -28,6 +28,42 @@ namespace yunggh
 {
     public class YungGH
     {
+        public Brep ShrinkSurface(Brep surface, int shrinkSides = 0)
+        {
+            //guard statement for breps without faces
+            if (surface.Faces.Count == 0) return null;
+
+            BrepFace face = surface.Faces[0];
+            if (shrinkSides <= 0) { face.ShrinkFace(BrepFace.ShrinkDisableSide.ShrinkAllSides); }
+            else if (shrinkSides == 1)
+            { face.ShrinkFace(BrepFace.ShrinkDisableSide.DoNotShrinkNorthSide); }
+            else if (shrinkSides == 2) { face.ShrinkFace(BrepFace.ShrinkDisableSide.DoNotShrinkEastSide); }
+            else if (shrinkSides == 3) { face.ShrinkFace(BrepFace.ShrinkDisableSide.DoNotShrinkSouthSide); }
+            else if (shrinkSides >= 4) { face.ShrinkFace(BrepFace.ShrinkDisableSide.DoNotShrinkWestSide); }
+
+            Brep brep = face.Brep;
+            return brep;
+        }
+
+        public Brep ShrinkSurface(Brep surface)
+        {
+            //guard statement for breps without faces
+            if (surface.Faces.Count == 0) return null;
+
+            BrepFace face = surface.Faces[0];
+            face.ShrinkSurfaceToEdge();
+            Brep brep = face.Brep;
+            return brep;
+        }
+
+        /// <summary>
+        /// Fits a bounding box based on largest face and longest edge.
+        /// </summary>
+        /// <param name="B">A brep to fit inside an oriented bounding box</param>
+        /// <param name="plane">returns a plane of the bounding boxes orientation</param>
+        /// <param name="normal">returns the normal of the bounding boxes plane</param>
+        /// <param name="forward">returns the forward direction of the bounding box</param>
+        /// <returns>A bounding box fitted around the brep</returns>
         public Box FitBoundingBox(Brep B, out Plane plane, out Vector3d normal, out Vector3d forward)
         {
             //get surface normal from largest surface of brep
@@ -97,6 +133,12 @@ namespace yunggh
             return worldBox;
         }
 
+        /// <summary>
+        /// Selects all objects on a layer
+        /// </summary>
+        /// <param name="doc">Rhino document</param>
+        /// <param name="layer">Full layer path</param>
+        /// <returns>A list of selected Guids</returns>
         public List<System.Guid> SelectObjectsByLayer(RhinoDoc doc, Rhino.DocObjects.Layer layer)
         {
             List<System.Guid> guids = new List<System.Guid>();
@@ -111,6 +153,18 @@ namespace yunggh
             return guids;
         }
 
+        /// <summary>
+        /// A simple mesh cube
+        /// </summary>
+        /// <param name="A">bottom front right point</param>
+        /// <param name="B">bottom back right point</param>
+        /// <param name="C">bottom back left point</param>
+        /// <param name="D">bottom front left point</param>
+        /// <param name="E">top front right point</param>
+        /// <param name="F">top back right point</param>
+        /// <param name="G">top back left point</param>
+        /// <param name="H">top front left point</param>
+        /// <returns>A simple quad mesh "cube" with the input points as vertices</returns>
         public Mesh MeshCube(Point3d A, Point3d B, Point3d C, Point3d D, Point3d E, Point3d F, Point3d G, Point3d H)
         {
             Rhino.Geometry.Mesh mesh = new Rhino.Geometry.Mesh();
@@ -135,6 +189,12 @@ namespace yunggh
             return mesh;
         }
 
+        /// <summary>
+        /// Imports CSV data into a Grasshopper data tree.
+        /// </summary>
+        /// <param name="filepath">CSV filepath</param>
+        /// <param name="delimiter">delimiter for CSV (default ',')</param>
+        /// <returns>A data tree from csv</returns>
         public GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> ImportCSV(string filepath, string delimiter)
         {
             Grasshopper.Kernel.Data.GH_Structure<Grasshopper.Kernel.Types.IGH_Goo>
@@ -155,6 +215,12 @@ namespace yunggh
             return treeArray;
         }
 
+        /// <summary>
+        /// writes an array of data to a filepath.
+        /// </summary>
+        /// <param name="filepath">Output filepath</param>
+        /// <param name="data">Array of data to write to file.</param>
+        /// <returns>A boolean indicating successful write</returns>
         public bool Write(string filepath, string[] data)
         {
             //string filename = System.IO.Path.GetFileNameWithoutExtension(filepath);
@@ -166,12 +232,24 @@ namespace yunggh
             return true;
         }
 
-        // !!!NOTE: IF MODIFYING SCOPES!!!,
-        // delete your previously saved credentials at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
+        /// <summary>
+        /// !!!NOTE: IF MODIFYING SCOPES!!!,
+        /// delete your previously saved credentials at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
+        /// </summary>
         private static string[] Scopes = { SheetsService.Scope.Spreadsheets };
 
+        /// <summary>
+        /// Application Name
+        /// </summary>
         private static string ApplicationName = "Yung GH";
 
+        /// <summary>
+        /// Turn google spreadsheet data into a Grasshopper data tree.
+        /// </summary>
+        /// <param name="authentication">Google authentication .json</param>
+        /// <param name="spreadsheetId">Name of spreadsheet</param>
+        /// <param name="tab">Name of spreadsheet tab</param>
+        /// <returns>A data tree of spreadsheet information</returns>
         public GH_Structure<Grasshopper.Kernel.Types.IGH_Goo> ReadGoogleSpreadsheet(string authentication, String spreadsheetId, string tab)
         {
             //credential
@@ -229,6 +307,14 @@ namespace yunggh
             return treeArray;
         }
 
+        /// <summary>
+        /// Write data to google spreadsheet.
+        /// </summary>
+        /// <param name="authentication">Google authentication .json</param>
+        /// <param name="spreadsheetId">Name of spreadsheet</param>
+        /// <param name="tab">Name of spreadsheet tab</param>
+        /// <param name="data">Data to add to spreadsheet</param>
+        /// <returns>True if successful, false if not</returns>
         public bool WriteGoogleSpreadsheet(string authentication, String spreadsheetId, string tab, GH_Structure<Grasshopper.Kernel.Types.GH_String> data)
         {
             //credential
@@ -292,6 +378,12 @@ namespace yunggh
             return true;
         }
 
+        /// <summary>
+        /// Add new tab to google spreadsheet
+        /// </summary>
+        /// <param name="service">Scope</param>
+        /// <param name="spreadsheetId">Spreadsheet ID</param>
+        /// <param name="sheetName">Name of spreadsheet tab</param>
         private void AddNewTab(SheetsService service, string spreadsheetId, string sheetName)
         {
             var addSheetRequest = new AddSheetRequest();
@@ -309,6 +401,11 @@ namespace yunggh
             batchUpdateRequest.Execute();
         }
 
+        /// <summary>
+        /// Read Rhino Object text attributes into dictionary.
+        /// </summary>
+        /// <param name="obj">Rhino Object</param>
+        /// <returns>Attributes as  Dictionary</returns>
         public Dictionary<string, string> ReadObjectAttributes(Rhino.DocObjects.RhinoObject obj)
         {
             Dictionary<string, string> attributes = new Dictionary<string, string>();
@@ -323,6 +420,15 @@ namespace yunggh
             return attributes;
         }
 
+        /// <summary>
+        /// Write Rhino Object attributes. If the object exists in the Rhino Document, attributes are added.
+        /// </summary>
+        /// <param name="obj">Rhino Object</param>
+        /// <param name="name">Object name</param>
+        /// <param name="key">List of Attribute keys</param>
+        /// <param name="val">List of Attribute values</param>
+        /// <param name="clean">If true, removes keys if not existing in key list. If false, keeps existing keys</param>
+        /// <returns>Object Attributes (even if object not existing)</returns>
         public Rhino.DocObjects.ObjectAttributes WriteObjectAttributes(object obj, string name, List<string> key, List<string> val, bool clean)
         {
             Rhino.DocObjects.ObjectAttributes objattributes = new Rhino.DocObjects.ObjectAttributes();
@@ -370,8 +476,16 @@ namespace yunggh
             return objattributes;
         }
 
+        /// <summary>
+        /// Rhino full layer path delimiter
+        /// </summary>
         private const string layerDelimiter = "::";
 
+        /// <summary>
+        /// Get a Layer by the full path name.
+        /// </summary>
+        /// <param name="layerPath">Full layer path</param>
+        /// <returns>Rhino Layer</returns>
         public Rhino.DocObjects.Layer LayerByFullPath(string layerPath)
         {
             Rhino.DocObjects.Layer layer = null;
@@ -387,8 +501,14 @@ namespace yunggh
             return layer;
         }
 
+        /// <summary>
+        /// Delete objects on a layer
+        /// </summary>
+        /// <param name="doc">Rhino Document</param>
+        /// <param name="layer">Full layer path</param>
         public void DeleteObjectsOnLayer(RhinoDoc doc, Rhino.DocObjects.Layer layer)
         {
+            //TODO: return deleted Guids
             Rhino.DocObjects.RhinoObject[] rhobjs = doc.Objects.FindByLayer(layer);
             foreach (Rhino.DocObjects.RhinoObject rhobj in rhobjs)
             {
@@ -396,6 +516,20 @@ namespace yunggh
             }
         }
 
+        /// <summary>
+        /// Modify a Layer in the Rhino document. If no layer exists, a layer is created. The layer name uses the full layer path.
+        /// </summary>
+        /// <param name="doc">Rhino Document</param>
+        /// <param name="layerPath">Full layer path</param>
+        /// <param name="color">Layer color</param>
+        /// <param name="locked">Layer locked status</param>
+        /// <param name="lineTypeName">Layer line type</param>
+        /// <param name="materialName">Layer material name (if not existing, is set to default material)</param>
+        /// <param name="onOff">Layer visibility status</param>
+        /// <param name="printColor">Layer plot color</param>
+        /// <param name="printWidth">Layer plot width</param>
+        /// <param name="delete">If true, the layer is deleted</param>
+        /// <returns>Rhino Layer</returns>
         public Rhino.DocObjects.Layer CreateModify(RhinoDoc doc, string layerPath, System.Drawing.Color color,
           bool locked, string lineTypeName,
           string materialName, bool onOff,
@@ -477,10 +611,16 @@ namespace yunggh
             return layer;
         }
 
+        /// <summary>
+        /// Bake geometry from Grasshopper into the Rhino Document
+        /// </summary>
+        /// <param name="geometries">List of geometries to "Bake"</param>
+        /// <param name="layers">Layers to "Bake" geometry to</param>
         public void BakeGeometry(List<GeometryBase> geometries, List<string> layers)
         {
+            //TODO: return Guids of baked geometry
             Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
-            int layer = -1;
+            int layerIndex = -1;
             string name = "";
 
             for (int i = 0; i < geometries.Count; i++)
@@ -488,12 +628,15 @@ namespace yunggh
                 //find layer
                 if (i < layers.Count)
                 {
-                    layer = GetLayerIndex(doc, layers[i]);
+                    Rhino.DocObjects.Layer layer = LayerByFullPath(layers[i]);
+                    if (layer == null) continue; //TODO: create layer if it isn't existing
+
+                    layerIndex = layer.Index;
                 }
 
                 //create attributes
                 Rhino.DocObjects.ObjectAttributes attributes = new Rhino.DocObjects.ObjectAttributes();
-                attributes.LayerIndex = layer;
+                attributes.LayerIndex = layerIndex;
                 attributes.Name = name;
                 //attributes.ColorSource = ObjectColorSource.ColorFromObject;
                 //attributes.ObjectColor = Color.Black;
@@ -503,8 +646,15 @@ namespace yunggh
             }
         }
 
+        /// <summary>
+        /// Get the layer index from the layer name
+        /// </summary>
+        /// <param name="doc">Rhino Document</param>
+        /// <param name="layer">Layer name</param>
+        /// <returns>Layer index</returns>
         public int GetLayerIndex(Rhino.RhinoDoc doc, string layer)
         {
+            //TODO: merge with Get Full Layer Path
             string layer_name = layer.Trim();
 
             //does layer name contain data?
@@ -546,18 +696,32 @@ namespace yunggh
             return layer_index;
         }
 
+        /// <summary>
+        /// Selects objects in the Rhino document based on their Guids.
+        /// </summary>
+        /// <param name="doc">Rhino Document</param>
+        /// <param name="guids">List of guids to select</param>
         public void Select(RhinoDoc doc, List<System.Guid> guids)
         {
             foreach (System.Guid guid in guids)
                 doc.Objects.Select(guid, true, true, true);
         }
 
+        /// <summary>
+        /// Export rhino geometry. Geometry should already be selected.
+        /// </summary>
+        /// <param name="filepath"></param>
         public void ExportModel(string filepath)
         {
             string scriptExport = string.Format("_-Export \"{0}\" _Enter", filepath);
             RhinoApp.RunScript(scriptExport, false);
         }
 
+        /// <summary>
+        /// Import a file into the Rhino Document
+        /// </summary>
+        /// <param name="filepath">import filepath</param>
+        /// <returns>List of Guids from imported model.</returns>
         public List<System.Guid> ImportModel(string filepath)
         {
             List<System.Guid> importedGuids = new List<System.Guid>();
@@ -582,6 +746,11 @@ namespace yunggh
             return importedGuids;
         }
 
+        /// <summary>
+        /// Resets all the Button components
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event Arguements</param>
         public void ResetButtonComponents(object sender, GH_SolutionEventArgs e)
         {
             e.Document.SolutionEnd -= ResetButtonComponents;
@@ -599,6 +768,12 @@ namespace yunggh
             //*/
         }
 
+        /// <summary>
+        /// Test a surface for developability status.
+        /// </summary>
+        /// <param name="surface">Surface to test.</param>
+        /// <param name="type">Developability type as index</param>
+        /// <returns>Developability type as string</returns>
         public string TestSurfaceDevelopability(Surface surface, out int type)
         {
             //https://discourse.mcneel.com/t/verifying-developable-surfaces/73594
@@ -639,6 +814,13 @@ namespace yunggh
             }
         }
 
+        /// <summary>
+        /// Finds the extremums of a brep.
+        /// </summary>
+        /// <param name="brep">Brep</param>
+        /// <param name="directions">Extremum direction(s)</param>
+        /// <param name="minmax">True for maximum, false for minimum</param>
+        /// <returns>List of points/curves representing the brep's extremum(s)</returns>
         public List<Object> FindExtremums(Brep brep, List<Vector3d> directions, bool minmax)
         {
             double tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
@@ -748,9 +930,24 @@ namespace yunggh
 
             Curve crv = C[0];
             C.RemoveAt(0);
-            foreach (Brep brep in breps)
+            foreach (Brep brep in breps) //TODO: loop splits if curve didn't split,
             {
                 Brep[] test = brep.Split(new List<Curve>() { crv }, tolerance); //it will always only be one intersection at a time
+
+                //if curve is planar, we'll try splitting it with a plane
+                if (test.Length == 0 && crv.IsPlanar())
+                {
+                    Plane plane = Plane.Unset;
+                    if (!crv.TryGetPlane(out plane)) { splits.Add(brep); continue; }
+
+                    if (!plane.IsValid) { splits.Add(brep); continue; }
+
+                    List<Brep> temp = SafeSplit(new List<Brep>() { brep }, new List<Plane>() { plane }, tolerance);
+
+                    foreach (Brep b in temp)
+                        splits.Add(b);
+                    continue;
+                }
 
                 //if the split failed, we keep the original brep
                 if (test.Length == 0) { splits.Add(brep); continue; }
@@ -794,6 +991,10 @@ namespace yunggh
             return indices;
         }
 
+        /// <summary>
+        /// Get all active Guids from the Rhino document
+        /// </summary>
+        /// <returns>A list of Guids of active objects in the rhino document</returns>
         public List<System.Guid> GetGuids()
         {
             List<System.Guid> guids = new List<System.Guid>();
@@ -804,6 +1005,9 @@ namespace yunggh
             return guids;
         }
 
+        /// <summary>
+        /// A list of supported import file extensions for Rhino.
+        /// </summary>
         public List<string> SupportedImportFileTypes = new List<string>(){
       ".3dm",".3dmbak",".rws",".3mf",".3ds",".amf",".ai",
       ".dwg",".dxf",".x",".e57",".dst",".exp",".eps",".off",
@@ -814,6 +1018,9 @@ namespace yunggh
       ".vrml",".vi",".gdf",".zpr"
       };
 
+        /// <summary>
+        /// A list of supported export file extensions for Rhino.
+        /// </summary>
         public List<string> SupportedExportFileTypes = new List<string>(){
       ".3dm",".3dmbak",".rws",".3mf",".3ds",".amf",".ai",
       ".dwg",".dxf",".x",

@@ -93,6 +93,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CurveMinMax {
+            get {
+                object obj = ResourceManager.GetObject("CurveMinMax", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Developabilitly {
             get {
                 object obj = ResourceManager.GetObject("Developabilitly", resourceCulture);
@@ -236,6 +246,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap SelectPoint {
             get {
                 object obj = ResourceManager.GetObject("SelectPoint", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ShrinkSurface {
+            get {
+                object obj = ResourceManager.GetObject("ShrinkSurface", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

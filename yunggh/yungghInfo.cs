@@ -152,4 +152,8 @@ namespace yunggh
     //TODO: Isovist
     //TODO: Waffle Structure (fabrication) - solids, surfaces, single surface
     //TODO: Generate Site Model
+    //TODO: Curve Boolean (keeps internal curves)
+    //TODO: Developable Surface Generation
+    //TODO: Method for turning DataTree into separate list for threading
+    //TODO: Patterning From planes
 }

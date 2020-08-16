@@ -79,8 +79,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Document\CreateSavedView.cs" />
+    <Compile Include="Components\Geometry\CurveMinMax.cs" />
     <Compile Include="Components\Geometry\Developability.cs" />
     <Compile Include="Components\Data\ReadAttributes.cs" />
+    <Compile Include="Components\Geometry\ShrinkSurface.cs" />
     <Compile Include="Components\Geometry\SurfaceFit.cs" />
     <Compile Include="Components\Data\WriteAttributes.cs" />
     <Compile Include="Components\Format\Bake.cs" />
@@ -139,8 +141,10 @@
     <Content Include="Resources\Format\Export.png" />
     <Content Include="Resources\Format\Import.png" />
     <None Include="Resources\Geometry\Developabilitly.png" />
+    <Content Include="Resources\Geometry\CurveMinMax.png" />
     <Content Include="Resources\Geometry\Extremum.png" />
     <Content Include="Resources\Geometry\OrientedBoundingBox.png" />
+    <Content Include="Resources\Geometry\ShrinkSurface.png" />
     <Content Include="Resources\Geometry\SplitBrepPlane.png" />
     <Content Include="Resources\Geometry\SplitKeepRemove.png" />
     <None Include="Resources\Geometry\SurfaceFit.png" />

@@ -71,7 +71,7 @@ namespace yunggh
             int type = 0;
             string text = yunggh.TestSurfaceDevelopability(surface, out type);
 
-            // Finally assign the spiral to the output parameter.
+            // Finally assign the developability analysis to the output parameter.
             DA.SetData(0, text);
             DA.SetData(1, type);
         }

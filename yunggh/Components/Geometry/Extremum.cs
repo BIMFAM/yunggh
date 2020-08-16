@@ -34,9 +34,9 @@ namespace yunggh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddBrepParameter("Brep", "B", "Base plane for spiral", GH_ParamAccess.item);
+            pManager.AddBrepParameter("Brep", "B", "Extremum Brep", GH_ParamAccess.item);
             pManager.AddVectorParameter("Direction", "D", "Vectors representing extremum directions", GH_ParamAccess.list);
-            pManager.AddBooleanParameter("MinMax", "M", "True returns the maximum extremum, False returns the minimum extremum", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("MinMax", "M", "True returns the maximum extremum, False returns the minimum extremum", GH_ParamAccess.item, true);
         }
 
         /// <summary>

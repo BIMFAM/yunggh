@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
+using System.Linq;
+
 // In order to load the result of this wizard, you will also need to
 // add the output bin/ folder of this project to the list of loaded
 // folder in Grasshopper.
@@ -37,6 +39,7 @@ namespace yunggh
             pManager.AddBrepParameter("Brep", "B", "Brep to split", GH_ParamAccess.item);
             pManager.AddCurveParameter("Curves", "C", "Curve(s) to split brep with", GH_ParamAccess.list);
             pManager.AddPointParameter("Keep/Remove Points", "P", "If these points are on a split brep, that brep will be kept/removed", GH_ParamAccess.list);
+            pManager[2].Optional = true; //allow the script to run without points
             pManager.AddBooleanParameter("Keep/Remove", "X", "True keeps the points, False removes the points", GH_ParamAccess.item, true);
         }
 
@@ -64,7 +67,7 @@ namespace yunggh
             // guard statement for when data cannot be extracted from a parameter
             if (!DA.GetData(0, ref brep)) return;
             if (!DA.GetDataList(1, curves)) return;
-            if (!DA.GetDataList(2, points)) return;
+            DA.GetDataList(2, points); //if no points are supplied, we still split
             if (!DA.GetData(3, ref X)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
@@ -79,8 +82,14 @@ namespace yunggh
             double tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
             YungGH yunggh = new YungGH();
 
+            //sort list
+            curves = curves.OrderByDescending(o => o.GetLength()).ToList();
+
             //split the brep using safe split
             List<Brep> splits = yunggh.SafeSplit(new List<Brep>() { brep }, curves, tolerance);
+
+            //if there are no keep remove points, we keep all the surfaces
+            if (points.Count == 0) { DA.SetDataList(0, splits); return; }
 
             //find out which splits should be kept or removed
             List<int> keepIndices = yunggh.BrepPointCheck(splits, points, tolerance);

@@ -78,6 +78,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\YungGH_Data.cs" />
+    <Compile Include="Classes\YungGH_Document.cs" />
+    <Compile Include="Classes\YungGH_Format.cs" />
+    <Compile Include="Classes\YungGH_Geometry.cs" />
+    <Compile Include="Classes\YungGH_Mesh.cs" />
+    <Compile Include="Classes\YungGH_Selection.cs" />
     <Compile Include="Components\Document\CreateSavedView.cs" />
     <Compile Include="Components\Geometry\CurveMinMax.cs" />
     <Compile Include="Components\Geometry\Developability.cs" />
@@ -114,7 +120,6 @@
     <Compile Include="Components\Document\ViewportCapture.cs" />
     <Compile Include="Components\Data\WriteCSV.cs" />
     <Compile Include="Components\Data\WriteGoogleSheet.cs" />
-    <Compile Include="YungGH.cs" />
     <Compile Include="yungghInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

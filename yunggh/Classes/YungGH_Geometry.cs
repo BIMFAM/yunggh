@@ -17,6 +17,27 @@ namespace yunggh
     partial class YungGH
     {
         /// <summary>
+        /// Find the largest Brep by volume in an array of Breps.
+        /// </summary>
+        /// <param name="inputBreps">Breps to evaluate</param>
+        /// <returns></returns>
+        public Brep FindLargestBrepByVolume(Brep[] inputBreps)
+        {
+            Brep largestBrep = null;
+            double largestVolume = 0;
+            foreach (Brep inputBrep in inputBreps)
+            {
+                double currentVolume = inputBrep.GetVolume();
+                if (currentVolume > largestVolume)
+                {
+                    largestVolume = currentVolume;
+                    largestBrep = inputBrep;
+                }
+            }
+            return largestBrep;
+        }
+
+        /// <summary>
         /// Retrim Surface to minimum.
         /// </summary>
         /// <param name="surface">Surface</param>

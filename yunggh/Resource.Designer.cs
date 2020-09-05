@@ -19,7 +19,7 @@ namespace yunggh {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resource {
@@ -66,6 +66,36 @@ namespace yunggh {
         internal static System.Drawing.Bitmap Bake {
             get {
                 object obj = ResourceManager.GetObject("Bake", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap BooleanBrep {
+            get {
+                object obj = ResourceManager.GetObject("BooleanBrep", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ClassificationGeometrySorter {
+            get {
+                object obj = ResourceManager.GetObject("ClassificationGeometrySorter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ClusteringGeometrySorter {
+            get {
+                object obj = ResourceManager.GetObject("ClusteringGeometrySorter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,6 +163,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap FilletBrep {
+            get {
+                object obj = ResourceManager.GetObject("FilletBrep", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Import {
             get {
                 object obj = ResourceManager.GetObject("Import", resourceCulture);
@@ -146,6 +186,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap LargestNumber {
             get {
                 object obj = ResourceManager.GetObject("LargestNumber", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ModelTrainer {
+            get {
+                object obj = ResourceManager.GetObject("ModelTrainer", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -27,6 +27,8 @@ namespace yunggh
               "Fillets all Brep edges with the largest possible radius in the given interval.",
               "yung gh", "Geometry")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>
@@ -185,9 +187,7 @@ namespace yunggh
         {
             get
             {
-                // You can add image files to your project resources and access them like this:
-                //return Resources.IconForThisComponent;
-                return null;
+                return Resource.FilletBrep;
             }
         }
 

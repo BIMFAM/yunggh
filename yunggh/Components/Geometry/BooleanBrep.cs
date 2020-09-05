@@ -25,6 +25,8 @@ namespace yunggh
               "Creates a Brep from additive and subtractive Breps.",
               "yung gh", "Geometry")
         {
+            CustomAttributes custom = new CustomAttributes(this);
+            this.m_attributes = custom;
         }
 
         /// <summary>
@@ -111,9 +113,7 @@ namespace yunggh
         {
             get
             {
-                // You can add image files to your project resources and access them like this:
-                //return Resources.IconForThisComponent;
-                return null;
+                return Resource.BooleanBrep;
             }
         }
 

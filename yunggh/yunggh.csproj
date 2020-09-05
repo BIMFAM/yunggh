@@ -78,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\YungGH_Machine Learning.cs" />
     <Compile Include="Classes\YungGH_Data.cs" />
     <Compile Include="Classes\YungGH_Document.cs" />
     <Compile Include="Classes\YungGH_Format.cs" />
@@ -85,9 +86,11 @@
     <Compile Include="Classes\YungGH_Mesh.cs" />
     <Compile Include="Classes\YungGH_Selection.cs" />
     <Compile Include="Components\Document\CreateSavedView.cs" />
+    <Compile Include="Components\Geometry\BooleanBrep.cs" />
     <Compile Include="Components\Geometry\CurveMinMax.cs" />
     <Compile Include="Components\Geometry\Developability.cs" />
     <Compile Include="Components\Data\ReadAttributes.cs" />
+    <Compile Include="Components\Geometry\FilletBrep.cs" />
     <Compile Include="Components\Geometry\ShrinkSurface.cs" />
     <Compile Include="Components\Geometry\SurfaceFit.cs" />
     <Compile Include="Components\Data\WriteAttributes.cs" />
@@ -101,6 +104,9 @@
     <Compile Include="Components\Geometry\OrientedBoundingBox.cs" />
     <Compile Include="Components\Data\ReadCSV.cs" />
     <Compile Include="Components\Data\ReadGoogleSheet.cs" />
+    <Compile Include="Components\Machine Learning\ClusteringGeometrySorter.cs" />
+    <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
+    <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -146,13 +152,18 @@
     <Content Include="Resources\Format\Export.png" />
     <Content Include="Resources\Format\Import.png" />
     <None Include="Resources\Geometry\Developabilitly.png" />
+    <Content Include="Resources\Geometry\BooleanBrep.png" />
     <Content Include="Resources\Geometry\CurveMinMax.png" />
     <Content Include="Resources\Geometry\Extremum.png" />
+    <Content Include="Resources\Geometry\FilletBrep.png" />
     <Content Include="Resources\Geometry\OrientedBoundingBox.png" />
     <Content Include="Resources\Geometry\ShrinkSurface.png" />
     <Content Include="Resources\Geometry\SplitBrepPlane.png" />
     <Content Include="Resources\Geometry\SplitKeepRemove.png" />
     <None Include="Resources\Geometry\SurfaceFit.png" />
+    <Content Include="Resources\Machine Learning\ClassificationGeometrySorter.png" />
+    <Content Include="Resources\Machine Learning\ClusteringGeometrySorter.png" />
+    <Content Include="Resources\Machine Learning\ModelTrainer.png" />
     <Content Include="Resources\Mesh\SimpleMeshCube.png" />
     <Content Include="Resources\Selection\SelDup.png" />
     <Content Include="Resources\Selection\SelDupAll.png" />

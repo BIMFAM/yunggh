@@ -303,6 +303,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap SelUnique {
+            get {
+                object obj = ResourceManager.GetObject("SelUnique", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ShrinkSurface {
             get {
                 object obj = ResourceManager.GetObject("ShrinkSurface", resourceCulture);

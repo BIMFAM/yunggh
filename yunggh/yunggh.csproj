@@ -104,9 +104,13 @@
     <Compile Include="Components\Geometry\OrientedBoundingBox.cs" />
     <Compile Include="Components\Data\ReadCSV.cs" />
     <Compile Include="Components\Data\ReadGoogleSheet.cs" />
+<<<<<<< Updated upstream
     <Compile Include="Components\Machine Learning\ClusteringGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
+=======
+    <Compile Include="Components\Selection\SelUnique.cs" />
+>>>>>>> Stashed changes
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -170,6 +174,7 @@
     <Content Include="Resources\Selection\SelectGeometry.png" />
     <Content Include="Resources\Selection\SelectLayer.png" />
     <Content Include="Resources\Selection\SelectPoint.png" />
+    <Content Include="Resources\Selection\SelUnique.png" />
     <Content Include="Resources\yunggh.png" />
   </ItemGroup>
   <ItemGroup>

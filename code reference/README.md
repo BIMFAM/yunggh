@@ -1,18 +1,18 @@
 # code reference
 
-# 1. types
-# 1. [conditional statements](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements)
-	1. [if](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-if)
-	1. [if else](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-ifelse)
-	1. [else if](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-elseif)
-	1. [&& (logical AND)](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-and)
-	1. [|| (logical OR)](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-or)
-	1. [nested if](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-nestedif)
-	1. [switch statement](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-switchstatements)
-# 1. data structures
-# 1. looping
-# 1. looping conditionals
-# 1. functions
-# 1. classes
-# 1. geometry
-# 1. transforms
+# [types](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/types)
+# [conditional statements](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements)
+	- [if](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-if)
+	- [if else](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-ifelse)
+	- [else if](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-elseif)
+	- [&& (logical AND)](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-and)
+	- [|| (logical OR)](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-or)
+	- [nested if](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-nestedif)
+	- [switch statement](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/conditional%20statements#tag-switchstatements)
+# [data structures](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/data%20structures)
+# [looping](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/looping)
+# [looping conditionals](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/looping%20conditionals)
+# [functions](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/functions)
+# [classes](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/classes)
+# [geometry](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/geometry)
+# [transforms](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/transforms)

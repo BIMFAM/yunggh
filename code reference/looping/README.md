@@ -164,7 +164,21 @@
 [Rhino DataTree documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2?view=net-6.0)
 
 ```csharp
-
+	private void RunScript(DataTree<Point3d> P)
+	{
+		DataTree<int> pZ = new DataTree<int>();
+		for(int p = 0;p < P.BranchCount;p++)
+		{
+			GH_Path path = P.Path(i);
+			List<Point3d> pts = P.Branch(p);
+			List<int> z = new List<int>();
+			foreach(Point3d pt in pts)
+			{
+				z.Add(pt.Z);
+			}
+			pZ.AddRange(z,path);
+		}
+	}
 ```
 
 # <a id="tag-recursivefunctions" href="#tag-recursivefunctions">Recursive Functions</a>

@@ -111,3 +111,17 @@
 
 # <a id="tag-datatree" href="#tag-datatree">DataTree</a>
 [Rhino DataTree documentation](https://developer.rhino3d.com/api/grasshopper/html/T_Grasshopper_DataTree_1.htm)
+
+```csharp
+	List<int> nums = new List<int>(){0,1,2};
+    DataTree<int> numTree = new DataTree<int>();
+    foreach(int i in nums)
+    {
+      GH_Path path = new GH_Path(i);
+	  Print(path.ToString());
+      numTree.Add(i, path);
+    }
+    //Console: {0}
+	//Console: {1}
+	//Console: {2}
+```

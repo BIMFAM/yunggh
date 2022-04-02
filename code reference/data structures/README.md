@@ -1,6 +1,14 @@
 # data structures
 
-Array
+1. <a href="#tag-array">Array</a>
+1. <a href="#tag-list">List</a>
+1. <a href="#tag-reverse">Reverse</a>
+1. <a href="#tag-sort">Sort</a>
+1. <a href="#tag-dictionary">Dictionary</a>
+1. <a href="#tag-datatree">DataTree</a>
+
+# <a id="tag-array" href="#tag-array">Array</a>
+[Microsoft Array documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/arrays/)
 
 ```csharp
 	int[] nums = new int[]{0,2,4,7};
@@ -17,7 +25,8 @@ Array
 	//0
 ```
 
-List
+# <a id="tag-list" href="#tag-list">List</a>
+[Microsoft List documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1?view=net-6.0)
 
 ```csharp
 	List<int> nums = new List<int>(){0,2,4};
@@ -35,7 +44,8 @@ List
 	//7
 ```
 
-Reverse
+# <a id="tag-reverse" href="#tag-reverse">Reverse</a>
+[Microsoft Reverse documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.reverse?view=net-6.0)
 
 ```csharp
 	List<int> nums = new List<int>();
@@ -52,7 +62,8 @@ Reverse
 	//32
 ```
 
-Sort
+# <a id="tag-sort" href="#tag-sort">Sort</a>
+[Microsoft Sort documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.sort?view=net-6.0)
 
 ```csharp
 	List<int> nums = new List<int>();
@@ -69,7 +80,8 @@ Sort
 	//4
 ```
 
-Dictionary
+# <a id="tag-dictionary" href="#tag-dictionary">Dictionary</a>
+[Microsoft Dictionary documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2?view=net-6.0)
 
 ```csharp
 	Dictionary<int,string> loc = new Dictionary<int,string>();
@@ -97,4 +109,5 @@ Dictionary
 	//BOS
 ```
 
-DataTree
+# <a id="tag-datatree" href="#tag-datatree">DataTree</a>
+[Rhino DataTree documentation](https://developer.rhino3d.com/api/grasshopper/html/T_Grasshopper_DataTree_1.htm)

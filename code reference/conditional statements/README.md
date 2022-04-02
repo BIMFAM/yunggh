@@ -9,14 +9,14 @@
 1. <a href="#tag-switchstatements">switch statement</a>
 
 # <a id="tag-if" href="#tag-if">if</a>
-[microsoft if statement documents](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
+[Microsoft if statement documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
 
 ```csharp
 	bool condition = true;
 	
 	if (condition)
 	{
-		Debug.Log("Is True");
+		Print("Is True");
 	}
 	//Console: Is True
 ```
@@ -72,7 +72,7 @@
 ```
 
 # <a id="tag-ifelse" href="#tag-ifelse">if else</a>
-[microsoft if statement documents](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
+[Microsoft if statement documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
 
 ```csharp
 	string text = "Studio";
@@ -103,7 +103,7 @@
 ```
 
 # <a id="tag-elseif" href="#tag-elseif">else if</a>
-[microsoft if statement documents](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
+[Microsoft if statement documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
 
 ```csharp
 	int i = 0;
@@ -160,7 +160,7 @@
 ```
 
 # <a id="tag-and" href="#tag-and">&&</a>
-[microsoft logical AND operator documents](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/boolean-logical-operators#conditional-logical-and-operator-)
+[Microsoft logical AND operator documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/boolean-logical-operators#conditional-logical-and-operator-)
 
 ```csharp
 	int i = 0;
@@ -185,7 +185,7 @@
 ```
 
 # <a id="tag-or" href="#tag-or">||</a>
-[microsoft logical OR operator documents](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/boolean-logical-operators#conditional-logical-or-operator-)
+[Microsoft logical OR operator documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/boolean-logical-operators#conditional-logical-or-operator-)
 
 ```csharp
 	int i = 0;
@@ -210,7 +210,7 @@
 ```
 
 # <a id="tag-nestedif" href="#tag-nestedif">nested if</a>
-[microsoft if statement documents](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
+[Microsoft if statement documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-if-statement)
 
 ```csharp
 	int n = 0; int x = 0;
@@ -255,7 +255,7 @@
 ```
 
 # <a id="tag-switchstatements" href="#tag-switchstatements">switch statement</a>
-[microsoft switch statement documents](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-switch-statement)
+[Microsoft switch statement documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/selection-statements#the-switch-statement)
 
 ```csharp
 	int day = 4;

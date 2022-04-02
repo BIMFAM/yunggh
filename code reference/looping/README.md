@@ -1,6 +1,16 @@
 # looping
 
-foreach loop
+1. <a href="#tag-foreach">foreach</a>
+1. <a href="#tag-for">for</a>
+1. <a href="#tag-backwardsfor">backwards for</a>
+1. <a href="#tag-nestedfor">nested for</a>
+1. <a href="#tag-dictionaryiteration">Dictionary iteration</a>
+1. <a href="#tag-datatreeiteration">DataTree iteration</a>
+1. <a href="#tag-recursivefunctions">Recursive Functions</a>
+1. <a href="#tag-parallelfor">Parallel For</a>
+
+# <a id="tag-foreach" href="#tag-foreach">foreach</a>
+[Microsoft foreach documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#the-foreach-statement)
 
 ```csharp
 	List<int> nums = new List<int>(){0,2,4,7};
@@ -17,7 +27,8 @@ foreach loop
 	//7
 ```
 
-for loop
+# <a id="tag-for" href="#tag-for">for</a>
+[Microsoft for documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#the-for-statement)
 
 ```csharp
 	List<int> nums = new List<int>(){0,2,4,7};
@@ -52,7 +63,8 @@ for loop
 	//13
 ```
 
-reverse for
+# <a id="tag-backwardsfor" href="#tag-backwardsfor">backwards for</a>
+[Microsoft for documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#the-for-statement)
 
 ```csharp
 	List<int> nums = new List<int>(){0,2,4,7};
@@ -69,7 +81,8 @@ reverse for
 	//0
 ```
 
-nested looping
+# <a id="tag-nestedfor" href="#tag-nestedfor">nested for</a>
+[Microsoft for documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#the-for-statement)
 
 ```csharp
 	List<int> nums = new List<int>(){0,2,4,7};
@@ -101,7 +114,8 @@ nested looping
 	//7, 7
 ```
 
-dictionary
+# <a id="tag-dictionaryiteration" href="#tag-dictionaryiteration">Dictionary iteration</a>
+[Microsoft Dictionary documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2?view=net-6.0)
 
 ```csharp
 	void RunScript()
@@ -146,13 +160,15 @@ dictionary
 	//BOS
 ```
 
-data tree
+# <a id="tag-datatreeiteration" href="#tag-datatreeiteration">DataTree iteration</a>
+[Rhino DataTree documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2?view=net-6.0)
 
 ```csharp
 
 ```
 
-recursion
+# <a id="tag-recursivefunctions" href="#tag-recursivefunctions">Recursive Functions</a>
+[Microsoft Recursive Functions documentation](https://docs.microsoft.com/en-us/cpp/c-language/recursive-functions?view=msvc-170)
 
 ```csharp
 	void RunScript()
@@ -174,7 +190,8 @@ recursion
 	//Fibonacci Recursion: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144,...
 ```
 
-parallel processing
+# <a id="tag-parallelfor" href="#tag-parallelfor">Parallel For</a>
+[Microsoft Parallel For documentation](https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/how-to-write-a-simple-parallel-for-loop)
 
 ```csharp
 	private void RunScript(List<Point3d> x, List<Point3d> y, ref object A)

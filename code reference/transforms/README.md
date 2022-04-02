@@ -1,6 +1,12 @@
 # transforms
 
-Translation
+1. <a href="#tag-translation">Translation</a>
+1. <a href="#tag-rotation">Rotation</a>
+1. <a href="#tag-scale">Scale</a>
+1. <a href="#tag-projection">Projection</a>
+
+# <a id="tag-translation" href="#tag-translation">Translation</a>
+[Rhino Translation documentation](https://developer.rhino3d.com/api/RhinoCommon/html/M_Rhino_Geometry_Transform_Translation.htm)
 
 ```csharp
 	void RunScript(ref object A, ref object B)
@@ -18,7 +24,8 @@ Translation
 	}
 ```
 
-Rotation
+# <a id="tag-rotation" href="#tag-rotation">Rotation</a>
+[Rhino Rotation documentation](https://developer.rhino3d.com/api/RhinoCommon/html/Overload_Rhino_Geometry_Transform_Rotation.htm)
 
 ```csharp
 	void RunScript(ref object A, ref object B)
@@ -53,7 +60,8 @@ Rotation
 	}
 ```
 
-Scaling
+# <a id="tag-scale" href="#tag-scale">Scale</a>
+[Rhino Scale documentation](https://developer.rhino3d.com/api/RhinoCommon/html/Overload_Rhino_Geometry_Transform_Scale.htm)
 
 ```csharp
 	void RunScript(ref object A, ref object B)
@@ -87,7 +95,8 @@ Scaling
 	}
 ```
 
-Projection
+# <a id="tag-projection" href="#tag-projection">Projection</a>
+[Rhino Projection documentation](https://developer.rhino3d.com/api/RhinoCommon/html/M_Rhino_Geometry_Transform_PlanarProjection.htm)
 
 ```csharp
 	void RunScript(ref object A, ref object B, ref object C)

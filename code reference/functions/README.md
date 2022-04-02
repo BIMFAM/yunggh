@@ -1,6 +1,11 @@
 # functions
 
-function
+1. <a href="#tag-method">Method</a>
+1. <a href="#tag-methodinput">Method Input</a>
+1. <a href="#tag-methodlogic">Method Logic</a>
+
+# <a id="tag-method" href="#tag-method">Method</a>
+[Microsoft Method documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/methods)
 
 ```csharp
 	void RunScript()
@@ -17,7 +22,8 @@ function
 	//Hello World
 ```
 
-function inputs
+# <a id="tag-methodinput" href="#tag-methodinput">Method Input</a>
+[Microsoft Method documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/methods)
 
 ```csharp
 	void RunScript()
@@ -36,7 +42,8 @@ function inputs
 	//Cool!
 ```
 
-function logic
+# <a id="tag-methodlogic" href="#tag-methodlogic">Method Logic</a>
+[Microsoft Method documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/methods)
 
 ```csharp
 	void RunScript()

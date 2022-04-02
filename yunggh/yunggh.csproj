@@ -108,6 +108,7 @@
     <Compile Include="Components\Machine Learning\ClusteringGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
+    <Compile Include="Components\ExampleComponent.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>

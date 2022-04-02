@@ -25,8 +25,6 @@ namespace yunggh
               "Read attribute information from rhino objects",
               "yung gh", "Data")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

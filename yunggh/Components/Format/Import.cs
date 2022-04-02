@@ -33,8 +33,6 @@ namespace yunggh
               "Import geometry",
               "yung gh", "Format")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

@@ -35,8 +35,6 @@ namespace yunggh
               "Read Google Sheet",
               "yung gh", "Data")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

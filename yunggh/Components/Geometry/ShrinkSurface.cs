@@ -25,8 +25,6 @@ namespace yunggh
               "Shrink a Trimmed Surface to a minimum surface.",
               "yung gh", "Geometry")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

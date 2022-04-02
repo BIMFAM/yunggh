@@ -25,8 +25,6 @@ namespace yunggh
               "Export current worksessions as single document",
               "yung gh", "Format")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

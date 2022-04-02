@@ -27,8 +27,6 @@ namespace yunggh
               "Return the smallest number from collection.",
               "yung gh", "Data")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

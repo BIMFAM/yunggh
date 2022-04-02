@@ -30,8 +30,6 @@ namespace yunggh
               "Select all objects by a layer (and child layer).",
               "yung gh", "Selection")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

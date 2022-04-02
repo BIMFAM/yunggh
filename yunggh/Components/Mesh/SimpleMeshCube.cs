@@ -25,8 +25,6 @@ namespace yunggh
               "Create a basic mesh cube",
               "yung gh", "Mesh")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

@@ -30,8 +30,6 @@ namespace yunggh
               "Prompt user to select geometry.",
               "yung gh", "Selection")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

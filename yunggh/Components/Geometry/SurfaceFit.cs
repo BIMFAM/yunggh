@@ -25,8 +25,6 @@ namespace yunggh
               "Fit developable surfaces to surfaces.",
               "yung gh", "Geometry")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

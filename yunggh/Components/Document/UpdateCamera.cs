@@ -25,8 +25,6 @@ namespace yunggh
               "Updates the viewport view.",
               "yung gh", "Document")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

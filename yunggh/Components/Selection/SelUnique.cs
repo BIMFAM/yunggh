@@ -26,8 +26,6 @@ namespace yunggh
               "Select unique objects.",
               "yung gh", "Selection")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

@@ -25,8 +25,6 @@ namespace yunggh
               "Exports the viewport as an image",
               "yung gh", "Document")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

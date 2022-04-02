@@ -25,8 +25,6 @@ namespace yunggh
               "Write csv file.",
               "yung gh", "Data")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

@@ -25,8 +25,6 @@ namespace yunggh
               "Select all duplicates.",
               "yung gh", "Selection")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

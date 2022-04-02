@@ -25,8 +25,6 @@ namespace yunggh
               "Find the minimum and maximum deviation between overlapping curves.",
               "yung gh", "Geometry")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

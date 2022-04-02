@@ -25,8 +25,6 @@ namespace yunggh
               "Creates or updates a Rhino Saved View.",
               "yung gh", "Document")
         {
-            CustomAttributes custom = new CustomAttributes(this);
-            this.m_attributes = custom;
         }
 
         /// <summary>

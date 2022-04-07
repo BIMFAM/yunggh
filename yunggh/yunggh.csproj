@@ -109,6 +109,7 @@
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
+    <Compile Include="Components\TREComponent.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

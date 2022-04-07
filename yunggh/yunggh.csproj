@@ -51,8 +51,8 @@
     <Reference Include="Google.Apis.Sheets.v4, Version=1.42.0.1791, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.Sheets.v4.1.42.0.1791\lib\net45\Google.Apis.Sheets.v4.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -108,6 +108,7 @@
     <Compile Include="Components\Machine Learning\ClusteringGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
+    <Compile Include="Components\FindAllIndex.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -132,6 +133,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -12,9 +12,9 @@ namespace yunggh.Components
         /// Initializes a new instance of the MyComponent1 class.
         /// </summary>
         public TREComponent()
-          : base("TREComponent", "Nickname",
+          : base("TREComponent", "TRETrial",
               "Description",
-              "Category", "Subcategory")
+              "yung gh", "Subcategory")
         {
         }
 
@@ -58,7 +58,7 @@ namespace yunggh.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("A42B0F8D-ADFC-4881-9CBE-18EAFD234591"); }
+            get { return new Guid("9A78E2ED-D004-40DC-8088-13C1A89DE6E6"); }
         }
     }
 }

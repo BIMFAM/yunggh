@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using Grasshopper;
+using Grasshopper.Kernel.Data;
 
 namespace yunggh.Components
 {
@@ -26,7 +28,7 @@ namespace yunggh.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddNumberParameter("list", "n", "input your list", GH_ParamAccess.list);
-            pManager.AddNumberParameter("item", "i", "items to search all indexes", GH_ParamAccess.item);
+            pManager.AddNumberParameter("items", "i", "items to search all indexes", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -34,7 +36,7 @@ namespace yunggh.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddNumberParameter("indexex", "in", "retrieved indexes in difference branches", GH_ParamAccess.list);
+            pManager.AddNumberParameter("indexes", "in", "retrieved indexes in difference branches", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -43,11 +45,11 @@ namespace yunggh.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<double> numList = new List<double>();         
-            double item = double.NaN;
+            List<double> numList = new List<double>();
+            List<double> items = new List<double>();
             ///List<int> FindAllIndexOf(int i, List<int> num)
             if(!DA.GetDataList(0, numList)) { return; }
-            if(!DA.GetData(1, ref item)) { return; }
+            if(!DA.GetDataList(1, items)) { return; }
             
             if (numList.Count == 0)
             {
@@ -55,26 +57,38 @@ namespace yunggh.Components
                 return;
             }
 
-            List<int> indexes = new List<int>();
-            /*for (int idx = 0; idx < numList.Count; idx++)
-            {
-                idx = numList.IndexOf(item, idx);//idx is the starting index of the search
-                if (idx == -1)// not found, index = -1
-                    return;
-                indexes.Add(idx);
-            }*/
+            DA.SetDataTree(0, ReturnIdxBranches(items, numList));
+        }
 
-            DA.SetDataList(0, FindIndexes(item, numList));
+        DataTree<int> ReturnIdxBranches(List<double> items, List<double> numList)
+        {
+            DataTree<int> idxBracnes = new DataTree<int>();
+            //create new branch for each list
+            int pathIndex = 0;
+            for (int i = 0; i < items.Count; i++)
+            {
+                GH_Path path = new GH_Path(pathIndex);
+                pathIndex++;
+                idxBracnes.AddRange(FindIndexes(items[i], numList), path);
+            }
+
+            return idxBracnes;
         }
 
         List<int> FindIndexes(double item, List<double> numList)
         {
             List<int> indexes = new List<int>();
+            
+            if(!numList.Contains(item)) //check whether list contains the item
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "item(s) was not found in the list");
+            }
+
             for (int idx = 0; idx < numList.Count; idx++)
             {
                 idx = numList.IndexOf(item, idx);//idx is the starting index of the search
-                if (idx == -1)// not found, index = -1
-                    return indexes;
+                if (idx == -1) { return indexes; }// not found, index = -1
+           
                 indexes.Add(idx);
             }
 

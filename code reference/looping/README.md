@@ -7,6 +7,7 @@
 1. <a href="#tag-dictionaryiteration">Dictionary iteration</a>
 1. <a href="#tag-datatreeiteration">DataTree iteration</a>
 1. <a href="#tag-recursivefunctions">Recursive Functions</a>
+1. <a href="#tag-while">while</a>
 1. <a href="#tag-parallelfor">Parallel For</a>
 
 # <a id="tag-foreach" href="#tag-foreach">foreach</a>
@@ -202,6 +203,32 @@
 	//Console:
 	//34
 	//Fibonacci Recursion: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144,...
+```
+
+# <a id="tag-while" href="#tag-while">while</a>
+[Microsoft while statement documentation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#the-while-statement)
+
+```csharp
+	void RunScript()
+	{
+		List<int> nums = new List<int>(){0,2,4,7};
+		
+		int count = 0;
+		int index = 0;
+		while(count < 5)
+		{
+			count += nums[index];
+			index++;
+			Print(count.ToString());
+		}
+		Print("END");
+	}
+
+	//Console:
+	//0
+	//2
+	//6
+	//END
 ```
 
 # <a id="tag-parallelfor" href="#tag-parallelfor">Parallel For</a>

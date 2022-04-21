@@ -12,7 +12,7 @@ namespace yunggh.Components
         /// Initializes a new instance of the MyComponent1 class.
         /// </summary>
         public TREComponent()
-          : base("TREComponent", "TRETrial",
+          : base("TREComponent", "TRE",
               "Description",
               "yung gh", "Subcategory")
         {

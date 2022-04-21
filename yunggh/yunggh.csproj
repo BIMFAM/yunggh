@@ -88,6 +88,7 @@
     <Compile Include="Classes\YungGH_Selection.cs" />
     <Compile Include="Components\Document\CreateSavedView.cs" />
     <Compile Include="Components\Geometry\BooleanBrep.cs" />
+    <Compile Include="Components\Geometry\Bricks.cs" />
     <Compile Include="Components\Geometry\CurveMinMax.cs" />
     <Compile Include="Components\Geometry\Developability.cs" />
     <Compile Include="Components\Data\ReadAttributes.cs" />

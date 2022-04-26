@@ -36,7 +36,7 @@ namespace yunggh.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddNumberParameter("indexes", "in", "retrieved indexes in difference branches", GH_ParamAccess.tree);
+            pManager.AddNumberParameter("indices", "in", "retrieved indices in difference branches", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -109,6 +109,7 @@ namespace yunggh.Components
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
                 return null;
+                
             }
         }
 

@@ -192,7 +192,8 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetDir)*" "$(USERPROFILE)\AppData\Roaming\Grasshopper\Libraries"</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetDir)$(ProjectName).dll" "$(USERPROFILE)\AppData\Roaming\Grasshopper\Libraries\$(ProjectName).gha"
+Copy "$(TargetDir)*" "$(USERPROFILE)\AppData\Roaming\Grasshopper\Libraries"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <FallbackCulture>en-US</FallbackCulture>

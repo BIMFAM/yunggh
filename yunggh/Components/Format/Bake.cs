@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 
 // In order to load the result of this wizard, you will also need to
@@ -22,7 +23,7 @@ namespace yunggh
         /// </summary>
         public Bake()
          : base("Bake", "Bake",
-            "Bake geometry",
+            "Bake geometry duh2",
             "yung gh", "Format")
         {
         }
@@ -37,8 +38,8 @@ namespace yunggh
             // All parameters must have the correct access type. If you want
             // to import lists or trees of values, modify the ParamAccess flag.
             pManager.AddBooleanParameter("Bake", "B", "Boolean for bake operation.", GH_ParamAccess.item);
-            pManager.AddGeometryParameter("Geometry", "G", "Geometry to bake.", GH_ParamAccess.list);
-            pManager.AddTextParameter("Layer", "L", "Layer for each geometry", GH_ParamAccess.list);
+            pManager.AddGeometryParameter("Geometry", "G", "Geometry to bake.", GH_ParamAccess.tree);
+            pManager.AddTextParameter("Layer", "L", "Layer for each geometry", GH_ParamAccess.tree);
             // If you want to change properties of certain parameters,
             // you can use the pManager instance to access them by index:
             //pManager[0].Optional = true;
@@ -67,37 +68,76 @@ namespace yunggh
             // First, we need to retrieve all data from the input parameters.
             // We'll start by declaring variables and assigning them starting values.
             bool run = false;
-            List<GeometryBase> geometry = new List<GeometryBase>();
-            List<string> layer = new List<string>();
+            Grasshopper.Kernel.Data.GH_Structure<IGH_GeometricGoo> geometries = new Grasshopper.Kernel.Data.GH_Structure<IGH_GeometricGoo>();
+            Grasshopper.Kernel.Data.GH_Structure<GH_String> layers = new Grasshopper.Kernel.Data.GH_Structure<GH_String>();
 
             // Then we need to access the input parameters individually.
             // When data cannot be extracted from a parameter, we should abort this method.
             if (!DA.GetData(0, ref run)) return;
-            if (!DA.GetDataList(1, geometry)) return;
-            if (!DA.GetDataList(2, layer)) return;
+            if (!DA.GetDataTree(2, out layers)) return;
+            if (!DA.GetDataTree(1, out geometries)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
-            if (geometry.Count == 0)
+            if (geometries.DataCount == 0)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Geometry not input");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Geometry not input");
                 return;
             }
-            if (layer.Count == 0)
+            if (layers.DataCount == 0)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Layer not input");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Layer not input");
                 return;
             }
 
-            // We're set to create the spiral now. To keep the size of the SolveInstance() method small,
-            // The actual functionality will be in a different method:
+            // run each tree branch, including a safe layer in case the layer tree is less than the geometry branch
             if (run)
             {
                 YungGH yunggh = new YungGH();
-                yunggh.BakeGeometry(geometry, layer);
+                List<string> lastLayer = new List<string> { };
+                for (int i = 0; i < geometries.PathCount; i++)
+                {
+                    var path = geometries.Paths[i];
+
+                    //get geometry
+                    var geoList = geometries.get_Branch(path);
+                    List<GeometryBase> geoBase = new List<GeometryBase>();
+                    foreach (var geo in geoList)
+                    {
+                        string test = geo.ToString();
+                        if (geo == null || test == "Singular Box") { continue; }
+                        var g = GH_Convert.ToGeometryBase(geo);
+                        if (g == null) { continue; }
+                        geoBase.Add(g);
+                    }
+
+                    //get new layers if the list is matching the geometry branch count
+                    if (layers.PathCount > i)
+                    {
+                        lastLayer = new List<string>();
+                        var layerPath = layers.Paths[i];
+                        if (layers.PathExists(path)) 
+                        { 
+                            layerPath = path; 
+                        }
+                        var layer = layers.get_Branch(layerPath);
+
+                        foreach (var l in layer)
+                        {
+                            string name;
+                            GH_Convert.ToString(l, out name, GH_Conversion.Primary);
+                            lastLayer.Add(name);
+                        }
+                    }
+
+                    yunggh.BakeGeometry(geoBase, lastLayer);
+                }
+
+                //TODO: output baked IDs
+                DA.SetData(0, true);
+                return;
             }
 
-            // Finally assign the spiral to the output parameter.
-            DA.SetData(0, true);
+            DA.SetData(0, false);
         }
 
         /// <summary>

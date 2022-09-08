@@ -26,7 +26,7 @@ using System.Collections.Specialized;
 
 namespace yunggh
 {
-    partial class YungGH
+    internal partial class YungGH
     {
         /// <summary>
         /// writes an array of data to a filepath.

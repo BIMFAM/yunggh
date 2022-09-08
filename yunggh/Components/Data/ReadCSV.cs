@@ -40,7 +40,7 @@ namespace yunggh
             // All parameters must have the correct access type. If you want
             // to import lists or trees of values, modify the ParamAccess flag.
             pManager.AddTextParameter("Filepath", "F", "Filepath for csv document", GH_ParamAccess.item);
-            pManager.AddTextParameter("Delimiter", "D", "Char to split file with", GH_ParamAccess.item);
+            pManager.AddTextParameter("Delimiter", "D", "Char to split file with", GH_ParamAccess.item, ",");
             // If you want to change properties of certain parameters,
             // you can use the pManager instance to access them by index:
             //pManager[0].Optional = true;

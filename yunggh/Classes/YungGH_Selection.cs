@@ -14,7 +14,7 @@ using Rhino.Geometry;
 
 namespace yunggh
 {
-    partial class YungGH
+    internal partial class YungGH
     {
         /// <summary>
         /// Selects objects in the Rhino document based on their Guids.

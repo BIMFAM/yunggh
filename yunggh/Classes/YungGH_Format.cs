@@ -18,7 +18,7 @@ using Rhino.Geometry;
 
 namespace yunggh
 {
-    partial class YungGH
+    internal partial class YungGH
     {
         /// <summary>
         /// Bake geometry from Grasshopper into the Rhino Document

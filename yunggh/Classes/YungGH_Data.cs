@@ -80,7 +80,7 @@ namespace yunggh
         /// <summary>
         /// Application Name
         /// </summary>
-        private static string ApplicationName = "Yung GH";
+        private const string ApplicationName = "Yung GH";
 
         /// <summary>
         /// Turn google spreadsheet data into a Grasshopper data tree.

@@ -20,7 +20,7 @@ using System.Collections.Specialized;
 
 namespace yunggh
 {
-    partial class YungGH
+    internal partial class YungGH
     {
     }
 }

@@ -14,7 +14,7 @@ using Rhino.Geometry;
 
 namespace yunggh
 {
-    partial class YungGH
+    internal partial class YungGH
     {
         /// <summary>
         /// Find the largest Brep by volume in an array of Breps.

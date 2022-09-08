@@ -79,11 +79,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\YungGH_Machine Learning.cs" />
     <Compile Include="Classes\YungGH_Data.cs" />
     <Compile Include="Classes\YungGH_Document.cs" />
     <Compile Include="Classes\YungGH_Format.cs" />
     <Compile Include="Classes\YungGH_Geometry.cs" />
+    <Compile Include="Classes\YungGH_Machine Learning.cs" />
     <Compile Include="Classes\YungGH_Mesh.cs" />
     <Compile Include="Classes\YungGH_Selection.cs" />
     <Compile Include="Components\Document\CreateSavedView.cs" />
@@ -192,8 +192,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>
-Copy "$(TargetDir)$(ProjectName).dll" "$(USERPROFILE)\AppData\Roaming\Grasshopper\Libraries\$(ProjectName).gha"</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetDir)*" "$(USERPROFILE)\AppData\Roaming\Grasshopper\Libraries"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <FallbackCulture>en-US</FallbackCulture>

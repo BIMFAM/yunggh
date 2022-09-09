@@ -16,6 +16,48 @@ namespace yunggh
 {
     internal partial class YungGH
     {
+        public static List<GH_Surface> PQMeshSurface(GH_Surface srf, IEnumerable<GH_Curve> rails1, IEnumerable<GH_Curve> rails2)
+        {
+            List<GH_Surface> panels = new List<GH_Surface>();
+            if (srf == null || rails1 == null || rails2 == null) { return panels; }
+            if (rails1.Count() == 0 || rails2.Count() == 0) { return panels; }
+
+            Surface surface = null;
+            if (!GH_Convert.ToSurface(srf, ref surface, GH_Conversion.Both)) { return panels; }
+
+            //get all intersection points
+            var points = new List<Point3d>();
+            foreach (GH_Curve rail1 in rails1)
+            {
+                foreach (GH_Curve rail2 in rails2)
+                {
+                    var ccx = Rhino.Geometry.Intersect.Intersection.CurveCurve(rail1.Value, rail2.Value, 0.001, 0);
+                    if (ccx == null) { continue; }
+                    if (ccx.Count == 0) { continue; }
+
+                    //get intersection as surface parameter
+                    points.Add(ccx[0].PointA);
+                }
+                points.Add(rail1.Value.PointAtStart);
+                points.Add(rail1.Value.PointAtEnd);
+            }
+            foreach (GH_Curve rail2 in rails2)//add end points from other rails
+            {
+                points.Add(rail2.Value.PointAtStart);
+                points.Add(rail2.Value.PointAtEnd);
+            }
+            points = points.Distinct().ToList();
+
+            //TODO: convert intersection points to surface UV coordinates
+            //double u; double v;
+            //if (!surface.ClosestPoint(pt, out u, out v)) { continue; }
+
+            //TODO: sort/organize intersection points into panels
+            //this assumes the rails are isocurves and will just return nothing if they are not, hence the planar nature of the panel
+
+            return panels;
+        }
+
         /// <summary>
         /// Find the largest Brep by volume in an array of Breps.
         /// </summary>

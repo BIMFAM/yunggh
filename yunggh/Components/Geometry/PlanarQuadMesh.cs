@@ -76,7 +76,7 @@ namespace yunggh.Components.Geometry
                 if (rails1.Count == 0 || rails2.Count == 0 || surfaces.Count == 0) { continue; }
 
                 //run panelization routine
-                var panels = PQMeshSurface(surfaces[0], rails1, rails2);
+                var panels = YungGH.PQMeshSurface(surfaces[0], rails1, rails2);
 
                 //add panels to output
                 panelData.AppendRange(panels, path);
@@ -84,18 +84,6 @@ namespace yunggh.Components.Geometry
 
             //set output
             DA.SetDataTree(0, panelData);
-        }
-
-        public List<GH_Surface> PQMeshSurface(GH_Surface srf, IEnumerable<GH_Curve> rails1, IEnumerable<GH_Curve> rails2)
-        {
-            List<GH_Surface> panels = new List<GH_Surface>();
-
-            //TODO: get all intersection points as surface UV coordinates
-
-            //TODO: sort/organize intersection points into panels
-            //this assumes the rails are isocurves and will just return nothing if they are not, hence the planar nature of the panel
-
-            return panels;
         }
 
         /// <summary>

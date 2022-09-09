@@ -93,6 +93,7 @@
     <Compile Include="Components\Geometry\Developability.cs" />
     <Compile Include="Components\Data\ReadAttributes.cs" />
     <Compile Include="Components\Geometry\FilletBrep.cs" />
+    <Compile Include="Components\Geometry\PlanarQuadMesh.cs" />
     <Compile Include="Components\Geometry\ShrinkSurface.cs" />
     <Compile Include="Components\Geometry\SurfaceFit.cs" />
     <Compile Include="Components\Data\WriteAttributes.cs" />

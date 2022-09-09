@@ -36,7 +36,7 @@ namespace yunggh.Components.Geometry
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Planar Quads", "P", "Planar Quad Panels", GH_ParamAccess.tree);
+            pManager.AddSurfaceParameter("Planar Quads", "P", "Planar Quad Panels", GH_ParamAccess.tree);
         }
 
         /// <summary>

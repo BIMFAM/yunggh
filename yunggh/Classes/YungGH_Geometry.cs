@@ -80,7 +80,33 @@ namespace yunggh
                 sortedPoints[kvp.Key] = pts;
             }
 
-            //TODO: create panels
+            //create panels
+            for (int i = 1; i < sortedPoints.Count; i++)
+            {
+                List<Point2d> col1 = sortedPoints.ElementAt(i - 1).Value;
+                List<Point2d> col2 = sortedPoints.ElementAt(i).Value;
+
+                int start = 1;
+
+                for (int j = start; j < col1.Count; j++)
+                {
+                    if(col1.Count <= j || col2.Count <= j) { break; }
+                    Point2d uv1 = col1[j - 1];
+                    Point2d uv2 = col2[j - 1];
+                    Point2d uv3 = col2[j];
+                    Point2d uv4 = col1[j];
+
+                    Point3d p1 = surface.PointAt(uv1.X, uv1.Y);
+                    Point3d p2 = surface.PointAt(uv2.X, uv2.Y);
+                    Point3d p3 = surface.PointAt(uv3.X, uv3.Y);
+                    Point3d p4 = surface.PointAt(uv4.X, uv4.Y);
+
+                    var panel = NurbsSurface.CreateFromCorners(p1, p2, p3, p4);
+                    GH_Surface ghSrf = null;
+                    if(!GH_Convert.ToGHSurface(panel, GH_Conversion.Secondary, ref ghSrf)) { continue; }
+                    panels.Add(ghSrf);
+                }
+            }
 
             return panels;
         }

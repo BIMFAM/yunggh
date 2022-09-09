@@ -38,6 +38,7 @@ namespace yunggh
                     //get intersection as surface parameter
                     points.Add(ccx[0].PointA);
                 }
+                //TODO: add check to make sure rails are isocurves
                 points.Add(rail1.Value.PointAtStart);
                 points.Add(rail1.Value.PointAtEnd);
             }
@@ -48,12 +49,38 @@ namespace yunggh
             }
             points = points.Distinct().ToList();
 
-            //TODO: convert intersection points to surface UV coordinates
-            //double u; double v;
-            //if (!surface.ClosestPoint(pt, out u, out v)) { continue; }
+            //convert intersection points to surface UV coordinates
+            var uvs = new List<Point2d>();
+            foreach (Point3d pt in points)
+            {
+                double u; double v;
+                if (!surface.ClosestPoint(pt, out u, out v)) { continue; }
+                u = Math.Round(u, 3);
+                v = Math.Round(v, 3);
+                uvs.Add(new Point2d(u, v));
+            }
 
-            //TODO: sort/organize intersection points into panels
-            //this assumes the rails are isocurves and will just return nothing if they are not, hence the planar nature of the panel
+            //sort/organize intersection points into order columns
+            var sortedPoints = new SortedDictionary<double, List<Point2d>>();
+            foreach (Point2d uv in uvs)
+            {
+                double key = uv.X;
+                if (!sortedPoints.ContainsKey(key))
+                {
+                    sortedPoints.Add(key, new List<Point2d>());
+                }
+                sortedPoints[key].Add(uv);
+            }
+            //sort each column by the opposite point value
+            for (int i = 0; i < sortedPoints.Count; i++)
+            {
+                var kvp = sortedPoints.ElementAt(i);
+                var pts = kvp.Value;
+                pts = pts.OrderBy(o => o.Y).Distinct().ToList();
+                sortedPoints[kvp.Key] = pts;
+            }
+
+            //TODO: create panels
 
             return panels;
         }

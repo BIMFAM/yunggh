@@ -29,6 +29,8 @@ namespace yunggh
             var points = new List<Point3d>();
             foreach (GH_Curve rail1 in rails1)
             {
+                //TODO: add check to make sure rails are isocurves
+
                 foreach (GH_Curve rail2 in rails2)
                 {
                     var ccx = Rhino.Geometry.Intersect.Intersection.CurveCurve(rail1.Value, rail2.Value, 0.001, 0);
@@ -38,7 +40,7 @@ namespace yunggh
                     //get intersection as surface parameter
                     points.Add(ccx[0].PointA);
                 }
-                //TODO: add check to make sure rails are isocurves
+
                 points.Add(rail1.Value.PointAtStart);
                 points.Add(rail1.Value.PointAtEnd);
             }
@@ -49,7 +51,13 @@ namespace yunggh
             }
             points = points.Distinct().ToList();
 
-            //convert intersection points to surface UV coordinates
+            //convert intersection points to surface UV coordinates, using interval max and min to test if point is on a seam
+            Interval uD = surface.Domain(0);
+            Interval vD = surface.Domain(1);
+            uD.T0 = Math.Round(uD.T0, 3);
+            uD.T1 = Math.Round(uD.T1, 3);
+            vD.T0 = Math.Round(vD.T0, 3);
+            vD.T1 = Math.Round(vD.T1, 3);
             var uvs = new List<Point2d>();
             foreach (Point3d pt in points)
             {
@@ -58,7 +66,36 @@ namespace yunggh
                 u = Math.Round(u, 3);
                 v = Math.Round(v, 3);
                 uvs.Add(new Point2d(u, v));
+
+                //we need to test if the point is on a seam, and if so add the other point too
+                if (u == uD.T0 || u == uD.T1)
+                {
+                    Point3d p0 = surface.PointAt(uD.T0, v);
+                    Point3d p1 = surface.PointAt(uD.T1, v);
+                    if (pt.DistanceTo(p0) < 0.001)
+                    {
+                        uvs.Add(new Point2d(uD.T0, v));
+                    }
+                    if (pt.DistanceTo(p1) < 0.001)
+                    {
+                        uvs.Add(new Point2d(uD.T1, v));
+                    }
+                }
+                if (v == vD.T0 || v == vD.T1)
+                {
+                    Point3d p0 = surface.PointAt(u, vD.T0);
+                    Point3d p1 = surface.PointAt(u, vD.T1);
+                    if (pt.DistanceTo(p0) < 0.001)
+                    {
+                        uvs.Add(new Point2d(u, vD.T0));
+                    }
+                    if (pt.DistanceTo(p1) < 0.001)
+                    {
+                        uvs.Add(new Point2d(u, vD.T1));
+                    }
+                }
             }
+            uvs = uvs.Distinct().ToList();
 
             //sort/organize intersection points into order columns
             var sortedPoints = new SortedDictionary<double, List<Point2d>>();
@@ -90,7 +127,7 @@ namespace yunggh
 
                 for (int j = start; j < col1.Count; j++)
                 {
-                    if(col1.Count <= j || col2.Count <= j) { break; }
+                    if (col1.Count <= j || col2.Count <= j) { break; }
                     Point2d uv1 = col1[j - 1];
                     Point2d uv2 = col2[j - 1];
                     Point2d uv3 = col2[j];
@@ -103,7 +140,7 @@ namespace yunggh
 
                     var panel = NurbsSurface.CreateFromCorners(p1, p2, p3, p4);
                     GH_Surface ghSrf = null;
-                    if(!GH_Convert.ToGHSurface(panel, GH_Conversion.Secondary, ref ghSrf)) { continue; }
+                    if (!GH_Convert.ToGHSurface(panel, GH_Conversion.Secondary, ref ghSrf)) { continue; }
                     panels.Add(ghSrf);
                 }
             }

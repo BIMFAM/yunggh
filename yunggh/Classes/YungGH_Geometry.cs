@@ -98,54 +98,121 @@ namespace yunggh
             uvs = uvs.Distinct().ToList();
 
             //sort/organize intersection points into order columns
-            var sortedPoints = new SortedDictionary<double, List<Point2d>>();
+            var sortedUPoints = new SortedDictionary<double, List<Point2d>>();
+            var sortedVPoints = new SortedDictionary<double, List<Point2d>>();
             foreach (Point2d uv in uvs)
             {
-                double key = uv.X;
-                if (!sortedPoints.ContainsKey(key))
+                //setup U
+                double keyU = uv.X;
+                if (!sortedUPoints.ContainsKey(keyU))
                 {
-                    sortedPoints.Add(key, new List<Point2d>());
+                    sortedUPoints.Add(keyU, new List<Point2d>());
                 }
-                sortedPoints[key].Add(uv);
+                sortedUPoints[keyU].Add(uv);
+
+                //setup V
+                double keyV = uv.Y;
+                if (!sortedVPoints.ContainsKey(keyV))
+                {
+                    sortedVPoints.Add(keyV, new List<Point2d>());
+                }
+                sortedVPoints[keyV].Add(uv);
             }
+
             //sort each column by the opposite point value
-            for (int i = 0; i < sortedPoints.Count; i++)
+            for (int i = 0; i < sortedUPoints.Count; i++)
             {
-                var kvp = sortedPoints.ElementAt(i);
+                var kvp = sortedUPoints.ElementAt(i);
                 var pts = kvp.Value;
                 pts = pts.OrderBy(o => o.Y).Distinct().ToList();
-                sortedPoints[kvp.Key] = pts;
+                sortedUPoints[kvp.Key] = pts;
+            }
+            for (int i = 0; i < sortedVPoints.Count; i++)
+            {
+                var kvp = sortedVPoints.ElementAt(i);
+                var pts = kvp.Value;
+                pts = pts.OrderBy(o => o.X).Distinct().ToList();
+                sortedVPoints[kvp.Key] = pts;
             }
 
             //create panels
-            for (int i = 1; i < sortedPoints.Count; i++)
+            for (int i = 0; i < uvs.Count; i++)
             {
-                List<Point2d> col1 = sortedPoints.ElementAt(i - 1).Value;
-                List<Point2d> col2 = sortedPoints.ElementAt(i).Value;
-
-                int start = 1;
-
-                for (int j = start; j < col1.Count; j++)
+                //get corresponding points if they are available
+                Point2d uv1 = uvs[i];
+                Point2d uv2 = Point2d.Unset;
+                Point2d uv3 = Point2d.Unset;
+                Point2d uv4 = Point2d.Unset;
+                if (sortedUPoints.ContainsKey(uv1.X))
                 {
-                    if (col1.Count <= j || col2.Count <= j) { break; }
-                    Point2d uv1 = col1[j - 1];
-                    Point2d uv2 = col2[j - 1];
-                    Point2d uv3 = col2[j];
-                    Point2d uv4 = col1[j];
-
-                    Point3d p1 = surface.PointAt(uv1.X, uv1.Y);
-                    Point3d p2 = surface.PointAt(uv2.X, uv2.Y);
-                    Point3d p3 = surface.PointAt(uv3.X, uv3.Y);
-                    Point3d p4 = surface.PointAt(uv4.X, uv4.Y);
-
-                    var panel = NurbsSurface.CreateFromCorners(p1, p2, p3, p4);
-                    GH_Surface ghSrf = null;
-                    if (!GH_Convert.ToGHSurface(panel, GH_Conversion.Secondary, ref ghSrf)) { continue; }
-                    panels.Add(ghSrf);
+                    List<Point2d> col = sortedUPoints[uv1.X];
+                    int itemIndex = col.IndexOf(uv1) + 1;
+                    if (itemIndex < col.Count)
+                    {
+                        uv2 = col[itemIndex];
+                    }
                 }
+                if (sortedVPoints.ContainsKey(uv1.Y))
+                {
+                    List<Point2d> col = sortedVPoints[uv1.Y];
+                    int itemIndex = col.IndexOf(uv1) + 1;
+                    if (itemIndex < col.Count)
+                    {
+                        uv3 = col[itemIndex];
+                    }
+
+                    //attempt to get 4th point
+                    if (uv2 != Point2d.Unset)
+                    {
+                        Point2d uv4Temp = new Point2d(uv3.X, uv2.Y);
+                        if (sortedVPoints.ContainsKey(uv4Temp.Y))
+                        {
+                            col = sortedVPoints[uv4Temp.Y];
+                            itemIndex = col.IndexOf(uv4Temp);
+                            if (itemIndex > -1)
+                            {
+                                uv4 = uv4Temp;
+                            }
+                        }
+                    }
+                }
+
+                var ghSrf = UVSRF(surface, uv1, uv2, uv3, uv4);
+                if (ghSrf == null) { continue; }
+                panels.Add(ghSrf);
             }
 
             return panels;
+        }
+
+        public static GH_Surface UVSRF(Surface surface, Point2d uv1, Point2d uv2, Point2d uv3, Point2d uv4)
+        {
+            if (uv1 == null || uv2 == null || uv3 == null) { return null; } //guard statement
+            //get points
+            Point3d p1 = surface.PointAt(uv1.X, uv1.Y);
+            Point3d p2 = surface.PointAt(uv2.X, uv2.Y);
+            Point3d p3 = surface.PointAt(uv3.X, uv3.Y);
+
+            if (p1 == Point3d.Unset || p2 == Point3d.Unset || p3 == Point3d.Unset) { return null; } //guard statement
+
+            //get surface
+            NurbsSurface panel = null;
+            if (uv4 == null || uv4 == Point2d.Unset)
+            {
+                panel = NurbsSurface.CreateFromCorners(p1, p2, p3);
+            }
+            else
+            {
+                Point3d p4 = surface.PointAt(uv4.X, uv4.Y); //only get the fourh point if uv4 isn't empty
+                if (p4 != Point3d.Unset)
+                {
+                    panel = NurbsSurface.CreateFromCorners(p1, p2, p3, p4);
+                }
+            }
+
+            GH_Surface ghSrf = null;
+            GH_Convert.ToGHSurface(panel, GH_Conversion.Secondary, ref ghSrf);
+            return ghSrf;
         }
 
         /// <summary>

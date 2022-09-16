@@ -83,6 +83,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Brick {
+            get {
+                object obj = ResourceManager.GetObject("Brick", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ClassificationGeometrySorter {
             get {
                 object obj = ResourceManager.GetObject("ClassificationGeometrySorter", resourceCulture);
@@ -206,6 +216,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap OrientedBoundingBox {
             get {
                 object obj = ResourceManager.GetObject("OrientedBoundingBox", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PQMesh {
+            get {
+                object obj = ResourceManager.GetObject("PQMesh", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

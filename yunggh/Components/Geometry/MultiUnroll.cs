@@ -165,12 +165,12 @@ namespace yunggh
             DA.SetDataTree(3, centers); //C
         }
 
-        public static List<GH_Brep> ConvertToGH(List<Brep> breps)
+        public static List<GH_Brep> ConvertToGH(IEnumerable<Brep> breps)
         {
             List<GH_Brep> brepsGH = new List<GH_Brep>();
-            for (int i = 0; i < breps.Count; i++)
+            for (int i = 0; i < breps.Count(); i++)
             {
-                Brep b = breps[i];
+                Brep b = breps.ElementAt(i);
                 GH_Brep ghB = null;
                 if (!GH_Convert.ToGHBrep_Primary(b, ref ghB)) { continue; }
                 brepsGH.Add(ghB);

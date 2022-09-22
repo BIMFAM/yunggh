@@ -67,8 +67,8 @@ namespace yunggh.Components.Geometry
                 if (rails1Data.PathCount < i || rails2Data.PathCount < i) { break; }
 
                 //get datas
-                var rails1 = rails1Data.get_Branch(i).Cast<GH_Curve>().ToList(); ;
-                var rails2 = rails2Data.get_Branch(i).Cast<GH_Curve>().ToList(); ;
+                var rails1 = rails1Data.get_Branch(i).Cast<GH_Curve>().ToList();
+                var rails2 = rails2Data.get_Branch(i).Cast<GH_Curve>().ToList();
                 var path = surfacesData.Paths[i];
                 var surfaces = surfacesData.get_Branch(i).Cast<GH_Surface>().ToList();
 

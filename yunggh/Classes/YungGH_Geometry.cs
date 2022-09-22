@@ -16,6 +16,16 @@ namespace yunggh
 {
     internal partial class YungGH
     {
+        public static Point3d AveragePoint(List<Point3d> points)
+        {
+            double x = points.Sum(item => item.X);
+            double y = points.Sum(item => item.Y);
+            double z = points.Sum(item => item.Z);
+            double count = points.Count * 1.00;
+            Point3d center = new Point3d(x / count, y / count, z / count);
+            return center;
+        }
+
         public static List<GH_Surface> PQMeshSurface(GH_Surface srf, IEnumerable<GH_Curve> rails1, IEnumerable<GH_Curve> rails2)
         {
             List<GH_Surface> panels = new List<GH_Surface>();

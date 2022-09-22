@@ -191,6 +191,19 @@ namespace yunggh
             return pointsGH;
         }
 
+        public static List<GH_Curve> ConvertToGH(List<Curve> curves)
+        {
+            List<GH_Curve> curvesGH = new List<GH_Curve>();
+            for (int i = 0; i < curves.Count; i++)
+            {
+                Curve c = curves[i];
+                GH_Curve ghC = new GH_Curve();
+                if (!GH_Convert.ToGHCurve_Primary(c, ref ghC)) { continue; }
+                curvesGH.Add(ghC);
+            }
+            return curvesGH;
+        }
+
         public override GH_Exposure Exposure
         {
             get { return GH_Exposure.primary; }

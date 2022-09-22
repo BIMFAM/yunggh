@@ -42,7 +42,7 @@ namespace yunggh
         {
             get
             {
-                return null;
+                return Resource.DocFonts;
             }
         }
 

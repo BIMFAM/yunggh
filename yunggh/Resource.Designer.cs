@@ -63,6 +63,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AddTabs {
+            get {
+                object obj = ResourceManager.GetObject("AddTabs", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Bake {
             get {
                 object obj = ResourceManager.GetObject("Bake", resourceCulture);
@@ -153,6 +163,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DocFonts {
+            get {
+                object obj = ResourceManager.GetObject("DocFonts", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Export {
             get {
                 object obj = ResourceManager.GetObject("Export", resourceCulture);
@@ -206,6 +226,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap ModelTrainer {
             get {
                 object obj = ResourceManager.GetObject("ModelTrainer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MultiUnroll {
+            get {
+                object obj = ResourceManager.GetObject("MultiUnroll", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -386,6 +416,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap SurfaceFit {
             get {
                 object obj = ResourceManager.GetObject("SurfaceFit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TextCurve {
+            get {
+                object obj = ResourceManager.GetObject("TextCurve", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

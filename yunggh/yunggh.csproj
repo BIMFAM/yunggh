@@ -151,6 +151,7 @@
     <Content Include="Resources\Data\WriteGooglesheet.png" />
     <Content Include="Resources\Document\CreateLayer.png" />
     <None Include="Resources\Document\CreateSavedView.png" />
+    <Content Include="Resources\Document\DocFonts.png" />
     <Content Include="Resources\Document\RestartComponent.png" />
     <Content Include="Resources\Document\UpdateCamera.png" />
     <None Include="Resources\Document\UpdateLayer.png" />
@@ -160,11 +161,14 @@
     <Content Include="Resources\Format\Export.png" />
     <Content Include="Resources\Format\Import.png" />
     <None Include="Resources\Geometry\Developabilitly.png" />
+    <Content Include="Resources\Format\TextCurve.png" />
+    <Content Include="Resources\Geometry\AddTabs.png" />
     <Content Include="Resources\Geometry\BooleanBrep.png" />
     <None Include="Resources\Geometry\Brick.png" />
     <Content Include="Resources\Geometry\CurveMinMax.png" />
     <Content Include="Resources\Geometry\Extremum.png" />
     <Content Include="Resources\Geometry\FilletBrep.png" />
+    <Content Include="Resources\Geometry\MultiUnroll.png" />
     <Content Include="Resources\Geometry\OrientedBoundingBox.png" />
     <None Include="Resources\Geometry\PQMesh.png" />
     <Content Include="Resources\Geometry\ShrinkSurface.png" />

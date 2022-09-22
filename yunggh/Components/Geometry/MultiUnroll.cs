@@ -41,6 +41,7 @@ namespace yunggh
 
             // guard statement for when data cannot be extracted from a parameter
             if (!DA.GetDataList(0, B)) return;
+            if(B.Count == 0) { AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No Breps input."); return; }
 
             //constant
             double tolerance = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
@@ -56,6 +57,7 @@ namespace yunggh
             {
                 //setup
                 Brep brep = B[j];
+                if(brep == null) { continue; }
 
                 //guard statement to ignore single surfaces
                 if (brep.Surfaces.Count < 2) { continue; }

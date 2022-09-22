@@ -91,8 +91,8 @@ namespace yunggh
                     {
                         if (brepEdge.Valence != EdgeAdjacency.Interior) { continue; }
 
-                        GH_Curve curveGH = null;
-                        if (!GH_Convert.ToGHCurve_Primary(brepEdge, ref curveGH)) { continue; }
+                        GH_Curve curveGH = new GH_Curve();
+                        if (!GH_Convert.ToGHCurve_Primary(brepEdge.ToNurbsCurve(), ref curveGH)) { continue; }
                         interiorEdges.Append(curveGH, path);
                     }
 

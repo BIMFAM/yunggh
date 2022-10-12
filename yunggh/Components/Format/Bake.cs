@@ -92,7 +92,6 @@ namespace yunggh
             // run each tree branch, including a safe layer in case the layer tree is less than the geometry branch
             if (run)
             {
-                YungGH yunggh = new YungGH();
                 List<string> lastLayer = new List<string> { };
                 for (int i = 0; i < geometries.PathCount; i++)
                 {
@@ -115,9 +114,9 @@ namespace yunggh
                     {
                         lastLayer = new List<string>();
                         var layerPath = layers.Paths[i];
-                        if (layers.PathExists(path)) 
-                        { 
-                            layerPath = path; 
+                        if (layers.PathExists(path))
+                        {
+                            layerPath = path;
                         }
                         var layer = layers.get_Branch(layerPath);
 
@@ -129,7 +128,7 @@ namespace yunggh
                         }
                     }
 
-                    yunggh.BakeGeometry(geoBase, lastLayer);
+                    YungGH.BakeGeometry(geoBase, lastLayer);
                 }
 
                 //TODO: output baked IDs

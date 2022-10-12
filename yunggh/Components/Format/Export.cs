@@ -105,7 +105,7 @@ namespace yunggh
                     guids.Add(guid);
                 }
 
-                yunggh.Select(Rhino.RhinoDoc.ActiveDoc, guids);
+                YungGH.Select(Rhino.RhinoDoc.ActiveDoc, guids);
 
                 //export objects
                 GH_String[] filepaths = inputFilePaths[path].ToArray();
@@ -117,7 +117,7 @@ namespace yunggh
                     if (!yunggh.SupportedExportFileTypes.Contains(Path.GetExtension(filepath))) continue;
 
                     //export
-                    yunggh.ExportModel(filepath);
+                    YungGH.ExportModel(filepath);
 
                     GH_Path newPath = new GH_Path(path);
                     filePaths.AppendRange(new List<GH_String>() { new GH_String(filepath) }, newPath);

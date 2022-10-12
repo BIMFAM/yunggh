@@ -92,7 +92,7 @@ namespace yunggh
                 for (int j = 0; j < gh_strings.Length; j++)
                 {
                     string fullLayerPath = gh_strings[j].Value;
-                    Rhino.DocObjects.Layer layer = yunggh.LayerByFullPath(fullLayerPath);
+                    Rhino.DocObjects.Layer layer = YungGH.LayerByFullPath(fullLayerPath);
                     List<System.Guid> layerObjects = yunggh.SelectObjectsByLayer(Rhino.RhinoDoc.ActiveDoc, layer);
 
                     foreach (System.Guid guid in layerObjects)

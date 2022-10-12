@@ -21,7 +21,7 @@ namespace yunggh
         /// </summary>
         /// <param name="doc">Rhino Document</param>
         /// <param name="guids">List of guids to select</param>
-        public void Select(RhinoDoc doc, List<System.Guid> guids)
+        public static void Select(RhinoDoc doc, List<System.Guid> guids)
         {
             foreach (System.Guid guid in guids)
                 doc.Objects.Select(guid, true, true, true);

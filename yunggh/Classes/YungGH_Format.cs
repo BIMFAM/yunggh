@@ -25,9 +25,9 @@ namespace yunggh
         /// </summary>
         /// <param name="geometries">List of geometries to "Bake"</param>
         /// <param name="layers">Layers to "Bake" geometry to</param>
-        public void BakeGeometry(List<GeometryBase> geometries, List<string> layers)
+        public static List<Guid> BakeGeometry(List<GeometryBase> geometries, List<string> layers, List<string> names = null)
         {
-            //TODO: return Guids of baked geometry
+            List<Guid> guids = new List<Guid>();
             Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
             int layerIndex = -1;
             string name = "";
@@ -43,6 +43,9 @@ namespace yunggh
                     layerIndex = layer.Index;
                 }
 
+                //set name if available
+                if (names != null) { if (i < names.Count) { name = names[i]; } }
+
                 //create attributes
                 Rhino.DocObjects.ObjectAttributes attributes = new Rhino.DocObjects.ObjectAttributes();
                 attributes.LayerIndex = layerIndex;
@@ -51,8 +54,10 @@ namespace yunggh
                 //attributes.ObjectColor = Color.Black;
 
                 //bake geometry
-                doc.Objects.Add(geometries[i], attributes);
+                Guid guid = doc.Objects.Add(geometries[i], attributes);
+                guids.Add(guid);
             }
+            return guids;
         }
 
         /// <summary>
@@ -88,7 +93,7 @@ namespace yunggh
         /// Export rhino geometry. Geometry should already be selected.
         /// </summary>
         /// <param name="filepath"></param>
-        public void ExportModel(string filepath)
+        public static void ExportModel(string filepath)
         {
             string scriptExport = string.Format("_-Export \"{0}\" _Enter", filepath);
             RhinoApp.RunScript(scriptExport, false);

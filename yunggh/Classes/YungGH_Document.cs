@@ -26,7 +26,7 @@ namespace yunggh
         /// </summary>
         /// <param name="layerPath">Full layer path</param>
         /// <returns>Rhino Layer</returns>
-        public Rhino.DocObjects.Layer LayerByFullPath(string layerPath)
+        public static Rhino.DocObjects.Layer LayerByFullPath(string layerPath)
         {
             Rhino.DocObjects.Layer layer = null;
 
@@ -227,7 +227,7 @@ namespace yunggh
         /// Get all active Guids from the Rhino document
         /// </summary>
         /// <returns>A list of Guids of active objects in the rhino document</returns>
-        public List<System.Guid> GetGuids()
+        public static List<System.Guid> GetGuids()
         {
             List<System.Guid> guids = new List<System.Guid>();
             foreach (Rhino.DocObjects.RhinoObject obj in Rhino.RhinoDoc.ActiveDoc.Objects)

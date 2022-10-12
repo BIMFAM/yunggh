@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Rhino;
 using Rhino.Geometry;
@@ -66,6 +67,15 @@ namespace yunggh
             if (!DA.GetData(0, ref run)) return;
             if (!DA.GetData(1, ref inputFilePath)) return;
             if (!DA.GetData(2, ref keep)) return;
+
+            //get all objects
+            var guids = YungGH.GetGuids(); Debug.WriteLine("Guids.Count: " + guids.Count);
+
+            //combine all objects
+
+            //bake objects as mesh
+
+            //export objects
         }
 
         /// <summary>

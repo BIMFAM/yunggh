@@ -88,6 +88,8 @@
     <Compile Include="Classes\YungGH_Selection.cs" />
     <Compile Include="Components\Document\CreateSavedView.cs" />
     <Compile Include="Components\Document\DocFonts.cs" />
+    <Compile Include="Components\Format\ExportByLayer.cs" />
+    <Compile Include="Components\Format\ExportByMaterial.cs" />
     <Compile Include="Components\Format\TextCurve.cs" />
     <Compile Include="Components\Geometry\AddTabs.cs" />
     <Compile Include="Components\Geometry\BooleanBrep.cs" />
@@ -159,6 +161,8 @@
     <Content Include="Resources\Format\Bake.png" />
     <Content Include="Resources\Format\CombineWorksession.png" />
     <Content Include="Resources\Format\Export.png" />
+    <Content Include="Resources\Format\ExportByLayer.png" />
+    <Content Include="Resources\Format\ExportByMaterial.png" />
     <Content Include="Resources\Format\Import.png" />
     <None Include="Resources\Geometry\Developabilitly.png" />
     <Content Include="Resources\Format\TextCurve.png" />

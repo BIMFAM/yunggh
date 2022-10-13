@@ -107,7 +107,7 @@ namespace yunggh
                     if (rhobj is Brep)
                     {
                         Brep brep = rhobj as Brep;
-                        var mesh_params = MeshingParameters.Default; //TODO: verify params (simplify)
+                        var mesh_params = MeshingParameters.FastRenderMesh; //TODO: verify params (simplify)
                         var meshes = Mesh.CreateFromBrep(brep, mesh_params);
                         foreach (var m in meshes) { mesh.Append(m); }
                     }

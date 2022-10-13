@@ -125,9 +125,23 @@ namespace yunggh
 
             //bake objects as mesh
             List<GeometryBase> geoBase = joinedMeshes.Values.ToList();
-            List<string> layers = joinedMeshes.Keys.ToList(); //TODO: make sure layers are bumped one up and that names are included so fbx perfectly matches Rhino structure
+            List<string> layers = joinedMeshes.Keys.ToList();
             List<string> names = new List<string>();
-            guids = YungGH.BakeGeometry(geoBase, layers); //TODO: Make sure objects have material of layer name assigned
+            for (int i = 0; i < layers.Count; i++)
+            {
+                string layer = layers[i];
+                if (!layer.Contains("::")) { names.Add(layer); continue; }//if this is the topmost layer we just continue
+
+                List<string> parts = layer.Split(new char[] { ':', ':' }).ToList();
+                string name = parts[parts.Count - 1];
+                names.Add(name);
+                parts.RemoveAt(parts.Count - 1);
+                parts.RemoveAll(s => s == "");
+                layer = string.Join("::", parts);
+                layers[i] = layer;
+            }
+
+            guids = YungGH.BakeGeometry(geoBase, layers, names); //TODO: Make sure objects have material of layer name assigned
 
             //export objects
             YungGH.Select(Rhino.RhinoDoc.ActiveDoc, guids);

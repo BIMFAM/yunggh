@@ -67,7 +67,11 @@ namespace yunggh
             if (!DA.GetData(0, ref run)) return;
             if (!DA.GetData(1, ref filepath)) return;
             if (!DA.GetData(2, ref keep)) return;
-            if (!run) { return; }
+
+            //Grasshopper Button Issue Fix
+            if (!run && !pending) return; //return when button isn't pressed
+            if (!pending) { pending = true; return; }//return & set pending to true
+            pending = false; // reset pending to false
 
             //get all objects
             var guids = YungGH.GetGuids(); Debug.WriteLine("Guids.Count: " + guids.Count);
@@ -107,7 +111,7 @@ namespace yunggh
                     if (rhobj is Brep)
                     {
                         Brep brep = rhobj as Brep;
-                        var mesh_params = MeshingParameters.FastRenderMesh; //TODO: verify params (simplify)
+                        var mesh_params = MeshingParameters.FastRenderMesh;
                         var meshes = Mesh.CreateFromBrep(brep, mesh_params);
                         foreach (var m in meshes) { mesh.Append(m); }
                     }
@@ -150,7 +154,13 @@ namespace yunggh
                 filepath = Path.ChangeExtension(filepath, ".fbx");
             }
             YungGH.ExportModel(filepath);
+
+            //delete baked elements if keep is false
+            if (keep) { return; }
+            doc.Objects.Delete(guids, true);
         }
+
+        private bool pending = false;
 
         /// <summary>
         /// The Exposure property controls where in the panel a component icon

@@ -1,4 +1,4 @@
-# code reference
+# Code reference
 
 # [types](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/types)
 - [Variable](https://github.com/BIMFAM/yunggh/tree/master/code%20reference/types#tag-variable)

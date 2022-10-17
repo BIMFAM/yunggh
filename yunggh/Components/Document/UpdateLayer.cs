@@ -95,8 +95,7 @@ namespace yunggh
             }
 
             // Main
-            YungGH yunggh = new YungGH();
-            Rhino.DocObjects.Layer layer = yunggh.CreateModify(Rhino.RhinoDoc.ActiveDoc, fullLayerPath, color, locked,
+            Rhino.DocObjects.Layer layer = YungGH.CreateModify(Rhino.RhinoDoc.ActiveDoc, fullLayerPath, color, locked,
                 plotLineType, material, onOff, plotLineColor, plotLineWidth, delete);
 
             string returnPath = "";

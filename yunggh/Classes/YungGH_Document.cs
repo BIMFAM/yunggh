@@ -46,7 +46,7 @@ namespace yunggh
         /// </summary>
         /// <param name="doc">Rhino Document</param>
         /// <param name="layer">Full layer path</param>
-        public void DeleteObjectsOnLayer(RhinoDoc doc, Rhino.DocObjects.Layer layer)
+        public static void DeleteObjectsOnLayer(RhinoDoc doc, Rhino.DocObjects.Layer layer)
         {
             //TODO: return deleted Guids
             Rhino.DocObjects.RhinoObject[] rhobjs = doc.Objects.FindByLayer(layer);
@@ -70,7 +70,7 @@ namespace yunggh
         /// <param name="printWidth">Layer plot width</param>
         /// <param name="delete">If true, the layer is deleted</param>
         /// <returns>Rhino Layer</returns>
-        public Rhino.DocObjects.Layer CreateModify(RhinoDoc doc, string layerPath, System.Drawing.Color color,
+        public static Rhino.DocObjects.Layer CreateModify(RhinoDoc doc, string layerPath, System.Drawing.Color color,
           bool locked, string lineTypeName,
           string materialName, bool onOff,
           System.Drawing.Color printColor, double printWidth, bool delete)

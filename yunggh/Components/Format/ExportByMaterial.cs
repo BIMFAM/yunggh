@@ -85,7 +85,7 @@ namespace yunggh
                 var rhobj = doc.Objects.FindId(guid);
                 if (rhobj == null) { continue; }
                 int materialIndex = rhobj.Attributes.MaterialIndex;
-                if(materialIndex == -1) //get layer material if there isn't one on the object
+                if (materialIndex == -1) //get layer material if there isn't one on the object
                 {
                     int layerIndex = rhobj.Attributes.LayerIndex;
                     var layer = RhinoDoc.ActiveDoc.Layers.FindIndex(layerIndex);
@@ -107,7 +107,7 @@ namespace yunggh
                 var mat = RhinoDoc.ActiveDoc.Materials.FindIndex(materialIndex);
 
                 string materialName = "NoMaterialSelected";
-                if(materialIndex != -1)
+                if (materialIndex != -1)
                 {
                     materialName = RhinoDoc.ActiveDoc.Materials.FindIndex(materialIndex).Name;
                 }
@@ -136,7 +136,7 @@ namespace yunggh
                         mesh.Append(m);
                     }
                 }
-                if(joinedMeshes.ContainsKey(materialName))
+                if (joinedMeshes.ContainsKey(materialName))
                 {
                     var geo = joinedMeshes[materialName];
                     Mesh m = geo as Mesh;
@@ -155,7 +155,7 @@ namespace yunggh
             bool locked = false;
             bool onOff = true;
             string plotLineType = "";
-            Color plotLineColor = Color.Black; 
+            Color plotLineColor = Color.Black;
             double plotLineWidth = 1.0;
             bool delete = false;
             YungGH.CreateModify(Rhino.RhinoDoc.ActiveDoc, fullLayerPath, color, locked,
@@ -170,7 +170,7 @@ namespace yunggh
                 layers.Add(fullLayerPath);
             }
 
-            guids = YungGH.BakeGeometry(geoBase, layers, materials); //TODO: Make sure objects have material of layer name assigned
+            guids = YungGH.BakeGeometry(geoBase, layers, materials, materials); //TODO: Make sure objects have material of layer name assigned
 
             //export objects
             YungGH.Select(Rhino.RhinoDoc.ActiveDoc, guids);

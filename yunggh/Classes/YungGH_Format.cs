@@ -25,7 +25,7 @@ namespace yunggh
         /// </summary>
         /// <param name="geometries">List of geometries to "Bake"</param>
         /// <param name="layers">Layers to "Bake" geometry to</param>
-        public static List<Guid> BakeGeometry(List<GeometryBase> geometries, List<string> layers, List<string> names = null)
+        public static List<Guid> BakeGeometry(List<GeometryBase> geometries, List<string> layers, List<string> names = null, List<string> materials = null)
         {
             List<Guid> guids = new List<Guid>();
             Rhino.RhinoDoc doc = Rhino.RhinoDoc.ActiveDoc;
@@ -45,11 +45,20 @@ namespace yunggh
 
                 //set name if available
                 if (names != null) { if (i < names.Count) { name = names[i]; } }
-
+                int matIndex = -1;
+                if (materials != null)
+                {
+                    if (i < materials.Count)
+                    {
+                        matIndex = RhinoDoc.ActiveDoc.Materials.Find(materials[i], true);
+                    }
+                }
                 //create attributes
                 Rhino.DocObjects.ObjectAttributes attributes = new Rhino.DocObjects.ObjectAttributes();
                 attributes.LayerIndex = layerIndex;
                 attributes.Name = name;
+                attributes.MaterialIndex = matIndex;
+                if (matIndex != -1) { attributes.MaterialSource = Rhino.DocObjects.ObjectMaterialSource.MaterialFromObject; }
                 //attributes.ColorSource = ObjectColorSource.ColorFromObject;
                 //attributes.ObjectColor = Color.Black;
 

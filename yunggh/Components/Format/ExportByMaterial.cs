@@ -136,6 +136,15 @@ namespace yunggh
                         mesh.Append(m);
                     }
                 }
+
+                mesh.RebuildNormals();
+                //mesh.Vertices.CombineIdentical(true, true); //is this necessary?
+                //mesh.Normals.ComputeNormals(); //is this necessary?
+                //mesh.UnifyNormals(); //is this necessary?
+                //mesh.Compact();
+                mesh.Faces.CullDegenerateFaces();
+
+                //join if already existing
                 if (joinedMeshes.ContainsKey(materialName))
                 {
                     var geo = joinedMeshes[materialName];

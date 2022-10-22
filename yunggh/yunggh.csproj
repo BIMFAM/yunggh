@@ -116,7 +116,15 @@
     <Compile Include="Components\Machine Learning\ClusteringGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
+    <Compile Include="Components\RealEstate\ProForma1.cs" />
+    <Compile Include="Components\RealEstate\ProForma2.cs" />
+    <Compile Include="Components\RealEstate\ProForma3.cs" />
+    <Compile Include="Components\RealEstate\ProForma4.cs" />
+    <Compile Include="Components\RealEstate\Revenue.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
+    <Compile Include="Components\Shape\Erosion.cs" />
+    <Compile Include="Components\Shape\MedialAxis.cs" />
+    <Compile Include="Components\Shape\PolarConvexity.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -183,12 +191,20 @@
     <Content Include="Resources\Machine Learning\ClusteringGeometrySorter.png" />
     <Content Include="Resources\Machine Learning\ModelTrainer.png" />
     <Content Include="Resources\Mesh\SimpleMeshCube.png" />
+    <Content Include="Resources\RealEstate\ProForma1.png" />
+    <Content Include="Resources\RealEstate\ProForma2.png" />
+    <Content Include="Resources\RealEstate\ProForma3.png" />
+    <Content Include="Resources\RealEstate\ProForma4.png" />
+    <Content Include="Resources\RealEstate\Revenue.png" />
     <Content Include="Resources\Selection\SelDup.png" />
     <Content Include="Resources\Selection\SelDupAll.png" />
     <Content Include="Resources\Selection\SelectGeometry.png" />
     <Content Include="Resources\Selection\SelectLayer.png" />
     <Content Include="Resources\Selection\SelectPoint.png" />
     <Content Include="Resources\Selection\SelUnique.png" />
+    <Content Include="Resources\Shape\Erosion.png" />
+    <Content Include="Resources\Shape\MedialAxis.png" />
+    <Content Include="Resources\Shape\PolarConvexity.png" />
     <Content Include="Resources\yunggh.png" />
   </ItemGroup>
   <ItemGroup>

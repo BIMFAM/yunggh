@@ -39,6 +39,55 @@ namespace yunggh
 {
     internal partial class YungGH
     {
+        public static Mesh SmartMeshCombine(List<Guid> rhobjs)
+        {
+            Mesh mesh = new Mesh();
+            foreach (var guid in rhobjs)
+            {
+                //get rhino object
+                var rhobj = Rhino.RhinoDoc.ActiveDoc.Objects.FindId(guid);
+                var geo = rhobj.Geometry;
+                Transform xform;
+                var textureMapping = rhobj.GetTextureMapping(1, out xform);
+
+                if (geo is Mesh)
+                {
+                    Mesh m = geo as Mesh;
+                    m.SetTextureCoordinates(textureMapping, xform, false);
+                    mesh.Append(m);
+                    continue;
+                }
+                if (geo is Brep)
+                {
+                    Brep brep = geo as Brep;
+                    var mesh_params = MeshingParameters.FastRenderMesh;
+                    var meshes = Mesh.CreateFromBrep(brep, mesh_params);
+                    foreach (var m in meshes)
+                    {
+                        m.SetTextureCoordinates(textureMapping, xform, false);
+                        mesh.Append(m);
+                    }
+                }
+                if (geo is Surface)
+                {
+                    Surface srf = geo as Surface;
+                    var mesh_params = MeshingParameters.Default;
+                    var m = Mesh.CreateFromSurface(srf, mesh_params);
+                    m.SetTextureCoordinates(textureMapping, xform, false);
+                    mesh.Append(m);
+                }
+            }
+
+            mesh.RebuildNormals();
+            //mesh.Vertices.CombineIdentical(true, true); //is this necessary?
+            //mesh.Normals.ComputeNormals(); //is this necessary?
+            //mesh.UnifyNormals(); //is this necessary?
+            //mesh.Compact();
+            mesh.Faces.CullDegenerateFaces();
+
+            return mesh;
+        }
+
         public static Mesh SmartMeshCombine(List<GeometryBase> rhobjs)
         {
             Mesh mesh = new Mesh();

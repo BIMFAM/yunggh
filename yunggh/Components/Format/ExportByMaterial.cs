@@ -101,7 +101,7 @@ namespace yunggh
 
             //organize objects by layer
             var doc = Rhino.RhinoDoc.ActiveDoc;
-            Dictionary<int, List<GeometryBase>> objects = new Dictionary<int, List<GeometryBase>>();
+            Dictionary<int, List<Guid>> objects = new Dictionary<int, List<Guid>>();
             foreach (var guid in guids)
             {
                 var rhobj = doc.Objects.FindId(guid);
@@ -115,14 +115,14 @@ namespace yunggh
                 }
                 if (!objects.ContainsKey(materialIndex))
                 {
-                    objects.Add(materialIndex, new List<GeometryBase>());
+                    objects.Add(materialIndex, new List<Guid>());
                 }
-                objects[materialIndex].Add(rhobj.Geometry);
+                objects[materialIndex].Add(guid);
             }
 
             //combine objects into Meshes
             Dictionary<string, GeometryBase> joinedMeshes = new Dictionary<string, GeometryBase>();
-            foreach (KeyValuePair<int, List<GeometryBase>> kvp in objects)
+            foreach (KeyValuePair<int, List<Guid>> kvp in objects)
             {
                 //get layer name
                 var materialIndex = kvp.Key;

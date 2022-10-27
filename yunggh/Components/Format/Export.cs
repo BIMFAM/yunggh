@@ -62,6 +62,7 @@ namespace yunggh
             pManager.AddBooleanParameter("Export", "E", "Run Export", GH_ParamAccess.item);
             pManager.AddGenericParameter("Objects", "O", "Objects to Export", GH_ParamAccess.tree);
             pManager.AddTextParameter("Filepaths", "F", "Export Filepath", GH_ParamAccess.tree);
+            pManager.AddPointParameter("Origin", "O", "Exports File with Origin.", GH_ParamAccess.item, Point3d.Origin);
         }
 
         /// <summary>
@@ -79,17 +80,15 @@ namespace yunggh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            // First, we need to retrieve all data from the input parameters.
-            // We'll start by declaring variables and assigning them starting values.
+            //Get input data from Grasshopper
             bool run = false;
             GH_Structure<IGH_Goo> objects;
             GH_Structure<GH_String> inputFilePaths;
-
-            // Then we need to access the input parameters individually.
-            // When data cannot be extracted from a parameter, we should abort this method.
+            Point3d origin = Point3d.Origin;
             if (!DA.GetData(0, ref run)) return;
             if (!DA.GetDataTree<IGH_Goo>(1, out objects)) return;
             if (!DA.GetDataTree<GH_String>(2, out inputFilePaths)) return;
+            if (!DA.GetData(3, ref origin)) return;
 
             // main
 
@@ -136,7 +135,7 @@ namespace yunggh
                     if (!yunggh.SupportedExportFileTypes.Contains(Path.GetExtension(filepath))) continue;
 
                     //export
-                    YungGH.ExportModel(filepath);
+                    YungGH.ExportModel(filepath, origin);
 
                     GH_Path newPath = new GH_Path(path);
                     filePaths.AppendRange(new List<GH_String>() { new GH_String(filepath) }, newPath);

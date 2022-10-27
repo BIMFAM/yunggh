@@ -63,6 +63,7 @@ namespace yunggh
             pManager.AddBooleanParameter("Export", "E", "Run Export", GH_ParamAccess.item);
             pManager.AddTextParameter("Filepaths", "F", "Export Filepath", GH_ParamAccess.item);
             pManager.AddBooleanParameter("Keep Mesh", "K", "Keep Meshes after combination.", GH_ParamAccess.item);
+            pManager.AddPointParameter("Origin", "O", "Exports File with Origin.", GH_ParamAccess.item, Point3d.Origin);
         }
 
         /// <summary>
@@ -83,9 +84,11 @@ namespace yunggh
             bool run = false;
             string filepath = string.Empty;
             bool keep = false;
+            Point3d origin = Point3d.Origin;
             if (!DA.GetData(0, ref run)) return;
             if (!DA.GetData(1, ref filepath)) return;
             if (!DA.GetData(2, ref keep)) return;
+            if (!DA.GetData(3, ref origin)) return;
 
             //Grasshopper Button Issue Fix
             if (!run && !pending) return; //return when button isn't pressed
@@ -172,7 +175,7 @@ namespace yunggh
             {
                 filepath = Path.ChangeExtension(filepath, ".fbx");
             }
-            YungGH.ExportModel(filepath);
+            YungGH.ExportModel(filepath, origin);
 
             //delete baked elements if keep is false
             if (keep) { return; }

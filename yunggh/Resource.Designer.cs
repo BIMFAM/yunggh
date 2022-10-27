@@ -192,6 +192,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Erosion {
+            get {
+                object obj = ResourceManager.GetObject("Erosion", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Export {
             get {
                 object obj = ResourceManager.GetObject("Export", resourceCulture);
@@ -262,6 +272,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MedialAxis {
+            get {
+                object obj = ResourceManager.GetObject("MedialAxis", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ModelTrainer {
             get {
                 object obj = ResourceManager.GetObject("ModelTrainer", resourceCulture);
@@ -292,9 +312,59 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap PolarConvexity {
+            get {
+                object obj = ResourceManager.GetObject("PolarConvexity", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap PQMesh {
             get {
                 object obj = ResourceManager.GetObject("PQMesh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProForma1 {
+            get {
+                object obj = ResourceManager.GetObject("ProForma1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProForma2 {
+            get {
+                object obj = ResourceManager.GetObject("ProForma2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProForma3 {
+            get {
+                object obj = ResourceManager.GetObject("ProForma3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProForma4 {
+            get {
+                object obj = ResourceManager.GetObject("ProForma4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -335,6 +405,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap RestartComponent {
             get {
                 object obj = ResourceManager.GetObject("RestartComponent", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Revenue {
+            get {
+                object obj = ResourceManager.GetObject("Revenue", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

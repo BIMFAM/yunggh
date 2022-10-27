@@ -91,6 +91,7 @@
     <Compile Include="Components\Format\ExportByLayer.cs" />
     <Compile Include="Components\Format\ExportByMaterial.cs" />
     <Compile Include="Components\Format\TextCurve.cs" />
+    <Compile Include="Components\Format\TextureMapBox.cs" />
     <Compile Include="Components\Geometry\AddTabs.cs" />
     <Compile Include="Components\Geometry\BooleanBrep.cs" />
     <Compile Include="Components\Geometry\Bricks.cs" />

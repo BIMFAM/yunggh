@@ -108,6 +108,12 @@ namespace yunggh
             RhinoApp.RunScript(scriptExport, false);
         }
 
+        public static void ExportModel(string filepath, Point3d origin)
+        {
+            string scriptExport = string.Format("_-ExportWithOrigin {0} \"{1}\" _Enter", origin.ToString(), filepath);
+            RhinoApp.RunScript(scriptExport, false);
+        }
+
         /// <summary>
         /// A list of supported import file extensions for Rhino.
         /// </summary>

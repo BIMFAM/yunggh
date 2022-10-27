@@ -17,7 +17,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -121,30 +121,7 @@ namespace yunggh
                 var layerIndex = kvp.Key;
                 string layerName = RhinoDoc.ActiveDoc.Layers.FindIndex(layerIndex).FullPath;
                 var rhobjs = kvp.Value;
-                Mesh mesh = new Mesh();
-                foreach (var rhobj in rhobjs)
-                {
-                    if (rhobj is Mesh)
-                    {
-                        Mesh m = rhobj as Mesh;
-                        mesh.Append(m);
-                        continue;
-                    }
-                    if (rhobj is Brep)
-                    {
-                        Brep brep = rhobj as Brep;
-                        var mesh_params = MeshingParameters.FastRenderMesh;
-                        var meshes = Mesh.CreateFromBrep(brep, mesh_params);
-                        foreach (var m in meshes) { mesh.Append(m); }
-                    }
-                    if (rhobj is Surface)
-                    {
-                        Surface srf = rhobj as Surface;
-                        var mesh_params = MeshingParameters.Default;
-                        var m = Mesh.CreateFromSurface(srf, mesh_params);
-                        mesh.Append(m);
-                    }
-                }
+                Mesh mesh = YungGH.SmartMeshCombine(rhobjs);
 
                 joinedMeshes.Add(layerName, mesh);
             }

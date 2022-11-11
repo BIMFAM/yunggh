@@ -117,20 +117,10 @@
     <Compile Include="Components\Machine Learning\ClusteringGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
-    <Compile Include="Components\RealEstate\ProForma1.cs" />
-    <Compile Include="Components\RealEstate\ProForma2.cs" />
-    <Compile Include="Components\RealEstate\ProForma3.cs" />
-    <Compile Include="Components\RealEstate\ProForma4.cs" />
-    <Compile Include="Components\RealEstate\Revenue.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
     <Compile Include="Components\Shape\Erosion.cs" />
     <Compile Include="Components\Shape\MedialAxis.cs" />
     <Compile Include="Components\Shape\PolarConvexity.cs" />
-    <Compile Include="Resource.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resource.resx</DependentUpon>
-    </Compile>
     <Compile Include="Components\Document\RestartComponent.cs" />
     <Compile Include="Components\Selection\SelDup.cs" />
     <Compile Include="Components\Selection\SelDupAll.cs" />
@@ -145,6 +135,11 @@
     <Compile Include="Components\Document\ViewportCapture.cs" />
     <Compile Include="Components\Data\WriteCSV.cs" />
     <Compile Include="Components\Data\WriteGoogleSheet.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
     <Compile Include="yungghInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -192,11 +187,6 @@
     <Content Include="Resources\Machine Learning\ClusteringGeometrySorter.png" />
     <Content Include="Resources\Machine Learning\ModelTrainer.png" />
     <Content Include="Resources\Mesh\SimpleMeshCube.png" />
-    <Content Include="Resources\RealEstate\ProForma1.png" />
-    <Content Include="Resources\RealEstate\ProForma2.png" />
-    <Content Include="Resources\RealEstate\ProForma3.png" />
-    <Content Include="Resources\RealEstate\ProForma4.png" />
-    <Content Include="Resources\RealEstate\Revenue.png" />
     <Content Include="Resources\Selection\SelDup.png" />
     <Content Include="Resources\Selection\SelDupAll.png" />
     <Content Include="Resources\Selection\SelectGeometry.png" />

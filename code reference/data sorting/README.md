@@ -3,6 +3,7 @@
 1. <a href="#tag-reverse">Reverse</a>
 1. <a href="#tag-sort">Sort</a>
 1. <a href="#tag-orderby">OrderBy</a>
+1. <a href="#tag-orderbyanotherlist">OrderBy Another List</a>
 
 # <a id="tag-reverse" href="#tag-reverse">Reverse</a>
 [Microsoft Reverse documentation](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.reverse?view=net-6.0)
@@ -62,4 +63,32 @@
 	//2
 	//4
 	//7
+```
+
+# <a id="tag-orderbyanotherlist" href="#tag-orderbyanotherlist">OrderBy Another List</a>
+
+```csharp
+	using System.Linq;
+	
+	var list1 = new List<double>(){4,2,3,2,1,1,1};
+	var list2 = new List<double>(){"forth","second1","third","second2","one1","one2","one3"};
+	
+	list2 = list2.Select((n, inde) => new { Name = n, Index = index})
+		.OrderBy(x => list1.ElementAtOrDefault(x.Index))
+		.Select(x => x.Name)
+		.ToList();
+	
+	foreach(var str in list2)
+	{
+		Print(str);
+	}
+	
+	//Console:
+	//one1
+	//one2
+	//one3
+	//second1
+	//second2
+	//third
+	//fourth
 ```

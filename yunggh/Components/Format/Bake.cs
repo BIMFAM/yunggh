@@ -17,11 +17,15 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
+using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
+
 using Rhino.Geometry;
 
 // In order to load the result of this wizard, you will also need to
@@ -69,13 +73,9 @@ namespace yunggh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            // Use the pManager object to register your output parameters.
-            // Output parameters do not have default values, but they too must have the correct access type.
-            pManager.AddBooleanParameter("Baked", "B", "Boolean indicating successful bake operation.", GH_ParamAccess.item);
-            // Sometimes you want to hide a specific parameter from the Rhino preview.
-            // You can use the HideParameter() method as a quick way:
-            //pManager.HideParameter(0);
-        }
+            pManager.AddBooleanParameter("Baked", "B", "Boolean indicating successful bake operation.", GH_ParamAccess.item);
+            pManager.AddGenericParameter("GUID", "ID", "Baked Geometry", GH_ParamAccess.tree);
+        }
 
         /// <summary>
         /// This is the method that actually does the work.
@@ -111,6 +111,7 @@ namespace yunggh
             // run each tree branch, including a safe layer in case the layer tree is less than the geometry branch
             if (run)
             {
+                var guids = new DataTree<Guid>();
                 List<string> lastLayer = new List<string> { };
                 for (int i = 0; i < geometries.PathCount; i++)
                 {
@@ -121,7 +122,9 @@ namespace yunggh
                     List<GeometryBase> geoBase = new List<GeometryBase>();
                     foreach (var geo in geoList)
                     {
+                        if(geo == null) { continue; }
                         string test = geo.ToString();
+                        Debug.WriteLine(test);
                         if (geo == null || test == "Singular Box") { continue; }
                         var g = GH_Convert.ToGeometryBase(geo);
                         if (g == null) { continue; }
@@ -147,11 +150,13 @@ namespace yunggh
                         }
                     }
 
-                    YungGH.BakeGeometry(geoBase, lastLayer);
+                    var baked = YungGH.BakeGeometry(geoBase, lastLayer);
+                    guids.AddRange(baked, path);
                 }
 
-                //TODO: output baked IDs
+                //output baked IDs
                 DA.SetData(0, true);
+                DA.SetDataTree(1, guids);
                 return;
             }
 

@@ -17,7 +17,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -312,11 +312,40 @@ namespace yunggh
         /// <param name="normal">returns the normal of the bounding boxes plane</param>
         /// <param name="forward">returns the forward direction of the bounding box</param>
         /// <returns>A bounding box fitted around the brep</returns>
-        public Box FitBoundingBox(Brep B, out Plane plane, out Vector3d normal, out Vector3d forward)
+        public static Box FitBoundingBox(GeometryBase geo, out Plane plane, out Vector3d normal, out Vector3d forward)
+        {
+            //set defaults
+            Point3d origin = new Point3d(0, 0, 0);
+            normal = new Vector3d(0, 0, 1);
+            forward = new Vector3d(0, 0, 0);
+            plane = new Plane();
+
+            //depending on geometry type, get orientation
+            if (geo is Brep) { BrepBBPlane(geo as Brep, out plane, out normal, out forward); }
+            if (geo is Mesh) { MeshBBPlane(geo as Mesh, out plane, out normal, out forward); }
+            if (geo is Curve) { CurveBBPlane(geo as Curve, out plane, out normal, out forward); }
+
+            //create bounding box
+            forward.Transform(Rhino.Geometry.Transform.PlanarProjection(plane));
+            forward.Unitize();
+            double angle = Vector3d.VectorAngle(plane.YAxis, forward, plane);
+            plane.Rotate(angle, normal);
+
+            //create bounding box
+            Box worldBox;
+            BoundingBox box = geo.GetBoundingBox(plane, out worldBox);
+
+            return worldBox;
+        }
+
+        private static void BrepBBPlane(Brep B, out Plane plane, out Vector3d normal, out Vector3d forward)
         {
             //get surface normal from largest surface of brep
             Point3d origin = new Point3d(0, 0, 0);
             normal = new Vector3d(0, 0, 1);
+            forward = new Vector3d(0, 0, 0);
+
+            //find largest planar face
             double largestArea = 0;
             bool NoPlanarSurfacesFound = true;
             foreach (BrepFace brep in B.Faces)
@@ -353,7 +382,6 @@ namespace yunggh
             }
 
             //get forward direction vector from longest line of brep
-            forward = new Vector3d(0, 0, 0);
             double longestLength = 0;
             foreach (Curve crv in B.Edges)
             {
@@ -369,16 +397,104 @@ namespace yunggh
 
             //contruct orientation plane from normal and forward vector
             plane = new Plane(origin, normal);
-            forward.Transform(Rhino.Geometry.Transform.PlanarProjection(plane));
-            forward.Unitize();
-            double angle = Vector3d.VectorAngle(plane.YAxis, forward, plane);
-            plane.Rotate(angle, normal);
+        }
 
-            //create bounding box
-            Box worldBox;
-            BoundingBox box = B.GetBoundingBox(plane, out worldBox);
+        private static void MeshBBPlane(Mesh M, out Plane plane, out Vector3d normal, out Vector3d forward)
+        {
+            //fix mesh if necessary
+            if (M.FaceNormals.Count == 0)
+            {
+                //pre simplify mesh
+                M.MergeAllCoplanarFaces(Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+                M.Vertices.CombineIdentical(true, true); //is this necessary?
+                M.Normals.ComputeNormals(); //is this necessary?
+                M.UnifyNormals(); //is this necessary?
+            }
 
-            return worldBox;
+            //get surface normal from largest surface of brep
+            Point3d origin = new Point3d(0, 0, 0);
+            normal = new Vector3d(0, 0, 1);
+            forward = new Vector3d(0, 0, 0);
+
+            //find largest planar face
+            double largestArea = 0;
+            int largestFaceIndex = 0;
+            var dupM = M.DuplicateMesh();
+            for (int f = 0; f < M.Faces.Count; f++)
+            {
+                var face = dupM.Faces.ExtractFaces(new int[f]); //var face = M.Faces[f];
+                if (face == null) { continue; }
+                var area = Rhino.Geometry.AreaMassProperties.Compute(face);
+                if (area == null) { continue; }
+                if (area.Area < largestArea) continue;
+
+                largestArea = area.Area;
+                origin = Rhino.Geometry.AreaMassProperties.Compute(face).Centroid;
+                normal = M.FaceNormals[f];
+                largestFaceIndex = f;
+            }
+
+            //making a huge assumption here that they want only rotate in the XY plane
+            bool verticalFound = false;
+            var largestFace = M.Faces[largestFaceIndex];
+            var edgeVecs = new List<Vector3d>();
+            edgeVecs.Add(M.Vertices[largestFace.B] - M.Vertices[largestFace.A]);
+            edgeVecs.Add(M.Vertices[largestFace.C] - M.Vertices[largestFace.B]);
+            if (largestFace.C != largestFace.D) { edgeVecs.Add(M.Vertices[largestFace.D] - M.Vertices[largestFace.C]); }
+            edgeVecs.Add(M.Vertices[largestFace.A] - M.Vertices[largestFace.D]);
+            if (normal.Z == 0) //huge assumption happening here
+            {
+                forward = Vector3d.ZAxis;
+            }
+            else
+            {
+                edgeVecs = edgeVecs.OrderBy(v => Math.Abs(v.Length)).ToList();
+                forward = edgeVecs[0];
+                if (Vector3d.VectorAngle(forward, normal) == 0)
+                {
+                    forward = edgeVecs[1];
+                }
+            }
+            //contruct orientation plane from normal and forward vector
+            plane = new Plane(origin, normal);
+        }
+
+        private static void CurveBBPlane(Curve C, out Plane plane, out Vector3d normal, out Vector3d forward)
+        {
+            //get surface normal from largest surface of brep
+            Point3d origin = new Point3d(0, 0, 0);
+            normal = new Vector3d(0, 0, 1);
+            forward = new Vector3d(0, 0, 0);
+
+            //easy if the curve is already planar
+            if (C.TryGetPlane(out plane))
+            {
+                forward = plane.XAxis;
+                normal = plane.ZAxis;
+                return;
+            }
+
+            //next we try and explode the curve and find the largest planar curve
+            var segments = C.DuplicateSegments();
+            double longestSegment = 0;
+            foreach (var seg in segments)
+            {
+                if (seg.GetLength() < longestSegment) { continue; }
+
+                longestSegment = seg.GetLength();
+                if (seg.TryGetPlane(out plane))
+                {
+                    forward = plane.XAxis;
+                    normal = plane.ZAxis;
+                }
+                else
+                {
+                    normal = seg.PointAtEnd - seg.PointAtStart;
+                }
+            }
+
+            //contruct orientation plane from normal and forward vector
+            plane = new Plane(origin, normal);
         }
 
         /// <summary>

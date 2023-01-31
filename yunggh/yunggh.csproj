@@ -117,6 +117,12 @@
     <Compile Include="Components\Machine Learning\ClusteringGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
+    <Compile Include="Components\Machine Learning\ShortestWalk.cs" />
+    <Compile Include="Components\Machine Learning\ShortestWalk\CurvesTopology.cs" />
+    <Compile Include="Components\Machine Learning\ShortestWalk\EdgeAddress.cs" />
+    <Compile Include="Components\Machine Learning\ShortestWalk\ListByPattern.cs" />
+    <Compile Include="Components\Machine Learning\ShortestWalk\NodeAddress.cs" />
+    <Compile Include="Components\Machine Learning\ShortestWalk\PathMethods.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
     <Compile Include="Components\Shape\Erosion.cs" />
     <Compile Include="Components\Shape\MedialAxis.cs" />

@@ -25,5 +25,6 @@ using System.Runtime.InteropServices;
 // Version Information Date
 // [assembly: AssemblyVersion("2022.09.08")]
 // [assembly: AssemblyVersion("2022.09.21")]
-[assembly: AssemblyVersion("2022.09.21")]
-[assembly: AssemblyFileVersion("2022.09.21")]
+// [assembly: AssemblyVersion("2023.01.30")]
+[assembly: AssemblyVersion("2023.01.30")]
+[assembly: AssemblyFileVersion("2023.01.30")]

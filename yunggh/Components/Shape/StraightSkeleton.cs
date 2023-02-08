@@ -6,11 +6,11 @@ using Rhino.Geometry;
 
 namespace yunggh
 {
-    public class Erosion : GH_Component
+    public class StraightSkeleton : GH_Component
     {
-        public Erosion()
-          : base("Erosion", "Erosion",
-              "Calculate Erosion",
+        public StraightSkeleton()
+          : base("Straight Skeleton", "Straight Skeleton",
+              "Calculate Straight Skeleton",
               "yung gh", "Shape")
         {
         }
@@ -23,7 +23,8 @@ namespace yunggh
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Curve", "C", "Curves for erossion", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Skeleton", "S", "Curves for straight skeleton", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Frame", "F", "Curves for erossion frame", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -31,8 +32,60 @@ namespace yunggh
             Curve crv = null;
             Double step = 0;
             if (!DA.GetData(0, ref crv) || !DA.GetData(1, ref step)) return;
-            List<Curve> output = getErossionCurves(crv, step);
-            DA.SetDataList(0, output);  // output list
+            List<Curve> erossionCurves = getErossionCurves(crv, step);
+
+            List<Polyline> frame;
+            List<LineCurve> skeleton;
+            getSkeleton(erossionCurves, out frame, out skeleton);
+
+            DA.SetDataList(0, skeleton);  // output skeleton
+            DA.SetDataList(1, frame);  // output frame
+        }
+
+        private static void getSkeleton(List<Curve> crvList, out List<Polyline> frame, out List<LineCurve> skeleton)
+        {
+            List<Polyline> pllList = new List<Polyline>();  // convert curves to polyline
+            frame = new List<Polyline>();
+            skeleton = new List<LineCurve>();
+            foreach (Curve curCrv in crvList)
+            {
+                Polyline pll;
+                curCrv.TryGetPolyline(out pll);
+                pllList.Add(pll);
+            }
+            foreach (Polyline pll in pllList)
+            {
+                if (frame.Count == 0)
+                {
+                    frame.Add(pll);
+                    continue;
+                }
+                Polyline prePll = frame[frame.Count - 1];
+
+                /*
+                foreach(Point3d pt in pll){
+                  Point3d closestPt = Rhino.Collections.Point3dList.ClosestPointInList(prePll, pt);
+                  Polyline newPll = new Polyline();
+                  newPll.Add(closestPt);
+                  newPll.Add(pt);
+                  output.Add(newPll);
+                }*/
+                //if(prePll.Count > pll.Count + 1) continue;
+                foreach (Point3d ppt in prePll)
+                {
+                    Point3d cpt = pll[0];
+                    foreach (Point3d pt in pll)
+                    {
+                        if (ppt.DistanceTo(pt) < ppt.DistanceTo(cpt)) cpt = pt;
+                    }
+
+                    LineCurve newLine = new LineCurve(ppt, cpt);
+                    int count = Rhino.Geometry.Intersect.Intersection.CurveCurve(prePll.ToNurbsCurve(), newLine, 0, 0).Count;
+                    if (count > 1) continue;
+                    skeleton.Add(newLine);
+                }
+                frame.Add(pll);
+            }
         }
 
         private static List<Curve> getErossionCurves(Curve crv, double step)
@@ -84,7 +137,7 @@ namespace yunggh
 
         public override Guid ComponentGuid
         {
-            get { return new Guid("29270538-1ADF-4972-B6EA-41A341E0B27D"); }
+            get { return new Guid("E0800B7B-1E8A-4B19-80FF-8AB57EE39D3D"); }
         }
     }
 }

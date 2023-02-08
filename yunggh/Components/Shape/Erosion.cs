@@ -52,11 +52,9 @@ namespace yunggh
                     if (intersect.Count > 0) break; // if there are intersections, break
                 }
                 output.Add(curCrv); // add current curve to output
-
-                Point3d centerPoint = currArea.Centroid;    // offset directions, could it be better?
-                Curve[] nextCrvs = curCrv.Offset(centerPoint, new Vector3d(0, 0, 1), step, 0.001, CurveOffsetCornerStyle.Sharp);
-
-                //Curve[] nextCrvs = curCrv.Offset(p, step, 0.001, CurveOffsetCornerStyle.Sharp); // offset by plane, this would be better!
+                //Point3d centerPoint = currArea.Centroid;    // offset directions, could it be better?
+                //Curve[] nextCrvs = curCrv.Offset(centerPoint, new Vector3d(0, 0, 1), step, 0.001, CurveOffsetCornerStyle.Sharp);
+                Curve[] nextCrvs = curCrv.Offset(p, step, 0.001, CurveOffsetCornerStyle.Sharp); // offset by plane, this would be better!
                 if (nextCrvs == null) break;
                 foreach (Curve cv in nextCrvs) {
                     if (cv.IsClosed) q.Enqueue(cv);

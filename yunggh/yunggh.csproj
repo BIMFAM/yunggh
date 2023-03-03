@@ -118,6 +118,8 @@
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
+    <Compile Include="Components\Shape\QuadrilateralGrids.cs" />
+    <Compile Include="Components\Shape\MinimumBoundingRectangle.cs" />
     <Compile Include="Components\Shape\Erosion.cs" />
     <Compile Include="Components\Shape\MedialAxis.cs" />
     <Compile Include="Components\Shape\PolarConvexity.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Components\Document\ViewportCapture.cs" />
     <Compile Include="Components\Data\WriteCSV.cs" />
     <Compile Include="Components\Data\WriteGoogleSheet.cs" />
+    <Compile Include="Components\Shape\StraightSkeleton.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

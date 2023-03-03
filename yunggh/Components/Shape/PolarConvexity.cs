@@ -20,6 +20,7 @@ namespace yunggh
             pManager.AddPointParameter("Point", "P", "Point for center", GH_ParamAccess.item);
             pManager.AddCurveParameter("Curve", "C", "Curve for walls", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Int", "I", "Integer for steps", GH_ParamAccess.item);
+            pManager[0].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -35,7 +36,8 @@ namespace yunggh
             Curve curve = null;
             Int32 step = 0;
 
-            if (!DA.GetData(0, ref centerPoint) || !DA.GetData(1, ref curve) || !DA.GetData(2, ref step)) return;
+            if (!DA.GetData(1, ref curve) || !DA.GetData(2, ref step)) return;
+            if (!DA.GetData(0, ref centerPoint)) centerPoint = AreaMassProperties.Compute(curve).Centroid;
 
             List<Point3d> points = new List<Point3d>(); //output points
             List<Line> lines = new List<Line>();  //output lines

@@ -118,6 +118,8 @@
     <Compile Include="Components\Machine Learning\ClassificationGeometrySorter.cs" />
     <Compile Include="Components\Machine Learning\ModelTrainer.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
+    <Compile Include="Components\Shape\MarchingCubes.cs" />
+    <Compile Include="Components\Shape\WaveFunctionCollapse.cs" />
     <Compile Include="Components\Shape\QuadrilateralGrids.cs" />
     <Compile Include="Components\Shape\MinimumBoundingRectangle.cs" />
     <Compile Include="Components\Shape\Erosion.cs" />

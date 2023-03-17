@@ -202,13 +202,19 @@ namespace yunggh
         List<HashSet<Int32>> createRules(List<Mesh> geo, List<List<int>> notConnects)
         { // create rules for selection
             List<HashSet<Int32>> rules = new List<HashSet<Int32>>();
+            Dictionary<Int32, HashSet<Int32>> map = new Dictionary<Int32, HashSet<Int32>>();    // could directly return this
             foreach (List<int> rawRule in notConnects)
             {
-                HashSet<Int32> rule = new HashSet<Int32>();
-                foreach (int num in rawRule)
+                HashSet<Int32> rule = null;
+                if (map.ContainsKey(rawRule[0]))
                 {
-                    rule.Add(num);
+                    rule = map[rawRule[0]];
                 }
+                else
+                {
+                    rule = new HashSet<Int32>();
+                }
+                rule.Add(rawRule[1]);
                 rules.Add(rule);
             }
             return rules;

@@ -4,12 +4,18 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using Rhino.Geometry.Collections;
+using Rhino;
+using Rhino.Geometry.Intersect;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
 using Grasshopper.Kernel.Geometry;
 
 namespace yunggh
 {
     public class MedialAxis : GH_Component
     {
+        public Vector3d up = new Vector3d(0, 0, 1);
+        public Vector3d down = new Vector3d(0, 0, -1);
         public MedialAxis()
           : base("Medial Axis", "MedialAxis",
               "Calculate Medial Axis",
@@ -24,8 +30,9 @@ namespace yunggh
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Curve", "C", "Medial axis curves", GH_ParamAccess.list);
-            pManager.AddMeshParameter("Mesh", "M", "Mesh of curve", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Mdeial Axis", "M", "Medial axis curves", GH_ParamAccess.list);
+            //pManager.AddCurveParameter("Curve", "C", "Curve of Voronoi", GH_ParamAccess.list);
+            //pManager.AddMeshParameter("Mesh", "M", "Mesh of curve", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -49,8 +56,29 @@ namespace yunggh
                 }
             }
 
-            DA.SetDataList(0, lcvlist);  // output curves list
-            DA.SetData(1, mesh);  // output mesh
+
+            List<LineCurve> medialLines = new List<LineCurve>();
+
+            for (int i = 0; i < lcvlist.Count; i++) {
+                if (!PointOnMesh(mesh, lcvlist[i].PointAt(0))) continue;
+                if (!PointOnMesh(mesh, lcvlist[i].PointAt(1))) continue;
+                CurveIntersections intersections = Intersection.CurveCurve(
+                        crv,
+                        lcvlist[i],
+                        RhinoDoc.ActiveDoc.ModelAbsoluteTolerance,
+                        Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance
+                );
+
+                if (intersections.Count != 0) continue;
+
+                medialLines.Add(lcvlist[i]);
+            }
+
+
+            DA.SetDataList(0, medialLines);  // output curves list
+            //DA.SetDataList(1, lcvlist); // voronoi curves
+            //DA.SetData(2, mesh);  // output mesh
+
         }
 
         List<Point3d> getControlPoints(Curve curve)
@@ -119,7 +147,7 @@ namespace yunggh
 
 
             //# Calculate the delaunay triangulation
-            var delaunay = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, 0.1, false);
+            var delaunay = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, 0.0001, false);
 
             // # Calculate the voronoi diagram
             var voronoi = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, delaunay, outline);
@@ -134,6 +162,23 @@ namespace yunggh
                 polys.Add(pl);
             }
             return polys;
+        }
+
+        public bool PointOnMesh(Mesh mesh, Point3d pt)
+        {
+            if (mesh == null) return false;
+            //check if intersections with up vector
+            Line lineUp = new Line(pt, up);
+            Int32[] intersectionsUp; //where intersection locations are held
+            Rhino.Geometry.Intersect.Intersection.MeshLine(mesh, lineUp, out intersectionsUp);
+
+            //check if intersections with down vector
+            Line lineDown = new Line(pt, down);
+            Int32[] intersectionsDown; //where intersection locations are held
+            Rhino.Geometry.Intersect.Intersection.MeshLine(mesh, lineDown, out intersectionsDown);
+
+            if (intersectionsUp == null && intersectionsDown == null) { return false; }
+            return true;
         }
 
         public override GH_Exposure Exposure

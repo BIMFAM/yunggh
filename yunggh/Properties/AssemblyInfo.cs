@@ -26,5 +26,6 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("2022.09.08")]
 // [assembly: AssemblyVersion("2022.09.21")]
 // [assembly: AssemblyVersion("2023.01.30")]
-[assembly: AssemblyVersion("2023.01.30")]
-[assembly: AssemblyFileVersion("2023.01.30")]
+// [assembly: AssemblyVersion("2023.09.02")] Added CricutExport
+[assembly: AssemblyVersion("2023.09.02")]
+[assembly: AssemblyFileVersion("2023.09.02")]

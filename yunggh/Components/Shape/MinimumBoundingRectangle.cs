@@ -7,6 +7,7 @@ using Rhino.Geometry.Collections;
 
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
+
 //using Grasshopper.Kernel.Geometry;
 
 namespace yunggh
@@ -52,7 +53,7 @@ namespace yunggh
         {
             get
             {
-                return Resource.MedialAxis; // this should be replaced
+                return Resource.MinimumBoundingRectangle; // this should be replaced
             }
         }
 

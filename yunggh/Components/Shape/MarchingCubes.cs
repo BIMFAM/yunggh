@@ -38,12 +38,11 @@ namespace yunggh
             int zSegs = 0;
             double isolevel = 0;
 
-
             if (!DA.GetData(0, ref brep) || !DA.GetData(1, ref xSegs) || !DA.GetData(2, ref ySegs) || !DA.GetData(3, ref zSegs)) return;
             DA.GetData(4, ref isolevel);
 
             BoundingBox bbox = brep.GetBoundingBox(true);
-            DA.SetData(0, resample(brep, bbox.Min, bbox.Max, xSegs, ySegs, zSegs, isolevel)); 
+            DA.SetData(0, resample(brep, bbox.Min, bbox.Max, xSegs, ySegs, zSegs, isolevel));
         }
 
         private Mesh resample(Brep brep, Point3d minpt, Point3d maxpt, int segs_x, int segs_y, int segs_z, double isolevel)
@@ -71,7 +70,6 @@ namespace yunggh
                         double z = (1.0 - zpct) * minpt.Z + zpct * maxpt.Z;
 
                         Point3d pt = new Point3d(x, y, z);
-
 
                         // Compute the isosurface value at the grid point
                         // it's the signed distance to the surface.
@@ -117,12 +115,12 @@ namespace yunggh
 
                         Mesh ms = Polygonize(vals, pts, isolevel);
                         if (ms != null && ms.IsValid) output.Append(ms);
-
                     }
                 }
             }
             return output;
         }
+
         private Point3d VertexInterp(double isoLevel, Point3d p1, Point3d p2, double valP1, double valP2)
         {
             if (Math.Abs(isoLevel - valP1) < 0.00001) return p1;
@@ -186,7 +184,7 @@ namespace yunggh
             }
             return tags;
         }
- 
+
         public static int[] edgeTable =
       {
       0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
@@ -222,8 +220,8 @@ namespace yunggh
       0xf00, 0xe09, 0xd03, 0xc0a, 0xb06, 0xa0f, 0x905, 0x80c,
       0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0
     };
+
         public static int[,] triTable = {
-      
       {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       {0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       {0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -491,7 +489,7 @@ namespace yunggh
         {
             get
             {
-                return Resource.PolarConvexity;
+                return Resource.MarchingCubes;
             }
         }
 

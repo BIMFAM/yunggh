@@ -143,6 +143,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Cricut {
+            get {
+                object obj = ResourceManager.GetObject("Cricut", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CurveMinMax {
             get {
                 object obj = ResourceManager.GetObject("CurveMinMax", resourceCulture);
@@ -253,9 +263,29 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MarchingCubes {
+            get {
+                object obj = ResourceManager.GetObject("MarchingCubes", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MedialAxis {
             get {
                 object obj = ResourceManager.GetObject("MedialAxis", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MinimumBoundingRectangle {
+            get {
+                object obj = ResourceManager.GetObject("MinimumBoundingRectangle", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -306,6 +336,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap PQMesh {
             get {
                 object obj = ResourceManager.GetObject("PQMesh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap QuadrilateralGrid {
+            get {
+                object obj = ResourceManager.GetObject("QuadrilateralGrid", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -413,6 +453,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ShortestWalk {
+            get {
+                object obj = ResourceManager.GetObject("ShortestWalk", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ShrinkSurface {
             get {
                 object obj = ResourceManager.GetObject("ShrinkSurface", resourceCulture);
@@ -463,6 +513,16 @@ namespace yunggh {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap StraightSkeleton {
+            get {
+                object obj = ResourceManager.GetObject("StraightSkeleton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap SurfaceFit {
             get {
                 object obj = ResourceManager.GetObject("SurfaceFit", resourceCulture);
@@ -506,6 +566,16 @@ namespace yunggh {
         internal static System.Drawing.Bitmap ViewportCapture {
             get {
                 object obj = ResourceManager.GetObject("ViewportCapture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap WaveFunctionCollapse {
+            get {
+                object obj = ResourceManager.GetObject("WaveFunctionCollapse", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

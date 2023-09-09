@@ -46,7 +46,6 @@ namespace yunggh
 
                 if (m.Faces[i].IsTriangle)
                 {
-
                     LineCurve lc1 = new LineCurve(pt1, pt2);
                     LineCurve lc2 = new LineCurve(pt2, pt3);
                     LineCurve lc3 = new LineCurve(pt3, pt1);
@@ -57,7 +56,6 @@ namespace yunggh
                     lst.Add(new LineCurve(lc1.PointAtNormalizedLength(0.5), ct));
                     lst.Add(new LineCurve(lc2.PointAtNormalizedLength(0.5), ct));
                     lst.Add(new LineCurve(lc3.PointAtNormalizedLength(0.5), ct));
-
                 }
                 else
                 {
@@ -75,13 +73,12 @@ namespace yunggh
                     lst.Add(new LineCurve(lc2.PointAtNormalizedLength(0.5), ct));
                     lst.Add(new LineCurve(lc3.PointAtNormalizedLength(0.5), ct));
                     lst.Add(new LineCurve(lc4.PointAtNormalizedLength(0.5), ct));
-
                 }
             }
             DA.SetDataList(0, lst);
         }
 
-        Mesh getDelaunay(List<Point3d> pts)
+        private Mesh getDelaunay(List<Point3d> pts)
         {
             //convert point3d to node2
             //grasshopper requres that nodes are saved within a Node2List for Delaunay
@@ -104,7 +101,6 @@ namespace yunggh
             return delMesh;
         }
 
-
         public override GH_Exposure Exposure
         {
             get { return GH_Exposure.primary; }
@@ -114,7 +110,7 @@ namespace yunggh
         {
             get
             {
-                return Resource.MedialAxis;
+                return Resource.QuadrilateralGrid;
             }
         }
 

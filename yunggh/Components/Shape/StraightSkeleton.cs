@@ -131,7 +131,7 @@ namespace yunggh
         {
             get
             {
-                return Resource.Erosion;
+                return Resource.StraightSkeleton;
             }
         }
 

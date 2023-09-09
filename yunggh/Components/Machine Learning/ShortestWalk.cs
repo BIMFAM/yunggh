@@ -175,7 +175,7 @@ namespace yunggh
         }
 
         protected override Bitmap Internal_Icon_24x24
-        { get { return Resource.yunggh; } }
+        { get { return Resource.ShortestWalk; } }
 
         public override Guid ComponentGuid
         { get { return new Guid("465E4A02-C2D6-45A7-B3D7-E46A321F3B65"); } }

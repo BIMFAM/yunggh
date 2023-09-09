@@ -178,6 +178,7 @@
     <Content Include="Resources\Document\ViewportCapture.png" />
     <Content Include="Resources\Format\Bake.png" />
     <Content Include="Resources\Format\CombineWorksession.png" />
+    <None Include="Resources\Format\Cricut.png" />
     <Content Include="Resources\Format\Export.png" />
     <Content Include="Resources\Format\ExportByLayer.png" />
     <Content Include="Resources\Format\ExportByMaterial.png" />
@@ -200,6 +201,7 @@
     <Content Include="Resources\Machine Learning\ClassificationGeometrySorter.png" />
     <Content Include="Resources\Machine Learning\ClusteringGeometrySorter.png" />
     <Content Include="Resources\Machine Learning\ModelTrainer.png" />
+    <None Include="Resources\Machine Learning\ShortestWalk.png" />
     <Content Include="Resources\Mesh\SimpleMeshCube.png" />
     <Content Include="Resources\Selection\SelDup.png" />
     <Content Include="Resources\Selection\SelDupAll.png" />
@@ -208,8 +210,13 @@
     <Content Include="Resources\Selection\SelectPoint.png" />
     <Content Include="Resources\Selection\SelUnique.png" />
     <Content Include="Resources\Shape\Erosion.png" />
+    <None Include="Resources\Shape\MarchingCubes.png" />
     <Content Include="Resources\Shape\MedialAxis.png" />
+    <None Include="Resources\Shape\MinimumBoundingRectangle.png" />
     <Content Include="Resources\Shape\PolarConvexity.png" />
+    <None Include="Resources\Shape\QuadrilateralGrid.png" />
+    <None Include="Resources\Shape\StraightSkeleton.png" />
+    <None Include="Resources\Shape\WaveFunctionCollapse.png" />
     <Content Include="Resources\yunggh.png" />
   </ItemGroup>
   <ItemGroup>

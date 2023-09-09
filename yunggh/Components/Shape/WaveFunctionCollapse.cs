@@ -53,7 +53,6 @@ namespace yunggh
             Int32 dx = 10;
             Int32 dy = 10;
             Int32 seed = 0;
-            
 
             if (!DA.GetDataList(0, geo) || !DA.GetDataTree(1, out notConnectRules)) return;
             DA.GetData(2, ref x);
@@ -65,12 +64,12 @@ namespace yunggh
             Int32 times = x * y;
             DA.GetData(7, ref times);
 
-
             foreach (List<GH_Integer> not in notConnectRules.Branches)
             {
                 List<Int32> nums = new List<Int32>();
                 Int32 num = 0;
-                foreach (GH_Integer n in not) {
+                foreach (GH_Integer n in not)
+                {
                     n.CastTo(ref num);
                     nums.Add(num);
                 }
@@ -91,7 +90,8 @@ namespace yunggh
             DA.SetDataList(0, output);
             DA.SetDataList(1, createGrids(x, y, dx, dy));
         }
-        void observation(Random rd, int x, int y, int mx, int my, int dx, int dy, ref List<Int32>[,] map, List<HashSet<Int32>> rules, List<Mesh> geo, ref List<Mesh> output)
+
+        private void observation(Random rd, int x, int y, int mx, int my, int dx, int dy, ref List<Int32>[,] map, List<HashSet<Int32>> rules, List<Mesh> geo, ref List<Mesh> output)
         { // select a random grid and set it
             if (x < 0 || x >= mx || y < 0 || y >= my) return;
             List<Int32> possibility = map[x, y];  // get possiblility of observed grid
@@ -106,7 +106,7 @@ namespace yunggh
             propagation(type, x, y - 1, mx, my, ref map, rules, geo, ref output);
         }
 
-        void propagation(int type, int x, int y, int mx, int my, ref List<Int32>[,] map, List<HashSet<Int32>> rules, List<Mesh> geo, ref List<Mesh> output)
+        private void propagation(int type, int x, int y, int mx, int my, ref List<Int32>[,] map, List<HashSet<Int32>> rules, List<Mesh> geo, ref List<Mesh> output)
         {
             if (x < 0 || x >= mx || y < 0 || y >= my) return;
             List<Int32> possibility = map[x, y];  // get possibility
@@ -121,7 +121,7 @@ namespace yunggh
             //map[x, y] = possibility;
         }
 
-        int getMinGrid(Random rd, int mx, int my, List<Int32>[,] map)
+        private int getMinGrid(Random rd, int mx, int my, List<Int32>[,] map)
         {
             List<Int32> ret = new List<Int32>();
             int min = 100000;
@@ -154,7 +154,7 @@ namespace yunggh
             return mIndex;
         }
 
-        List<Int32>[,] buildMap(int size, int x, int y)
+        private List<Int32>[,] buildMap(int size, int x, int y)
         { //  build a posibility map for grids
             List<Int32>[,] map = new List<Int32>[x, y];
             for (int i = 0; i < x; i++)
@@ -172,7 +172,7 @@ namespace yunggh
             return map;
         }
 
-        List<Rectangle3d> createGrids(int x, int y, int dx, int dy)
+        private List<Rectangle3d> createGrids(int x, int y, int dx, int dy)
         {  // create base grids
             List<Rectangle3d> ret = new List<Rectangle3d>();
             for (int i = 0; i < x; i++)
@@ -186,7 +186,7 @@ namespace yunggh
             return ret;
         }
 
-        void setGrid(int x, int y, int dx, int dy, int type, List<Mesh> geo, ref List<Mesh> output)
+        private void setGrid(int x, int y, int dx, int dy, int type, List<Mesh> geo, ref List<Mesh> output)
         {  // add new grid to output
             Mesh ms = new Mesh();
             ms.CopyFrom(geo[type]);
@@ -199,7 +199,7 @@ namespace yunggh
             output.Add(ms);
         }
 
-        List<HashSet<Int32>> createRules(List<Mesh> geo, List<List<int>> notConnects)
+        private List<HashSet<Int32>> createRules(List<Mesh> geo, List<List<int>> notConnects)
         { // create rules for selection
             List<HashSet<Int32>> rules = new List<HashSet<Int32>>();
             Dictionary<Int32, HashSet<Int32>> map = new Dictionary<Int32, HashSet<Int32>>();    // could directly return this
@@ -229,7 +229,7 @@ namespace yunggh
         {
             get
             {
-                return Resource.PolarConvexity;
+                return Resource.WaveFunctionCollapse;
             }
         }
 

@@ -74,7 +74,7 @@ namespace yunggh
         {
             get
             {
-                return Resource.Export;
+                return Resource.Cricut;
             }
         }
 

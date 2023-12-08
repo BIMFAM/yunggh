@@ -17,7 +17,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -220,6 +220,19 @@ namespace yunggh
                 Curve c = curves[i];
                 GH_Curve ghC = new GH_Curve();
                 if (!GH_Convert.ToGHCurve_Primary(c, ref ghC)) { continue; }
+                curvesGH.Add(ghC);
+            }
+            return curvesGH;
+        }
+
+        public static List<GH_Rectangle> ConvertToGH(List<Rectangle3d> curves)
+        {
+            var curvesGH = new List<GH_Rectangle>();
+            for (int i = 0; i < curves.Count; i++)
+            {
+                var c = curves[i];
+                var ghC = new GH_Rectangle();
+                if (!GH_Convert.ToGHRectangle_Primary(c, ref ghC)) { continue; }
                 curvesGH.Add(ghC);
             }
             return curvesGH;

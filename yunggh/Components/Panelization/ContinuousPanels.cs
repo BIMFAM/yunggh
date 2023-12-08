@@ -53,7 +53,7 @@ namespace yunggh.Components.Panelization
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddBrepParameter("Panels", "P", "Panel Breps.", GH_ParamAccess.tree);
+            pManager.AddGeometryParameter("Panels", "P", "Panel Breps.", GH_ParamAccess.tree);
             pManager.AddTextParameter("IDs", "ID", "Unique Identifier for each panel", GH_ParamAccess.tree);
         }
 
@@ -76,23 +76,225 @@ namespace yunggh.Components.Panelization
             if (!DA.GetData(5, ref bondShift)) return;
 
             //main script
-            var panels = new GH_Structure<GH_Brep>();
+            var panels = new GH_Structure<GH_Rectangle>();
             var ids = new GH_Structure<GH_String>();
 
             //1) unroll facade
             Point3d[] points;
             Brep[] breps;
             UnrollFacade(facade, guideCurve, out points, out breps);
+            Brep unrolledFacade = breps[0];
+            //var outputTesting = MultiUnroll.ConvertToGH(breps);
+            //panels.AppendRange(outputTesting);
+            //Point3d start = points[0];
 
-            var outputTesting = MultiUnroll.ConvertToGH(breps);
+            //2) create working oriented plane
+            Plane plane = GetOrientedPlane(points);
+
+            //3) making a basic panel grid
+            int bays, rows;
+            var grid = CreateSizedRectangleGrid(panelWidth, panelHeight, unrolledFacade, plane, out bays, out rows);
+
+            int BAYS = bays;
+            int ROWS = rows;
+            var GRID = grid;
+            /*/
+            var outputTesting = new List<GH_Rectangle>();
+            foreach (var list in grid)
+            {
+                outputTesting.AddRange(MultiUnroll.ConvertToGH(list));
+            }
             panels.AppendRange(outputTesting);
-            Point3d start = points[0];
+            //*/
+
+            //panels.AppendRange(outputTesting);
+
+            //4) shift panel grid
+            var shifted = ShiftRectangleGridBondPattern(panelWidth, panelHeight, uvDirection, bondShift, plane, ref GRID);
+            /*/
+            var outputTesting = new List<GH_Rectangle>();
+            foreach (var list in shifted)
+            {
+                outputTesting.AddRange(MultiUnroll.ConvertToGH(list));
+            }
+            panels.AppendRange(outputTesting);
+            //*/
+            var SHIFT = shifted;
+
+            //5) move grid so it is over original unroll surface
+            List<List<Rectangle3d>> align = AlignRectangleGridWithUnrolledSurface(panelWidth, panelHeight, plane, grid, BAYS, ROWS, GRID, SHIFT);
+            //*/
+            var outputTesting = new List<GH_Rectangle>();
+            foreach (var list in align)
+            {
+                outputTesting.AddRange(MultiUnroll.ConvertToGH(list));
+            }
+            panels.AppendRange(outputTesting);
+            //*/
+            var ALIGN = align;
+
+            //6) remove unused panels for efficiency
+
+            //7) clip edge panels
+
+            //8) mapping panels to original surface
 
             //output
             DA.SetDataTree(0, panels);
             DA.SetDataTree(1, ids);
 
             Debug.WriteLine("Solve Instance Ended");
+        }
+
+        private static List<List<Rectangle3d>> AlignRectangleGridWithUnrolledSurface(double panelWidth, double panelHeight, Plane plane, List<List<Rectangle3d>> grid, int BAYS, int ROWS, List<List<Rectangle3d>> GRID, List<List<Rectangle3d>> SHIFT)
+        {
+            //5.1) get move distances
+            double X = PanelOffset(BAYS, panelWidth);
+            double Y = PanelOffset(ROWS, panelHeight);
+
+            //5.2) create move vector and transform
+            Vector3d move = (-X * plane.XAxis) + (-Y * plane.YAxis);
+            Transform xform = Transform.Translation(move);
+            //Print(move.ToString());
+
+            //5.3) move panels
+            var align = new List<List<Rectangle3d>>();
+            for (int b = 0; b < GRID.Count; b++)
+            {
+                //GH_Path path = GRID[b];
+                //Print(path.ToString());
+                var list = new List<Rectangle3d>();
+                var alignedGrid = SHIFT[b];
+                for (int i = 0; i < grid.Count; i++)
+                {
+                    var crv = alignedGrid[i];
+                    crv.Transform(xform);
+                    alignedGrid[i] = crv;
+                }
+                //align.AddRange(alignedGrid, path);
+                align.Add(alignedGrid);
+            }
+
+            return align;
+        }
+
+        // <Custom additional code>
+        private static double PanelOffset(int count, double panelSize)
+        {
+            double offset = count / 2.0;
+            offset = Math.Round(offset);
+            offset *= panelSize;
+            return offset;
+        }
+
+        private static List<List<Rectangle3d>> ShiftRectangleGridBondPattern(double panelWidth, double panelHeight, bool uvDirection, double bondShift, Plane plane, ref List<List<Rectangle3d>> GRID)
+        {
+            //4.1) get move vector info
+            Vector3d move = plane.YAxis;
+            double dim = panelHeight;
+            if (uvDirection)
+            {
+                move = plane.XAxis;
+                dim = panelWidth;
+                GRID = Transpose(GRID); //Transpose DataTree
+            }
+
+            //4.2) shift each row
+            var shifted = new List<List<Rectangle3d>>();
+            double dist = 0;
+            for (int b = 0; b < GRID.Count; b++)
+            {
+                //Print(dist.ToString());
+                //4.2.1) create transform
+                Transform xform = Transform.Translation(move * dist);
+
+                //4.2.2) shift grid with transform
+                //GH_Path path = GRID.Path(b);
+                List<Rectangle3d> rectGrid = GRID[b];
+                shifted.Add(new List<Rectangle3d>());
+                for (int i = 0; i < rectGrid.Count; i++)
+                {
+                    Rectangle3d crv = rectGrid[i];
+                    crv.Transform(xform);
+                    //grid[i] = crv;
+                    shifted[b].Add(crv);
+                }
+
+                //4.2.3) add shifted curves to datatree output
+                //shifted.AddRange(grid, path);
+
+                //4.2.4) update panel move distance
+                dist += bondShift * dim;
+                if (dist < dim) { continue; }//guard statement
+                dist -= dim;
+            }
+
+            return shifted;
+        }
+
+        public static List<List<T>> Transpose<T>(List<List<T>> data)
+        {
+            return data.SelectMany(inner => inner.Select((item, index) => new { item, index }))
+                        .GroupBy(i => i.index, i => i.item)
+                        .Select(g => g.ToList())
+                        .ToList();
+        }
+
+        private static List<List<Rectangle3d>> CreateSizedRectangleGrid(double panelWidth, double panelHeight, Brep unrolledFacade, Plane plane, out int bays, out int rows)
+        {
+            //3.1) get bounding box
+            Box wbb;
+            BoundingBox bb = unrolledFacade.GetBoundingBox(plane, out wbb);
+            //GRID = wbb;
+
+            //3.2) get panel counts
+            double boxW = wbb.X.Length; //bounding box width
+            boxW /= panelWidth; //boxW = boxW/W; //bb width divided panel width
+            boxW *= 2; //margin of error for panel shift
+            bays = (int)boxW;
+
+            //3.3
+            double boxH = wbb.Y.Length;
+            boxH /= panelHeight; //boxW = boxW/W;
+            boxH *= 2;
+            rows = (int)boxH;
+
+            //3.4) create grid
+            //Rectangle3d rect = new Rectangle3d(PLN, W, H);
+            var grid = new List<List<Rectangle3d>>();
+            for (int i = 0; i < bays; i++) //columns
+            {
+                var list = new List<Rectangle3d>();
+                GH_Path path = new GH_Path(i);
+                for (int j = 0; j < rows; j++)
+                {
+                    Rectangle3d rect = new Rectangle3d(plane, panelWidth, panelHeight);
+                    Vector3d moveX = plane.XAxis * i * panelWidth;
+                    Vector3d moveY = plane.YAxis * j * panelHeight;
+                    Transform xform = Transform.Translation(moveX + moveY); //Move Component
+                    rect.Transform(xform);
+
+                    //add to dictionary
+                    list.Add(rect);
+                }
+                grid.Add(list);
+            }
+
+            return grid;
+        }
+
+        private static Plane GetOrientedPlane(Point3d[] points)
+        {
+            Point3d start = points[0];
+            Point3d end = points[1];
+            Plane plane = new Plane(Plane.WorldXY);
+            plane.Origin = start;
+
+            //align plane
+            Vector3d dir = end - start;
+            double angle = Vector3d.VectorAngle(Vector3d.XAxis, dir);
+            plane.Rotate(angle, Vector3d.ZAxis);
+            return plane;
         }
 
         private static void UnrollFacade(Brep facade, Curve guideCurve, out Point3d[] points, out Brep[] breps)

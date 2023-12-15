@@ -108,16 +108,182 @@ namespace yunggh.Components.Panelization
             List<Curve> interiorEdges;
             Curve[] nakedEdges;
             RemoveUnusedPanels(unrolledFacade, align, out panelsUsed, out idsUsed, out interiorEdges, out nakedEdges);
+            Curve En = nakedEdges[0];
 
             //7) clip edge panels
+            var splitPanels = SplitPanels(panelsUsed, interiorEdges, En);
+            var idsDict = new Dictionary<GH_Path, string>();
+            for (int i = 0; i < idsUsed.Count; i++)
+                idsDict.Add(new GH_Path(i), idsUsed[i]);
 
             //8) mapping panels to original surface
+            Dictionary<GH_Path, List<Curve>> panelsMapped;
+            Dictionary<GH_Path, List<string>> idsMapped;
+            MapPanels(facade, unrolledFacade, splitPanels, idsDict, out panelsMapped, out idsMapped);
+            var outputTesting = new List<Curve>();
+            foreach (var kvp in panelsMapped)
+            {
+                outputTesting.AddRange(kvp.Value);
+            }
 
             //output
-            DA.SetDataList(0, panelsUsed);
+            //TODO: Format in Data Tree Structures
+            DA.SetDataList(0, outputTesting);
             DA.SetDataList(1, idsUsed);
 
             Debug.WriteLine("Solve Instance Ended");
+        }
+
+        private static void MapPanels(Brep facade, Brep unrolledFacade, Dictionary<GH_Path, List<Curve>> splitPanels, Dictionary<GH_Path, string> idsDict, out Dictionary<GH_Path, List<Curve>> panelsMapped, out Dictionary<GH_Path, List<string>> idsMapped)
+        {
+            //8.1)get facades and unrolls as faces and create data tree paths
+            Dictionary<int, GH_Path> paths = new Dictionary<int, GH_Path>();
+            List<Brep> unrolls = new List<Brep>(); //unrolled flat faces
+            List<Brep> facades = new List<Brep>(); //original facade faces
+            for (int i = 0; i < facade.Faces.Count; i++)
+            {
+                GH_Path path = new GH_Path(i);
+                paths.Add(i, path);
+                facades.Add(facade.Faces[i].DuplicateFace(false));
+                unrolls.Add(unrolledFacade.Faces[i].DuplicateFace(false));
+            }
+            //GRID = facades;
+
+            //8.2)map panels to faces
+            panelsMapped = new Dictionary<GH_Path, List<Curve>>();
+            idsMapped = new Dictionary<GH_Path, List<string>>();
+            var keys = splitPanels.Keys.ToList();
+            for (int b = 0; b < keys.Count; b++)
+            {
+                var path = keys[b];
+                if (!idsDict.ContainsKey(path) || !splitPanels.ContainsKey(path)) { continue; }
+                string id = idsDict[keys[b]];
+                List<Curve> pnls = splitPanels[keys[b]];
+                foreach (Curve pnl in pnls)
+                {
+                    //8.2.1)find closest facade face index
+                    Point3d center = CurveCenter(pnl); //need center for facade face location
+                    int facadeIndex = -1;
+                    for (int i = 0; i < unrolls.Count; i++)
+                    {
+                        Brep brep = unrolls[i];
+                        Point3d cp = brep.ClosestPoint(center);
+                        if (cp.DistanceTo(center) > 0.01) { continue; }//skip if not on unrolled facade face
+                        facadeIndex = i; break; //once index is found, leave loop
+                    }
+                    if (facadeIndex == -1) { continue; }//skip panels not even on the unrolled facade
+
+                    //8.2.2) match UV coordinates across surfaces
+                    List<Point3d> pts = CurvePoints(pnl); //need points for UV transfer
+                    Surface facadeFace = facades[facadeIndex].Surfaces[0];
+                    Surface unrollFace = unrolls[facadeIndex].Surfaces[0];
+                    Polyline ply = new Polyline();
+                    for (int j = 0; j < pts.Count; j++)
+                    {
+                        double u;
+                        double v;
+                        unrollFace.ClosestPoint(pts[j], out u, out v);
+                        ply.Add(facadeFace.PointAt(u, v));
+                    }
+                    ply.Add(ply[0]);
+
+
+                    if (!panelsMapped.ContainsKey(paths[facadeIndex]))
+                    {
+                        panelsMapped.Add(paths[facadeIndex], new List<Curve>());
+                        idsMapped.Add(paths[facadeIndex], new List<string>());
+                    }
+                    panelsMapped[paths[facadeIndex]].Add(ply.ToNurbsCurve());
+                    idsMapped[paths[facadeIndex]].Add(id);
+                }
+                //*/
+            }
+        }
+
+        public static List<Point3d> CurvePoints(Curve crv)
+        {
+            List<Point3d> pts = new List<Point3d>();
+            Curve[] segs = crv.DuplicateSegments();
+            foreach (Curve seg in segs)
+            {
+                pts.Add(seg.PointAtStart);
+            }
+            return pts;
+        }
+
+        private static Point3d CurveCenter(Curve crv)
+        {
+            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            Polyline ply = crv.ToPolyline(tol, tol, 0, 10000000).ToPolyline();
+            return ply.CenterPoint();
+        }
+
+        private static Dictionary<GH_Path, List<Curve>> SplitPanels(List<Rectangle3d> panelsUsed, List<Curve> interiorEdges, Curve En)
+        {
+            //7.1) Split Panels on Edge
+            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var splitPanels = new Dictionary<GH_Path, List<Curve>>();
+            for (int i = 0; i < panelsUsed.Count; i++)
+            {
+                GH_Path path = new GH_Path(i);
+                List<Curve> crvs = new List<Curve>();
+                var crv = panelsUsed[i].ToNurbsCurve().DuplicateCurve(); //one panel curve
+                bool onEdge = IsCurveOnCurve(crv, En);
+                if (onEdge)
+                {
+                    Curve[] intersections = Curve.CreateBooleanIntersection(crv, En, tol);
+                    foreach (Curve region in intersections)
+                    {
+                        crvs.Add(region);
+                    }
+                }
+                else
+                {
+                    crvs.Add(crv);
+                }
+
+                //7.2) Split curves that are on a Bend
+                List<Curve> crvs2 = new List<Curve>();
+                foreach (Curve curve in crvs)
+                {
+                    List<Curve> splits = SplitCurveWithCurve(curve, interiorEdges);
+                    crvs2.AddRange(splits);
+                }
+
+                if (!splitPanels.ContainsKey(path))
+                {
+                    splitPanels.Add(path, new List<Curve>());
+                }
+                splitPanels[path].AddRange(crvs2);
+            }
+
+            return splitPanels;
+        }
+
+        private static List<Curve> SplitCurveWithCurve(Curve crv, List<Curve> splitters)
+        {
+            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            Brep pnl = Brep.CreatePlanarBreps(crv, tol)[0];
+            pnl = pnl.Faces[0].Split(splitters, tol);
+
+            //get split panels as curves
+            List<Curve> output = new List<Curve>();
+            foreach (BrepFace face in pnl.Faces)
+            {
+                Curve[] edges = face.DuplicateFace(false).DuplicateEdgeCurves();
+                Curve edge = Curve.JoinCurves(edges, tol)[0];
+                output.Add(edge);
+            }
+
+            return output;
+        }
+
+        public static bool IsCurveOnCurve(Curve crv, Curve testEdge)
+        {
+            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var events = Rhino.Geometry.Intersect.Intersection.CurveCurve(crv, testEdge, tol, tol);
+            if (events.Count > 0) { return true; } //return = "exit function"
+            return false;
         }
 
         private static void RemoveUnusedPanels(Brep unrolledFacade, List<List<Rectangle3d>> align, out List<Rectangle3d> output, out List<string> idsUsed, out List<Curve> interiorEdges, out Curve[] joins)

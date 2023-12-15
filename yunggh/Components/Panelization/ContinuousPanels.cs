@@ -134,16 +134,97 @@ namespace yunggh.Components.Panelization
             var ALIGN = align;
 
             //6) remove unused panels for efficiency
+            List<Rectangle3d> panelsUsed;
+            List<string> idsUsed;
+            List<Curve> interiorEdges;
+            Curve[] nakedEdges;
+            RemoveUnusedPanels(unrolledFacade, align, out panelsUsed, out idsUsed, out interiorEdges, out nakedEdges);
 
             //7) clip edge panels
 
             //8) mapping panels to original surface
 
             //output
-            DA.SetDataTree(0, panels);
-            DA.SetDataTree(1, ids);
+            DA.SetDataList(0, panelsUsed);
+            DA.SetDataList(1, idsUsed);
 
             Debug.WriteLine("Solve Instance Ended");
+        }
+
+        private static void RemoveUnusedPanels(Brep unrolledFacade, List<List<Rectangle3d>> align, out List<Rectangle3d> output, out List<string> idsUsed, out List<Curve> interiorEdges, out Curve[] joins)
+        {
+            //6.1) turn unrolled surface into mesh
+            var maxMeshEdge = 1000;
+            var mesh = BrepToMesh(unrolledFacade, maxMeshEdge);
+
+            //6.2) for each grid panel, test if it is close to the mesh
+            double offTol = 1;
+            output = new List<Rectangle3d>();
+            idsUsed = new List<string>();
+            for (int b = 0; b < align.Count; b++)
+            {
+                //GH_Path path = GRID.Path(b);
+                var crvs = align[b]; //branch curves
+                var bIds = new List<string>();//branch ids (empty atm)
+                for (int i = crvs.Count - 1; i >= 0; i--)//looping backwards
+                {
+                    var crv = crvs[i];
+
+                    //2.1) test if curve is close to unrolled brep
+                    bool inside = false;
+                    for (int c = 0; c < 4; c++)
+                    {
+                        Point3d start = crv.Corner(c);
+                        Point3d mCP = mesh.ClosestPoint(start);
+                        double dist = start.DistanceTo(mCP);
+                        if (dist > offTol) { continue; }//continue means go to next loop iteration/skip
+                        inside = true;
+                        break;//exit the loop
+                    }
+
+                    //2.2) remove curve if outside, else add GUID to output
+                    if (inside)
+                    {
+                        string id = b.ToString() + "-" + i.ToString();// b = branch, i = curve //TODO: panel count matches
+                        bIds.Insert(0, id); //add to the beginning of List
+                    }
+                    else
+                    {
+                        crvs.RemoveAt(i);//delete object at index from list
+                    }
+                }
+                output.AddRange(crvs);
+                idsUsed.AddRange(bIds);
+            }
+
+            //6.3) get unrolled facade geometry parts
+            List<Curve> nakedEdges = new List<Curve>();
+            interiorEdges = new List<Curve>();
+            foreach (BrepEdge brepEdge in unrolledFacade.Edges)
+            {
+                if (brepEdge.Valence == EdgeAdjacency.Interior)
+                    interiorEdges.Add(brepEdge.EdgeCurve);
+                else if (brepEdge.Valence == EdgeAdjacency.Naked)
+                    nakedEdges.Add(brepEdge.EdgeCurve);
+            }
+
+            joins = Curve.JoinCurves(nakedEdges, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+        }
+
+        public static Mesh BrepToMesh(Brep brep, double maxEdge)
+        {
+            //make meshes
+            MeshingParameters mp = new MeshingParameters();
+            mp.MaximumEdgeLength = maxEdge;
+            Mesh[] meshes = Mesh.CreateFromBrep(brep, mp);
+
+            //combine meshes
+            Mesh mesh = new Mesh();
+            foreach (Mesh m in meshes)
+            {
+                mesh.Append(m);
+            }
+            return mesh;
         }
 
         private static List<List<Rectangle3d>> AlignRectangleGridWithUnrolledSurface(double panelWidth, double panelHeight, Plane plane, List<List<Rectangle3d>> grid, int BAYS, int ROWS, List<List<Rectangle3d>> GRID, List<List<Rectangle3d>> SHIFT)

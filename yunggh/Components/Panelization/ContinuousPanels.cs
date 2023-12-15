@@ -84,9 +84,6 @@ namespace yunggh.Components.Panelization
             Brep[] breps;
             UnrollFacade(facade, guideCurve, out points, out breps);
             Brep unrolledFacade = breps[0];
-            //var outputTesting = MultiUnroll.ConvertToGH(breps);
-            //panels.AppendRange(outputTesting);
-            //Point3d start = points[0];
 
             //2) create working oriented plane
             Plane plane = GetOrientedPlane(points);
@@ -94,44 +91,16 @@ namespace yunggh.Components.Panelization
             //3) making a basic panel grid
             int bays, rows;
             var grid = CreateSizedRectangleGrid(panelWidth, panelHeight, unrolledFacade, plane, out bays, out rows);
-
             int BAYS = bays;
             int ROWS = rows;
             var GRID = grid;
-            /*/
-            var outputTesting = new List<GH_Rectangle>();
-            foreach (var list in grid)
-            {
-                outputTesting.AddRange(MultiUnroll.ConvertToGH(list));
-            }
-            panels.AppendRange(outputTesting);
-            //*/
-
-            //panels.AppendRange(outputTesting);
 
             //4) shift panel grid
             var shifted = ShiftRectangleGridBondPattern(panelWidth, panelHeight, uvDirection, bondShift, plane, ref GRID);
-            /*/
-            var outputTesting = new List<GH_Rectangle>();
-            foreach (var list in shifted)
-            {
-                outputTesting.AddRange(MultiUnroll.ConvertToGH(list));
-            }
-            panels.AppendRange(outputTesting);
-            //*/
             var SHIFT = shifted;
 
             //5) move grid so it is over original unroll surface
             List<List<Rectangle3d>> align = AlignRectangleGridWithUnrolledSurface(panelWidth, panelHeight, plane, grid, BAYS, ROWS, GRID, SHIFT);
-            //*/
-            var outputTesting = new List<GH_Rectangle>();
-            foreach (var list in align)
-            {
-                outputTesting.AddRange(MultiUnroll.ConvertToGH(list));
-            }
-            panels.AppendRange(outputTesting);
-            //*/
-            var ALIGN = align;
 
             //6) remove unused panels for efficiency
             List<Rectangle3d> panelsUsed;

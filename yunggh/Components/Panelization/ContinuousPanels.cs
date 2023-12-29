@@ -112,29 +112,66 @@ namespace yunggh.Components.Panelization
 
             //7) clip edge panels
             var splitPanels = SplitPanels(panelsUsed, interiorEdges, En);
-            var idsDict = new Dictionary<GH_Path, string>();
+            var idsDict = new Dictionary<string, string>();
             for (int i = 0; i < idsUsed.Count; i++)
-                idsDict.Add(new GH_Path(i), idsUsed[i]);
+                idsDict.Add((new GH_Path(i)).ToString(), idsUsed[i]);
 
             //8) mapping panels to original surface
             Dictionary<GH_Path, List<Curve>> panelsMapped;
             Dictionary<GH_Path, List<string>> idsMapped;
             MapPanels(facade, unrolledFacade, splitPanels, idsDict, out panelsMapped, out idsMapped);
+            /*/
             var outputTesting = new List<Curve>();
             foreach (var kvp in panelsMapped)
             {
                 outputTesting.AddRange(kvp.Value);
             }
+            //*/
 
             //output
-            //TODO: Format in Data Tree Structures
-            DA.SetDataList(0, outputTesting);
-            DA.SetDataList(1, idsUsed);
+            var outputPanels = DictionaryToGHStructure(panelsMapped);
+            var outputIds = DictionaryToGHStructure(idsMapped);
+            DA.SetDataTree(0, outputPanels);
+            DA.SetDataTree(1, outputIds);
 
             Debug.WriteLine("Solve Instance Ended");
         }
 
-        private static void MapPanels(Brep facade, Brep unrolledFacade, Dictionary<GH_Path, List<Curve>> splitPanels, Dictionary<GH_Path, string> idsDict, out Dictionary<GH_Path, List<Curve>> panelsMapped, out Dictionary<GH_Path, List<string>> idsMapped)
+        public static GH_Structure<GH_Curve> DictionaryToGHStructure(Dictionary<GH_Path, List<Curve>> dict)
+        {
+            var tree = new GH_Structure<GH_Curve>();
+            foreach (var kvp in dict)
+            {
+                var crvs = new List<GH_Curve>();
+                foreach (var crv in kvp.Value)
+                {
+                    GH_Curve ghCrv = null;
+                    if (!GH_Convert.ToGHCurve(crv, GH_Conversion.Primary, ref ghCrv)) { continue; }
+                    crvs.Add(ghCrv);
+                }
+                tree.AppendRange(crvs, kvp.Key);
+            }
+            return tree;
+        }
+
+        public static GH_Structure<GH_String> DictionaryToGHStructure(Dictionary<GH_Path, List<string>> dict)
+        {
+            var tree = new GH_Structure<GH_String>();
+            foreach (var kvp in dict)
+            {
+                var crvs = new List<GH_String>();
+                foreach (var crv in kvp.Value)
+                {
+                    GH_String ghCrv = null;
+                    if (!GH_Convert.ToGHString(crv, GH_Conversion.Primary, ref ghCrv)) { continue; }
+                    crvs.Add(ghCrv);
+                }
+                tree.AppendRange(crvs, kvp.Key);
+            }
+            return tree;
+        }
+
+        private static void MapPanels(Brep facade, Brep unrolledFacade, Dictionary<string, List<Curve>> splitPanels, Dictionary<string, string> idsDict, out Dictionary<GH_Path, List<Curve>> panelsMapped, out Dictionary<GH_Path, List<string>> idsMapped)
         {
             //8.1)get facades and unrolls as faces and create data tree paths
             Dictionary<int, GH_Path> paths = new Dictionary<int, GH_Path>();
@@ -187,7 +224,6 @@ namespace yunggh.Components.Panelization
                     }
                     ply.Add(ply[0]);
 
-
                     if (!panelsMapped.ContainsKey(paths[facadeIndex]))
                     {
                         panelsMapped.Add(paths[facadeIndex], new List<Curve>());
@@ -218,14 +254,14 @@ namespace yunggh.Components.Panelization
             return ply.CenterPoint();
         }
 
-        private static Dictionary<GH_Path, List<Curve>> SplitPanels(List<Rectangle3d> panelsUsed, List<Curve> interiorEdges, Curve En)
+        private static Dictionary<string, List<Curve>> SplitPanels(List<Rectangle3d> panelsUsed, List<Curve> interiorEdges, Curve En)
         {
             //7.1) Split Panels on Edge
             double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
-            var splitPanels = new Dictionary<GH_Path, List<Curve>>();
+            var splitPanels = new Dictionary<string, List<Curve>>();
             for (int i = 0; i < panelsUsed.Count; i++)
             {
-                GH_Path path = new GH_Path(i);
+                string path = (new GH_Path(i)).ToString();
                 List<Curve> crvs = new List<Curve>();
                 var crv = panelsUsed[i].ToNurbsCurve().DuplicateCurve(); //one panel curve
                 bool onEdge = IsCurveOnCurve(crv, En);
@@ -364,6 +400,8 @@ namespace yunggh.Components.Panelization
 
         private static List<List<Rectangle3d>> AlignRectangleGridWithUnrolledSurface(double panelWidth, double panelHeight, Plane plane, List<List<Rectangle3d>> grid, int BAYS, int ROWS, List<List<Rectangle3d>> GRID, List<List<Rectangle3d>> SHIFT)
         {
+            grid = GRID;
+
             //5.1) get move distances
             double X = PanelOffset(BAYS, panelWidth);
             double Y = PanelOffset(ROWS, panelHeight);
@@ -381,11 +419,11 @@ namespace yunggh.Components.Panelization
                 //Print(path.ToString());
                 var list = new List<Rectangle3d>();
                 var alignedGrid = SHIFT[b];
-                for (int i = 0; i < grid.Count; i++)
+                for (int i = 0; i < alignedGrid.Count; i++)
                 {
                     var crv = alignedGrid[i];
                     crv.Transform(xform);
-                    alignedGrid[i] = crv;
+                    alignedGrid[i] = crv; //TODO: ERROR index out of range
                 }
                 //align.AddRange(alignedGrid, path);
                 align.Add(alignedGrid);

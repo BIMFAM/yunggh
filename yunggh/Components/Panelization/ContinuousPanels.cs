@@ -76,8 +76,6 @@ namespace yunggh.Components.Panelization
             if (!DA.GetData(5, ref bondShift)) return;
 
             //main script
-            var panels = new GH_Structure<GH_Rectangle>();
-            var ids = new GH_Structure<GH_String>();
 
             //1) unroll facade
             Point3d[] points;
@@ -91,16 +89,12 @@ namespace yunggh.Components.Panelization
             //3) making a basic panel grid
             int bays, rows;
             var grid = CreateSizedRectangleGrid(panelWidth, panelHeight, unrolledFacade, plane, out bays, out rows);
-            int BAYS = bays;
-            int ROWS = rows;
-            var GRID = grid;
 
             //4) shift panel grid
-            var shifted = ShiftRectangleGridBondPattern(panelWidth, panelHeight, uvDirection, bondShift, plane, ref GRID);
-            var SHIFT = shifted;
+            var shifted = ShiftRectangleGridBondPattern(panelWidth, panelHeight, uvDirection, bondShift, plane, ref grid);
 
             //5) move grid so it is over original unroll surface
-            List<List<Rectangle3d>> align = AlignRectangleGridWithUnrolledSurface(panelWidth, panelHeight, plane, grid, BAYS, ROWS, GRID, SHIFT);
+            List<List<Rectangle3d>> align = AlignRectangleGridWithUnrolledSurface(panelWidth, panelHeight, plane, bays, rows, shifted);
 
             //6) remove unused panels for efficiency
             List<Rectangle3d> panelsUsed;
@@ -120,13 +114,6 @@ namespace yunggh.Components.Panelization
             Dictionary<GH_Path, List<Curve>> panelsMapped;
             Dictionary<GH_Path, List<string>> idsMapped;
             MapPanels(facade, unrolledFacade, splitPanels, idsDict, out panelsMapped, out idsMapped);
-            /*/
-            var outputTesting = new List<Curve>();
-            foreach (var kvp in panelsMapped)
-            {
-                outputTesting.AddRange(kvp.Value);
-            }
-            //*/
 
             //output
             var outputPanels = DictionaryToGHStructure(panelsMapped);
@@ -184,7 +171,6 @@ namespace yunggh.Components.Panelization
                 facades.Add(facade.Faces[i].DuplicateFace(false));
                 unrolls.Add(unrolledFacade.Faces[i].DuplicateFace(false));
             }
-            //GRID = facades;
 
             //8.2)map panels to faces
             panelsMapped = new Dictionary<GH_Path, List<Curve>>();
@@ -232,7 +218,6 @@ namespace yunggh.Components.Panelization
                     panelsMapped[paths[facadeIndex]].Add(ply.ToNurbsCurve());
                     idsMapped[paths[facadeIndex]].Add(id);
                 }
-                //*/
             }
         }
 
@@ -334,7 +319,6 @@ namespace yunggh.Components.Panelization
             idsUsed = new List<string>();
             for (int b = 0; b < align.Count; b++)
             {
-                //GH_Path path = GRID.Path(b);
                 var crvs = align[b]; //branch curves
                 var bIds = new List<string>();//branch ids (empty atm)
                 for (int i = crvs.Count - 1; i >= 0; i--)//looping backwards
@@ -398,10 +382,8 @@ namespace yunggh.Components.Panelization
             return mesh;
         }
 
-        private static List<List<Rectangle3d>> AlignRectangleGridWithUnrolledSurface(double panelWidth, double panelHeight, Plane plane, List<List<Rectangle3d>> grid, int BAYS, int ROWS, List<List<Rectangle3d>> GRID, List<List<Rectangle3d>> SHIFT)
+        private static List<List<Rectangle3d>> AlignRectangleGridWithUnrolledSurface(double panelWidth, double panelHeight, Plane plane, int BAYS, int ROWS, List<List<Rectangle3d>> SHIFT)
         {
-            grid = GRID;
-
             //5.1) get move distances
             double X = PanelOffset(BAYS, panelWidth);
             double Y = PanelOffset(ROWS, panelHeight);
@@ -409,23 +391,18 @@ namespace yunggh.Components.Panelization
             //5.2) create move vector and transform
             Vector3d move = (-X * plane.XAxis) + (-Y * plane.YAxis);
             Transform xform = Transform.Translation(move);
-            //Print(move.ToString());
 
             //5.3) move panels
             var align = new List<List<Rectangle3d>>();
-            for (int b = 0; b < GRID.Count; b++)
+            for (int b = 0; b < SHIFT.Count; b++)
             {
-                //GH_Path path = GRID[b];
-                //Print(path.ToString());
-                var list = new List<Rectangle3d>();
                 var alignedGrid = SHIFT[b];
                 for (int i = 0; i < alignedGrid.Count; i++)
                 {
                     var crv = alignedGrid[i];
                     crv.Transform(xform);
-                    alignedGrid[i] = crv; //TODO: ERROR index out of range
+                    alignedGrid[i] = crv;
                 }
-                //align.AddRange(alignedGrid, path);
                 align.Add(alignedGrid);
             }
 
@@ -514,7 +491,6 @@ namespace yunggh.Components.Panelization
             rows = (int)boxH;
 
             //3.4) create grid
-            //Rectangle3d rect = new Rectangle3d(PLN, W, H);
             var grid = new List<List<Rectangle3d>>();
             for (int i = 0; i < bays; i++) //columns
             {

@@ -114,7 +114,51 @@ namespace yunggh.Components.Panelization
             Dictionary<GH_Path, List<Curve>> panelsMapped;
             Dictionary<GH_Path, List<string>> idsMapped;
             MapPanels(facade, unrolledFacade, splitPanels, idsDict, out panelsMapped, out idsMapped);
-           
+
+            //9) organize output by row
+            if(panelDataTreebyRow)
+            {
+                //9.1) sort curves into rows
+                var panelByRow = new Dictionary<string, List<Curve>>();
+                var idsByRow = new Dictionary<string, List<string>>();
+                for (int i = 0;i<panelsMapped.Count;i++)
+                {
+                    var panels = panelsMapped.ElementAt(i).Value;
+                    var ids = idsMapped.ElementAt(i).Value;
+
+                    for(int j = 0;j<panels.Count;j++) //looping per each facade face
+                    {
+                        var panel = panels[j];
+                        var id = ids[j];
+                        var row = id.Split('-')[0];
+
+                        if(!panelByRow.ContainsKey(row))
+                        {
+                            panelByRow.Add(row, new List<Curve>());
+                            idsByRow.Add(row, new List<string>());
+                        }
+                        panelByRow[row].Add(panel);
+                        idsByRow[row].Add(id);
+                    }
+                }
+
+                //9.2) translate dictionary into DataTree
+                panelsMapped = new Dictionary<GH_Path, List<Curve>>();
+                idsMapped = new Dictionary<GH_Path, List<string>>();
+                for(int i = 0;i<panelByRow.Count;i++)
+                {
+                    var row = panelByRow.ElementAt(i).Key;
+                    var panels = panelByRow.ElementAt(i).Value;
+                    var ids = idsByRow.ElementAt(i).Value;
+
+                    int rowInt;
+                    if (!int.TryParse(row, out rowInt)) { continue; }
+                    GH_Path path = new GH_Path(rowInt);
+                    panelsMapped.Add(path, panels);
+                    idsMapped.Add(path, ids);
+                }
+            }
+
             //output
             var outputPanels = DictionaryToGHStructure(panelsMapped);
             var outputIds = DictionaryToGHStructure(idsMapped);

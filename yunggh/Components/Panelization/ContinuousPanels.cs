@@ -114,7 +114,7 @@ namespace yunggh.Components.Panelization
             Dictionary<GH_Path, List<Curve>> panelsMapped;
             Dictionary<GH_Path, List<string>> idsMapped;
             MapPanels(facade, unrolledFacade, splitPanels, idsDict, out panelsMapped, out idsMapped);
-
+           
             //output
             var outputPanels = DictionaryToGHStructure(panelsMapped);
             var outputIds = DictionaryToGHStructure(idsMapped);
@@ -562,5 +562,19 @@ namespace yunggh.Components.Panelization
         {
             get { return new Guid("3E74927D-C274-46C0-9329-C4ADE467B0FC"); }
         }
+
+        protected override void AppendAdditionalComponentMenuItems(System.Windows.Forms.ToolStripDropDown menu)
+        {
+            base.AppendAdditionalComponentMenuItems(menu);
+            Menu_AppendItem(menu, "Panel DataTree by Row", Menu_ClickPanelDataTreeRow);
+        }
+
+        private void Menu_ClickPanelDataTreeRow(object sender, EventArgs e)
+        {
+            panelDataTreebyRow = !panelDataTreebyRow;
+            this.ExpireSolution(true);
+        }
+
+        public bool panelDataTreebyRow = false;
     }
 }

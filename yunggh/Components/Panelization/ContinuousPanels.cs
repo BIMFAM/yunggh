@@ -116,23 +116,23 @@ namespace yunggh.Components.Panelization
             MapPanels(facade, unrolledFacade, splitPanels, idsDict, out panelsMapped, out idsMapped);
 
             //9) organize output by row
-            if(panelDataTreebyRow)
+            if (panelDataTreebyRow)
             {
                 //9.1) sort curves into rows
                 var panelByRow = new Dictionary<string, List<Curve>>();
                 var idsByRow = new Dictionary<string, List<string>>();
-                for (int i = 0;i<panelsMapped.Count;i++)
+                for (int i = 0; i < panelsMapped.Count; i++)
                 {
                     var panels = panelsMapped.ElementAt(i).Value;
                     var ids = idsMapped.ElementAt(i).Value;
 
-                    for(int j = 0;j<panels.Count;j++) //looping per each facade face
+                    for (int j = 0; j < panels.Count; j++) //looping per each facade face
                     {
                         var panel = panels[j];
                         var id = ids[j];
                         var row = id.Split('-')[0];
 
-                        if(!panelByRow.ContainsKey(row))
+                        if (!panelByRow.ContainsKey(row))
                         {
                             panelByRow.Add(row, new List<Curve>());
                             idsByRow.Add(row, new List<string>());
@@ -145,12 +145,21 @@ namespace yunggh.Components.Panelization
                 //9.2) translate dictionary into DataTree
                 panelsMapped = new Dictionary<GH_Path, List<Curve>>();
                 idsMapped = new Dictionary<GH_Path, List<string>>();
-                for(int i = 0;i<panelByRow.Count;i++)
+                for (int i = 0; i < panelByRow.Count; i++)
                 {
+                    //9.2.1) get inputs
                     var row = panelByRow.ElementAt(i).Key;
                     var panels = panelByRow.ElementAt(i).Value;
                     var ids = idsByRow.ElementAt(i).Value;
 
+                    //9.2.2) sort panels by id
+                    panels = panels.Select((n, index) => new { Name = n, Index = index })
+                                    .OrderBy(x => ids.ElementAtOrDefault(x.Index))
+                                    .Select(x => x.Name)
+                                    .ToList();
+                    ids.Sort();
+
+                    //9.2.3) add to datatree
                     int rowInt;
                     if (!int.TryParse(row, out rowInt)) { continue; }
                     GH_Path path = new GH_Path(rowInt);

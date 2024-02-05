@@ -90,6 +90,7 @@
     <Compile Include="Classes\YungGH_Selection.cs" />
     <Compile Include="Components\Document\CreateSavedView.cs" />
     <Compile Include="Components\Document\DocFonts.cs" />
+    <Compile Include="Components\Fabricate\Waffle.cs" />
     <Compile Include="Components\Format\CricutExport.cs" />
     <Compile Include="Components\Format\ExportByLayer.cs" />
     <Compile Include="Components\Format\ExportByMaterial.cs" />

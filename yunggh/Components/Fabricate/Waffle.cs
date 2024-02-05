@@ -85,15 +85,23 @@ namespace yunggh.Components.Fabricate
                 {
                     Curve[] crvs = new Curve[0];
                     Point3d[] pts = new Point3d[0];
-                    if(!Rhino.Geometry.Intersect.Intersection.BrepPlane(brep, plane, tol, out crvs, out pts)) { continue; }
+                    if (!Rhino.Geometry.Intersect.Intersection.BrepPlane(brep, plane, tol, out crvs, out pts)) { continue; }
                     if (crvs == null) { continue; }
                     crvs = Curve.JoinCurves(crvs);
-                    foreach (var crv in crvs)
+                    for (int i = 0; i < crvs.Length; i++)
                     {
-                        if (!crv.IsPlanar()) { continue; }
-                        if (!crv.IsClosed) { continue; }
-                        Brep[] breps = Brep.CreatePlanarBreps(crv, 0.0001);
-                        if (breps == null) { continue; }
+                        var crv = crvs[i];
+                        if (!crv.IsPlanar()) { Debug.WriteLine("crv not planar"); continue; }
+                        if (!crv.IsClosed)
+                        {
+                            if (!crv.MakeClosed(tol))
+                            {
+                                Debug.WriteLine("crv not closed");
+                                continue;
+                            }
+                        }
+                        Brep[] breps = Brep.CreatePlanarBreps(crv, tol);
+                        if (breps == null) { Debug.WriteLine("breps null"); continue; }
                         foreach (var b in breps)
                         {
                             slabs.Add(b);

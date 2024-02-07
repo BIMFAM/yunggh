@@ -154,9 +154,21 @@ namespace yunggh
                 {
                     //get values
                     string filename = filepaths[j].Value;
-                    var cuts = IGooArrayToCurveList(CrvPatCut[path].ToArray());
-                    var perfs = IGooArrayToCurveList(CrvPatPrf[path].ToArray());
-                    var draws = IGooArrayToCurveList(CrvDrwPen[path].ToArray());
+                    var cuts = new List<Curve>();
+                    var perfs = new List<Curve>();
+                    var draws = new List<Curve>();
+                    if (CrvPatCut.PathExists(path))
+                    {
+                        cuts = IGooArrayToCurveList(CrvPatCut[path].ToArray());
+                    }
+                    if (CrvPatPrf.PathExists(path))
+                    {
+                        perfs = IGooArrayToCurveList(CrvPatPrf[path].ToArray());
+                    }
+                    if (CrvDrwPen.PathExists(path))
+                    {
+                        draws = IGooArrayToCurveList(CrvDrwPen[path].ToArray());
+                    }
 
                     //main function
                     ExportSVG(filename, cuts, perfs, draws);
@@ -174,6 +186,7 @@ namespace yunggh
         public static List<Curve> IGooArrayToCurveList(IGH_Goo[] goos)
         {
             var crvs = new List<Curve>();
+            if (goos.Length == 0) { return crvs; }
             foreach (IGH_Goo goo in goos)
             {
                 Curve crv = null;

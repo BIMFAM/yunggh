@@ -17,7 +17,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -36,7 +36,7 @@ namespace yunggh
         public MultiUnroll()
           : base("Multi Unroll", "MultiUnroll",
               "Unroll multiple planar surfaces without duplicating edge points.",
-              "yung gh", "Geometry")
+              "yung gh", "Fabricate")
         {
         }
 
@@ -77,9 +77,6 @@ namespace yunggh
                 //setup
                 Brep brep = B[j];
                 if (brep == null) { continue; }
-
-                //guard statement to ignore single surfaces
-                if (brep.Surfaces.Count < 2) { continue; }
 
                 GH_Path path = new GH_Path(j);
                 List<Point3d> unrolledPts = new List<Point3d>();

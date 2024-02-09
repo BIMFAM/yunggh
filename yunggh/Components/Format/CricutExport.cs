@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Rhino;
 using Rhino.Geometry;
@@ -32,22 +33,10 @@ using System.Text;
 using System.IO;
 using System.Linq;
 
-// In order to load the result of this wizard, you will also need to
-// add the output bin/ folder of this project to the list of loaded
-// folder in Grasshopper.
-// You can use the _GrasshopperDeveloperSettings Rhino command for that.
-
 namespace yunggh
 {
     public class CricutExport : GH_Component
     {
-        /// <summary>
-        /// Each implementation of GH_Component must provide a public
-        /// constructor without any arguments.
-        /// Category represents the Tab in which the component will appear,
-        /// Subcategory the panel. If you use non-existing tab or panel names,
-        /// new tabs/panels will automatically be created.
-        /// </summary>
         public CricutExport()
           : base("CricutExport", "Cricut",
               "Export geometry by layer as *.svg for Cricut",
@@ -55,21 +44,11 @@ namespace yunggh
         {
         }
 
-        /// <summary>
-        /// The Exposure property controls where in the panel a component icon
-        /// will appear. There are seven possible locations (primary to septenary),
-        /// each of which can be combined with the GH_Exposure.obscure flag, which
-        /// ensures the component will only be visible on panel dropdowns.
-        /// </summary>
         public override GH_Exposure Exposure
         {
             get { return GH_Exposure.primary; }
         }
 
-        /// <summary>
-        /// Provides an Icon for every component that will be visible in the User Interface.
-        /// Icons need to be 24x24 pixels.
-        /// </summary>
         protected override System.Drawing.Bitmap Icon
         {
             get
@@ -78,19 +57,11 @@ namespace yunggh
             }
         }
 
-        /// <summary>
-        /// Each component must have a unique Guid to identify it.
-        /// It is vital this Guid doesn't change otherwise old ghx files
-        /// that use the old ID will partially fail during loading.
-        /// </summary>
         public override Guid ComponentGuid
         {
             get { return new Guid("D784BC41-52E4-41C5-991A-6E69B24325C0"); }
         }
 
-        /// <summary>
-        /// Registers all the input parameters for this component.
-        /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddBooleanParameter("Export", "E", "Run Export", GH_ParamAccess.item);
@@ -103,9 +74,6 @@ namespace yunggh
             pManager[4].Optional = true;
         }
 
-        /// <summary>
-        /// Registers all the output parameters for this component.
-        /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddTextParameter("Exported Files", "E", "Exported Filepaths", GH_ParamAccess.tree);
@@ -115,11 +83,6 @@ namespace yunggh
 
         private GH_Structure<GH_String> filePaths;
 
-        /// <summary>
-        /// This is the method that actually does the work.
-        /// </summary>
-        /// <param name="DA">The DA object can be used to retrieve data from input parameters and
-        /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Get input data from Grasshopper
@@ -224,8 +187,15 @@ namespace yunggh
                     svgs.Add(CurveToSVG(circle, style));
                     continue;
                 }
+                else if (crv.IsArc())
+                {
+                    Arc arc;
+                    if (!crv.TryGetArc(out arc)) { continue; }
+                    svgs.Add(CurveToSVG(arc, style));
+                    continue;
+                }
                 var nurbs = crv.ToNurbsCurve();
-                svgs.Add(CurveToSVG(nurbs, style));
+                svgs.AddRange(CurveToSVG(nurbs, style));
             }
             return svgs;
         }
@@ -272,27 +242,156 @@ namespace yunggh
             return sb.ToString();
         }
 
-        public static string CurveToSVG(NurbsCurve nurbsCurve, string style)
+        public static List<string> CurveToSVG(NurbsCurve nurbsCurve, string style)
         {
-            //convert polyline to points
-            StringBuilder pts = new StringBuilder("");
-            /*/
-            foreach(Point3d pt in pLine)
+            var sbs = new List<string>();
+
+            var segments = nurbsCurve.DuplicateSegments();
+            foreach (var segment in segments)
             {
-              pts.Append((pt.X * scale).ToString());
-              pts.Append(",");
-              pts.Append((pt.Y * scale).ToString());
-              pts.Append(" ");
+                if (segment.IsLinear())
+                {
+                    sbs.Add(CurveToSVG(new Line(segment.PointAtStart, segment.PointAtEnd), style));
+                    continue;
+                }
+                else if (segment.IsPolyline())
+                {
+                    Polyline polyline;
+                    double[] parameters;
+                    if (!segment.TryGetPolyline(out polyline, out parameters)) { continue; }
+                    sbs.Add(CurveToSVG(polyline, style));
+                    continue;
+                }
+                else if (segment.IsCircle())
+                {
+                    Circle circle;
+                    if (!segment.TryGetCircle(out circle)) { continue; }
+                    sbs.Add(CurveToSVG(circle, style));
+                    continue;
+                }
+                else if (segment.IsArc())
+                {
+                    Arc arc;
+                    if (!segment.TryGetArc(out arc)) { continue; }
+                    sbs.Add(CurveToSVG(arc, style));
+                    continue;
+                }
+                else
+                {
+                    var tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+                    var plycrv = segment.ToArcsAndLines(tol, tol, 0.001, 1000);
+                    var segments2 = plycrv.DuplicateSegments();
+                    foreach (var seg in segments2)
+                    {
+                        if (seg.IsLinear())
+                        {
+                            sbs.Add(CurveToSVG(new Line(seg.PointAtStart, seg.PointAtEnd), style));
+                            continue;
+                        }
+                        else if (seg.IsPolyline())
+                        {
+                            Polyline polyline;
+                            double[] parameters;
+                            if (!seg.TryGetPolyline(out polyline, out parameters)) { continue; }
+                            sbs.Add(CurveToSVG(polyline, style));
+                            continue;
+                        }
+                        else if (seg.IsCircle())
+                        {
+                            Circle circle;
+                            if (!seg.TryGetCircle(out circle)) { continue; }
+                            sbs.Add(CurveToSVG(circle, style));
+                            continue;
+                        }
+                        else if (seg.IsArc())
+                        {
+                            Arc arc;
+                            if (!seg.TryGetArc(out arc)) { continue; }
+                            sbs.Add(CurveToSVG(arc, style));
+                            continue;
+                        }
+                        else
+                        {
+                            sbs.Add(ConvertToSvgPath(seg.ToNurbsCurve(), style));
+                        }
+                    }
+                }
             }
+            return sbs;
+        }
+
+        public static string CurveToSVG(Arc rhinoArc, string style)
+        {
+            /*/
+            string _arc_svg = "    <path class=\"STYLE\" d=\"MSTARTX,STARTY A_RADIUSX,RADIUSY 0 0,SWEEPFLAG ENDX,ENDY\"/>";
+
+            StringBuilder sb = new StringBuilder(_arc_svg);
+
+            // Extract relevant arc parameters
+            double startX = rhinoArc.StartPoint.X * scale;
+            double startY = rhinoArc.StartPoint.Y * scale;
+            double endX = rhinoArc.EndPoint.X * scale;
+            double endY = rhinoArc.EndPoint.Y * scale;
+            double radiusX = rhinoArc.Radius * scale;
+            double radiusY = rhinoArc.Radius * scale;
+            double sweepFlag = (rhinoArc.Angle > Math.PI) ? 1 : 0;
+
+            // Replace placeholders in the SVG template
+            sb.Replace("STYLE", style);
+            sb.Replace("STARTX", startX.ToString());
+            sb.Replace("STARTY", startY.ToString());
+            sb.Replace("ENDX", endX.ToString());
+            sb.Replace("ENDY", endY.ToString());
+            sb.Replace("RADIUSX", radiusX.ToString());
+            sb.Replace("RADIUSY", radiusY.ToString());
+            sb.Replace("SWEEPFLAG", sweepFlag.ToString());
             //*/
+
+            var crv = rhinoArc.ToNurbsCurve();
+            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var polyline = crv.ToPolyline(tol, tol, 0.01, crv.GetLength());
+            return CurveToSVG(polyline.ToPolyline(), style);
+        }
+
+        public static string ConvertToSvgPath(NurbsCurve nurbsCurve, string style)
+        {
+            /*/
+            StringBuilder svgPathData = new StringBuilder();
+
+            int pointCount = nurbsCurve.Points.Count;
+            Point3d[] controlPoints = nurbsCurve.Points.Select(p => p.Location).ToArray();
+
+            if (pointCount >= 4)
+            {
+                // Move to the starting point
+                svgPathData.Append($"M {controlPoints[0].X},{controlPoints[0].Y} ");
+
+                // Iterate through the control points in groups of 3 to create cubic Bezier curves
+                for (int i = 1; i < pointCount; i += 3)
+                {
+                    // Ensure we have enough control points for the cubic Bezier curve
+                    if (i + 2 < pointCount)
+                    {
+                        // Convert control points to Bezier control points
+                        Point3d p1 = controlPoints[i];
+                        Point3d p2 = controlPoints[i + 1];
+                        Point3d p3 = controlPoints[i + 2];
+
+                        // Append the cubic Bezier curve command to the SVG path
+                        svgPathData.Append($"C {p1.X},{p1.Y} {p2.X},{p2.Y} {p3.X},{p3.Y} ");
+                    }
+                }
+            }
 
             StringBuilder sb = new StringBuilder(_path_svg);
             //is there a translation for scale that needs to happen?
             sb.Replace("STYLE", style);
-            sb.Replace("SX", (nurbsCurve.PointAtStart.X * scale).ToString());
-            sb.Replace("SY", (nurbsCurve.PointAtStart.Y * scale).ToString());
-            sb.Replace("PTS", pts.ToString());
-            return sb.ToString();
+            sb.Replace("MSX,SYcPTS", svgPathData.ToString());
+            //*/
+
+            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var polyline = nurbsCurve.ToPolyline(tol, tol, 0.01, nurbsCurve.GetLength());
+            return CurveToSVG(polyline.ToPolyline(), style);
         }
 
         private static void ExportSVG(string filename, List<Curve> cuts, List<Curve> perfs, List<Curve> draws)

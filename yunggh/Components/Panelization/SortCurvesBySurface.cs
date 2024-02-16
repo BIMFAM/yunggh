@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 using Grasshopper.Kernel;
@@ -78,6 +79,10 @@ namespace yunggh.Components.Panelization
             DA.SetDataList(1, vCrvsSorted);
             DA.SetDataList(2, uIndicesSorted);
             DA.SetDataList(3, vIndicesSorted);
+
+            //setup preview
+            _previewUCurves = uCrvsSorted;
+            _previewVCurves = vCrvsSorted;
         }
 
         public static void Sort(List<Curve> U, List<Curve> V, bool FU, bool FV,
@@ -132,6 +137,39 @@ namespace yunggh.Components.Panelization
             VO = V;
             VI = iV;
         }
+
+        #region PREVIEW OVERRIDES
+
+        private List<Curve> _previewUCurves = new List<Curve>();
+        private List<Curve> _previewVCurves = new List<Curve>();
+
+        //Draw all wires and points in this method.
+        public override void DrawViewportWires(IGH_PreviewArgs args)
+        {
+            PreviewCurveGradient(args, _previewUCurves, Color.Red, Color.Cyan);
+            PreviewCurveGradient(args, _previewVCurves, Color.Yellow, Color.Green);
+        }
+
+        private static void PreviewCurveGradient(IGH_PreviewArgs args, List<Curve> crvs, Color start, Color end)
+        {
+            for (int i = 0; i < crvs.Count; i++)
+            {
+                //calculate gradient
+                double percent = i / (crvs.Count * 1.00);
+
+                byte r = (byte)(start.R * (1 - percent) + end.R * percent);
+                byte g = (byte)(start.G * (1 - percent) + end.G * percent);
+                byte b = (byte)(start.B * (1 - percent) + end.B * percent);
+                byte a = (byte)(start.A * (1 - percent) + end.A * percent);
+
+                Color color = Color.FromArgb(a, r, g, b);
+
+                //preview curve
+                args.Display.DrawCurve(crvs[i], color);
+            }
+        }
+
+        #endregion PREVIEW OVERRIDES
 
         #region METHODS
 

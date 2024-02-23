@@ -127,6 +127,7 @@
     <Compile Include="Components\Machine Learning\ShortestWalk\NodeAddress.cs" />
     <Compile Include="Components\Machine Learning\ShortestWalk\PathMethods.cs" />
     <Compile Include="Components\Panelization\ContinuousPanels.cs" />
+    <Compile Include="Components\Panelization\PyramidPanelization.cs" />
     <Compile Include="Components\Panelization\SortCurvesBySurface.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
     <Compile Include="Components\Shape\MarchingCubes.cs" />

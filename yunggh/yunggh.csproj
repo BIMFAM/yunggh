@@ -129,6 +129,7 @@
     <Compile Include="Components\Panelization\ContinuousPanels.cs" />
     <Compile Include="Components\Panelization\PyramidPanelization.cs" />
     <Compile Include="Components\Panelization\SortCurvesBySurface.cs" />
+    <Compile Include="Components\Panelization\SurfaceQuadPoints.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />
     <Compile Include="Components\Shape\MarchingCubes.cs" />
     <Compile Include="Components\Shape\WaveFunctionCollapse.cs" />

@@ -131,11 +131,34 @@ namespace yunggh.Components.Panelization
                 V.Reverse();
                 iV.Reverse();
             }
+
+            //make sure all curves are going the right direction
+            U = OrientCurves(U);
+            V = OrientCurves(V);
+
             //output
             UO = U;
             UI = iU;
             VO = V;
             VI = iV;
+        }
+
+        private static List<Curve> OrientCurves(List<Curve> crvs)
+        {
+            for (int i = 1; i < crvs.Count; i++)
+            {
+                var crv0 = crvs[i - 1];
+                var crv1 = crvs[i];
+                var startTangent0 = crv0.TangentAtStart;
+                var startTangent1 = crv1.TangentAtStart;
+                var angleRadians = Vector3d.VectorAngle(startTangent0, startTangent1);
+                var angleDegrees = Rhino.RhinoMath.ToDegrees(angleRadians);
+                if (angleDegrees < 90) { continue; }
+
+                crv1.Reverse();
+                crvs[i] = crv1;
+            }
+            return crvs;
         }
 
         #region PREVIEW OVERRIDES

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-
+using System.Net;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
@@ -87,142 +87,162 @@ namespace yunggh.Components.Panelization
         public static List<List<List<Point3d>>> GetQuadCorners(List<Curve> uCrvs, List<Curve> vCrvs)
         {
             //setting up a complete grid with empty point values
-            var pts = new List<List<Point3d>>();
-            for (int u = 0; u < uCrvs.Count; u++)
-            {
-                var crvPts = new List<Point3d>();
-                for (int v = 0; v < vCrvs.Count; v++)
-                {
-                    crvPts.Add(Point3d.Unset);
-                }
-                pts.Add(crvPts);
-            }
-
-            //getting all curve intersection points
-            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
-            for (int u = 0; u < pts.Count; u++)
-            {
-                var uCrv = uCrvs[u];
-                for (int v = 0; v < vCrvs.Count; v++)
-                {
-                    var vCrv = vCrvs[v];
-                    var crvXs = Rhino.Geometry.Intersect.Intersection.CurveCurve(uCrv, vCrv, tol, tol);
-                    if (crvXs.Count == 0) { continue; }
-                    foreach (var crvX in crvXs) { pts[u][v] = crvX.PointA; }
-                }
-            }
-
-            //find end points that might not have been an intersection
-            int[] setsS = new int[pts.Count];
-            int[] setsE = new int[pts.Count];
-            for (int u = 1; u < pts.Count - 1; u++)
-            {
-                //Debug.WriteLine("A");
-                var uCrv = uCrvs[u - 1];
-                //Debug.WriteLine("B");
-
-                for (int v = 1; v < vCrvs.Count - 1; v++)
-                {
-                    //Debug.WriteLine("C" + u + "-" + v);
-                    var vCrv = vCrvs[v - 1];
-                    //Debug.WriteLine("D" + u + "-" + v);
-                    var pt = pts[u][v];
-                    //Debug.WriteLine("E" + u + "-" + v);
-                    if (pt == Point3d.Unset) { continue; }
-
-                    //V
-                    var ptVS = pts[u][v - 1];
-                    if (ptVS == Point3d.Unset && setsS[u] < 1)
-                    {
-                        //Debug.WriteLine("H" + u + "-" + v);
-                        var start = vCrv.PointAtStart;
-                        var end = vCrv.PointAtEnd;
-                        if (start.DistanceTo(pt) > tol && end.DistanceTo(pt) > tol)
-                        {
-                            if (pt.DistanceTo(start) < pt.DistanceTo(end))
-                                pts[u][v - 1] = start;
-                            else
-                                pts[u][v - 1] = end;
-                            setsS[u]++;
-                        }
-                        //Debug.WriteLine("I" + u + "-" + v);
-                    }
-                    var ptVE = pts[u][v + 1];
-                    if (ptVE == Point3d.Unset && setsE[u] < 1)
-                    {
-                        //Debug.WriteLine("L" + u + "-" + v);
-                        var start = vCrv.PointAtStart;
-                        var end = vCrv.PointAtEnd;
-                        if (start.DistanceTo(pt) > tol && end.DistanceTo(pt) > tol)
-                        {
-                            if (pt.DistanceTo(start) < pt.DistanceTo(end))
-                                pts[u][v + 1] = start;
-                            else
-                                pts[u][v + 1] = end;
-                            setsE[u]++;
-                        }
-                        //Debug.WriteLine("M" + u + "-" + v);
-                    }
-
-                    //U
-                    var ptUS = pts[u - 1][v];
-                    if (ptUS == Point3d.Unset && setsS[u - 1] < 1)
-                    {
-                        //Debug.WriteLine("F" + u + "-" + v);
-                        var start = uCrv.PointAtStart;
-                        var end = uCrv.PointAtEnd;
-                        if (start.DistanceTo(pt) > tol && end.DistanceTo(pt) > tol)
-                        {
-                            if (pt.DistanceTo(start) < pt.DistanceTo(end))
-                                pts[u - 1][v] = start;
-                            else
-                                pts[u - 1][v] = end;
-                            setsS[u - 1]++;
-                        }
-                        //Debug.WriteLine("G" + u + "-" + v);
-                    }
-                    var ptUE = pts[u + 1][v];
-                    if (ptUE == Point3d.Unset && setsE[u + 1] < 1)
-                    {
-                        //Debug.WriteLine("J" + u + "-" + v);
-                        var start = uCrv.PointAtStart;
-                        var end = uCrv.PointAtEnd;
-                        if (start.DistanceTo(pt) > tol && end.DistanceTo(pt) > tol)
-                        {
-                            if (pt.DistanceTo(start) < pt.DistanceTo(end))
-                                pts[u + 1][v] = start;
-                            else
-                                pts[u + 1][v] = end;
-                            setsE[u + 1]++;
-                        }
-                        //Debug.WriteLine("K" + u + "-" + v);
-                    }
-                }
-            }
-
-            //grouping points into quads
+            //generating default quad list structure by row
+            int uCrvCount = uCrvs.Count + 1;
+            int vCrvCount = vCrvs.Count + 1;
             var output = new List<List<List<Point3d>>>();
-            for (int i = 1; i < pts.Count; i++)
+            for (int u = 0; u < uCrvCount; u++)
             {
-                var row = new List<List<Point3d>>();
-
-                var pts0 = pts[i - 1];
-                var pts1 = pts[i];
-
-                for (int j = 1; j < pts0.Count; j++)
+                var quadRow = new List<List<Point3d>>();
+                for (int v = 0; v < vCrvCount; v++)
                 {
-                    var pt0 = pts0[j - 1];
-                    var pt1 = pts0[j];
-                    var pt2 = pts1[j];
-                    var pt3 = pts1[j - 1];
-
-                    var quad = new List<Point3d>() { pt0, pt1, pt2, pt3 };
-                    row.Add(quad);
+                    var quad = new List<Point3d>();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        quad.Add(Point3d.Unset);
+                    }
+                    quadRow.Add(quad);
                 }
-                output.Add(row);
+                output.Add(quadRow);
             }
+
+            //get topmost and bottom most rows
+
+            //for each quad, find points
+            for (int u = 1; u < output.Count - 1; u++)
+            {
+                var quadRow = output[u];
+                for (int v = 1; v < quadRow.Count - 1; v++)
+                {
+                    var quad = quadRow[v];
+                    var topUCrv = uCrvs[u];
+                    var botUCrv = uCrvs[u - 1];
+                    var leftVCrv = vCrvs[v - 1];
+                    var rightVCrv = vCrvs[v];
+
+                    var topLeft = GetIntersection(topUCrv, leftVCrv);
+                    var topRight = GetIntersection(topUCrv, rightVCrv);
+                    var botLeft = GetIntersection(botUCrv, leftVCrv);
+                    var botRight = GetIntersection(botUCrv, rightVCrv);
+                    quad[0] = topLeft;
+                    quad[1] = topRight;
+                    quad[2] = botRight;
+                    quad[3] = botLeft;
+
+                    quad = FixQuad(quad, topUCrv, botUCrv, leftVCrv, rightVCrv);
+                    
+
+                    quadRow[v] = quad;
+                }
+                output[u] = quadRow;
+            }
+
+            //find any pentagons
 
             return output;
+        }
+
+        private static List<Point3d> FixQuad(List<Point3d> quad, Curve topUCrv, Curve botUCrv, Curve leftVCrv, Curve rightVCrv)
+        {
+            //guard statement
+            if (quad[0] == Point3d.Unset && quad[1] == Point3d.Unset && quad[2] == Point3d.Unset && quad[3] == Point3d.Unset) { return quad; }
+            if (quad[0] != Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset) { return quad; }
+
+            #region One Point Missing
+            //top left is missing
+            if (quad[0] == Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset)
+            {
+                quad[0] = topUCrv.PointAtStart;
+                return quad;
+            }
+            //bottom left is missing
+            if (quad[0] != Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] == Point3d.Unset)
+            {
+                quad[3] = botUCrv.PointAtStart;
+                return quad;
+            }
+            //top right is missing
+            if (quad[0] != Point3d.Unset && quad[1] == Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset)
+            {
+                quad[1] = topUCrv.PointAtEnd;
+                return quad;
+            }
+            //bottom right is missing
+            if (quad[0] != Point3d.Unset && quad[1] != Point3d.Unset && quad[2] == Point3d.Unset && quad[3] != Point3d.Unset)
+            {
+                quad[2] = botUCrv.PointAtEnd;
+                return quad;
+            }
+            #endregion
+
+            #region Two Points Missing
+            //left is missing
+            if (quad[0] == Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] == Point3d.Unset) 
+            {
+                quad[0] = topUCrv.PointAtStart;
+                quad[3] = botUCrv.PointAtStart;
+                return quad; 
+            }
+            //right is missing
+            if (quad[0] != Point3d.Unset && quad[1] == Point3d.Unset && quad[2] == Point3d.Unset && quad[3] != Point3d.Unset) 
+            {
+                quad[1] = topUCrv.PointAtEnd;
+                quad[2] = botUCrv.PointAtEnd;
+                return quad; 
+            }
+            //top is missing
+            if (quad[0] == Point3d.Unset && quad[1] == Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset) 
+            {
+                quad[0] = leftVCrv.PointAtEnd;
+                quad[1] = rightVCrv.PointAtEnd;
+                return quad; 
+            }
+            //bottom is missing
+            if (quad[0] != Point3d.Unset && quad[1] != Point3d.Unset && quad[2] == Point3d.Unset && quad[3] == Point3d.Unset) 
+            {
+                quad[2] = rightVCrv.PointAtStart;
+                quad[3] = leftVCrv.PointAtStart;
+                return quad; 
+            }
+            #endregion
+
+            //only top left
+            if (quad[0] == Point3d.Unset)
+            {
+                quad[1] = topUCrv.PointAtEnd;
+                quad[3] = leftVCrv.PointAtStart;
+                return quad;
+            }
+            //only top right
+            if (quad[1] == Point3d.Unset)
+            {
+                quad[0] = topUCrv.PointAtStart;
+                quad[2] = rightVCrv.PointAtStart;
+                return quad;
+            }
+            //only bottom right
+            if (quad[2] == Point3d.Unset)
+            {
+                quad[1] = rightVCrv.PointAtEnd;
+                quad[3] = botUCrv.PointAtStart;
+                return quad;
+            }
+            //only bottom left
+            if (quad[3] == Point3d.Unset)
+            {
+                quad[0] = leftVCrv.PointAtEnd;
+                quad[2] = botUCrv.PointAtEnd;
+                return quad;
+            }
+            return quad;
+        }
+
+        private static Point3d GetIntersection(Curve A, Curve B)
+        {
+            double tol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var crvXs = Rhino.Geometry.Intersect.Intersection.CurveCurve(A, B, tol, tol);
+            if (crvXs.Count == 0) { return Point3d.Unset; }
+            return crvXs[0].PointA;
         }
 
         public static GH_Structure<GH_Point> ToDataTree(List<List<List<Point3d>>> listListList)

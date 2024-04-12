@@ -107,11 +107,86 @@ namespace yunggh.Components.Panelization
             }
 
             //get topmost and bottom most rows
+            var bottomRow = output[0]; //0 is the bottom row
+
+            for (int v = 1; v < bottomRow.Count - 1; v++)
+            {
+                var quad = bottomRow[v];
+                var topUCrv = uCrvs[0];
+                var leftVCrv = vCrvs[v - 1];
+                var rightVCrv = vCrvs[v];
+
+                var topLeft = GetIntersection(topUCrv, leftVCrv);
+                var topRight = GetIntersection(topUCrv, rightVCrv);
+
+                //here we'll test for the left most column
+                if (v == 1 && topLeft != Point3d.Unset)
+                {
+                    if (topLeft != topUCrv.PointAtStart)
+                    {
+                        var startQuad = new List<Point3d>();
+                        startQuad.Add(topUCrv.PointAtStart);
+                        startQuad.Add(topLeft);
+                        startQuad.Add(leftVCrv.PointAtStart);
+                        startQuad.Add(Point3d.Unset);
+                        startQuad.Add(Point3d.Unset);
+                        bottomRow[0] = startQuad;
+                    }
+                }
+
+                //if there aren't any intersections then we have to continue
+                if (topLeft == Point3d.Unset && topRight == Point3d.Unset) { continue; }
+
+                //test if intersection is the same as the VCrv start point (start is towards bottom)
+                if (topLeft == leftVCrv.PointAtStart) { continue; }
+                if (topRight == rightVCrv.PointAtStart) { continue; }
+
+                //check if it's triangle
+                if (topLeft == Point3d.Unset)
+                {
+                    quad[0] = topUCrv.PointAtStart;
+                    quad[1] = topRight;
+                    quad[2] = rightVCrv.PointAtStart;
+                }
+                else if (topRight == Point3d.Unset)
+                {
+                    quad[0] = topLeft;
+                    quad[1] = topUCrv.PointAtEnd;
+                    quad[3] = leftVCrv.PointAtStart;
+                }
+                else
+                {
+                    quad[0] = topLeft;
+                    quad[1] = topRight;
+                    quad[2] = rightVCrv.PointAtStart;
+                    quad[3] = leftVCrv.PointAtStart;
+                }
+                bottomRow[v] = quad;
+
+                //here we test for the right most column
+                if (v == bottomRow.Count - 2 && topRight != Point3d.Unset)
+                {
+                    if (topRight != topUCrv.PointAtEnd)
+                    {
+                        var endQuad = new List<Point3d>();
+                        endQuad.Add(topRight);
+                        endQuad.Add(topUCrv.PointAtEnd);
+                        endQuad.Add(Point3d.Unset);
+                        endQuad.Add(rightVCrv.PointAtStart);
+                        endQuad.Add(Point3d.Unset);
+                        bottomRow[bottomRow.Count - 1] = endQuad;
+                    }
+                }
+            }
+            output[0] = bottomRow;
 
             //for each quad, find points
             for (int u = 1; u < output.Count - 1; u++)
             {
                 var quadRow = output[u];
+
+                //get first column
+
                 for (int v = 1; v < quadRow.Count - 1; v++)
                 {
                     var quad = quadRow[v];
@@ -130,14 +205,16 @@ namespace yunggh.Components.Panelization
                     quad[3] = botLeft;
 
                     quad = FixQuad(quad, topUCrv, botUCrv, leftVCrv, rightVCrv);
-                    
 
                     quadRow[v] = quad;
                 }
+
+                //get last column
+
                 output[u] = quadRow;
             }
 
-            //find any pentagons
+            //find any pentagons by comparing all quad edges with the edges of adjacent quads
 
             return output;
         }
@@ -149,6 +226,7 @@ namespace yunggh.Components.Panelization
             if (quad[0] != Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset) { return quad; }
 
             #region One Point Missing
+
             //top left is missing
             if (quad[0] == Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset)
             {
@@ -173,38 +251,41 @@ namespace yunggh.Components.Panelization
                 quad[2] = botUCrv.PointAtEnd;
                 return quad;
             }
-            #endregion
+
+            #endregion One Point Missing
 
             #region Two Points Missing
+
             //left is missing
-            if (quad[0] == Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] == Point3d.Unset) 
+            if (quad[0] == Point3d.Unset && quad[1] != Point3d.Unset && quad[2] != Point3d.Unset && quad[3] == Point3d.Unset)
             {
                 quad[0] = topUCrv.PointAtStart;
                 quad[3] = botUCrv.PointAtStart;
-                return quad; 
+                return quad;
             }
             //right is missing
-            if (quad[0] != Point3d.Unset && quad[1] == Point3d.Unset && quad[2] == Point3d.Unset && quad[3] != Point3d.Unset) 
+            if (quad[0] != Point3d.Unset && quad[1] == Point3d.Unset && quad[2] == Point3d.Unset && quad[3] != Point3d.Unset)
             {
                 quad[1] = topUCrv.PointAtEnd;
                 quad[2] = botUCrv.PointAtEnd;
-                return quad; 
+                return quad;
             }
             //top is missing
-            if (quad[0] == Point3d.Unset && quad[1] == Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset) 
+            if (quad[0] == Point3d.Unset && quad[1] == Point3d.Unset && quad[2] != Point3d.Unset && quad[3] != Point3d.Unset)
             {
                 quad[0] = leftVCrv.PointAtEnd;
                 quad[1] = rightVCrv.PointAtEnd;
-                return quad; 
+                return quad;
             }
             //bottom is missing
-            if (quad[0] != Point3d.Unset && quad[1] != Point3d.Unset && quad[2] == Point3d.Unset && quad[3] == Point3d.Unset) 
+            if (quad[0] != Point3d.Unset && quad[1] != Point3d.Unset && quad[2] == Point3d.Unset && quad[3] == Point3d.Unset)
             {
                 quad[2] = rightVCrv.PointAtStart;
                 quad[3] = leftVCrv.PointAtStart;
-                return quad; 
+                return quad;
             }
-            #endregion
+
+            #endregion Two Points Missing
 
             //only top left
             if (quad[0] == Point3d.Unset)

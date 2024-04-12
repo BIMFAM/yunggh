@@ -94,6 +94,8 @@ namespace yunggh.Components.Panelization
                 for (int j = 0; j < row.Count; j++)
                 {
                     var quad = row[j];
+                    //TODO: test if quad is a pentagon
+                    //test if quad is a triangle
                     if (quad[0] == Point3d.Unset || quad[1] == Point3d.Unset || quad[2] == Point3d.Unset || quad[3] == Point3d.Unset)
                     {
                         //find out how many points are unset
@@ -144,6 +146,7 @@ namespace yunggh.Components.Panelization
                     center += normal * height;
 
                     //create pyramid panels
+                    quad.RemoveAt(quad.Count-1); //at this point we assume there is no need for a pentagon
                     for (int i = 1; i <= quad.Count; i++)
                     {
                         var pt0 = quad[i - 1];

@@ -128,6 +128,7 @@
     <Compile Include="Components\Machine Learning\ShortestWalk\PathMethods.cs" />
     <Compile Include="Components\Panelization\ContinuousPanels.cs" />
     <Compile Include="Components\Panelization\PyramidPanelization.cs" />
+    <Compile Include="Components\Panelization\SecantPlanePanelization.cs" />
     <Compile Include="Components\Panelization\SortCurvesBySurface.cs" />
     <Compile Include="Components\Panelization\SurfaceQuadPoints.cs" />
     <Compile Include="Components\Selection\SelUnique.cs" />

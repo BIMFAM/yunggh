@@ -29,7 +29,7 @@ namespace yunggh.Components.Panelization
             pManager.AddBrepParameter("Surface", "S", "Panelization Surface (can be double curved)", GH_ParamAccess.item);
             pManager.AddCurveParameter("U Curves", "U", "'U' Curves", GH_ParamAccess.list);
             pManager.AddCurveParameter("V Curves", "V", "'V' Curves", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Pointiness", "P", "Pulled Corner Location Offset", GH_ParamAccess.item, 0);
+            pManager.AddVectorParameter("Pointiness", "V", "Pulled Corner Location Offset as Vector (uses X,Y).", GH_ParamAccess.item, Vector3d.Zero);
             pManager.AddIntegerParameter("Pulled Point Logic", "L", "Determine which point to pull", GH_ParamAccess.item, 0);
             pManager.AddBooleanParameter("Flip U Curves", "FU", "Flip 'U' Curves", GH_ParamAccess.item, false);
             pManager.AddBooleanParameter("Flip V Curves", "FV", "Flip 'V' Curves", GH_ParamAccess.item, false);
@@ -52,7 +52,7 @@ namespace yunggh.Components.Panelization
             var brep = new Brep();
             var uCrvs = new List<Curve>();
             var vCrvs = new List<Curve>();
-            var pulledPointPointiness = 0.0;
+            var pulledPointPointiness = Vector3d.Zero;
             var pulledPointType = 0;
             var uFlip = false;
             var vFlip = false;
@@ -85,7 +85,7 @@ namespace yunggh.Components.Panelization
             DA.SetDataList(0, panels);
         }
 
-        public static List<Brep> GetSecantPlanePanels(List<List<List<Point3d>>> quadsByRow, Brep brep, double pulledPointPointiness, int pulledPointType)
+        public static List<Brep> GetSecantPlanePanels(List<List<List<Point3d>>> quadsByRow, Brep brep, Vector3d pulledPointPointiness, int pulledPointType)
         {
             var output = new List<Brep>();
 
@@ -111,6 +111,12 @@ namespace yunggh.Components.Panelization
                         //create plane and project Pulled Point
                         var plane = new Plane(quadByType[1], quadByType[2], quadByType[3]);
                         var pulledPoint = plane.ClosestPoint(originaPulledPoint);
+
+                        //apply pulled point Pointiness
+                        var moveVec = plane.XAxis * pulledPointPointiness.X + plane.YAxis * pulledPointPointiness.Y;
+                        var xform = Transform.Translation(moveVec);
+                        pulledPoint.Transform(xform);
+
                         //create quad
                         var quadPnl = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[1], quadByType[2], quadByType[3]);
 

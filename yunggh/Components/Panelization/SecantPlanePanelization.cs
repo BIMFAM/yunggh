@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 
 namespace yunggh.Components.Panelization
@@ -41,7 +44,7 @@ namespace yunggh.Components.Panelization
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddBrepParameter("Secant Plane Panels", "P", "Pyramid Panels", GH_ParamAccess.list);
+            pManager.AddBrepParameter("Secant Plane Panels", "P", "Pyramid Panels", GH_ParamAccess.tree);
         }
 
         #endregion UI
@@ -78,11 +81,39 @@ namespace yunggh.Components.Panelization
             //get quad corners
             var quads = SurfaceQuadPoints.GetQuadCorners(uCrvsSorted, vCrvsSorted);
 
-            //create pyramid panels
+            //create secant panels
             var panels = GetSecantPlanePanels(quads, brep, pulledPointPointiness, pulledPointType);
 
+            //sort secant panels into data tree by row
+            var dataTree = ListListListToTree(panels);
+
             //output
-            DA.SetDataList(0, panels);
+            DA.SetDataTree(0, dataTree);
+        }
+
+        public static GH_Structure<GH_Brep> ListListListToTree(List<List<List<Brep>>> listListList)
+        {
+            var tree = new GH_Structure<GH_Brep>();
+            for (int i = 0; i < listListList.Count; i++)
+            {
+                var row = listListList[i];
+                for (int j = 0; j < row.Count; j++)
+                {
+                    var cell = row[j];
+                    var gh_cell = new List<GH_Brep>();
+                    foreach (var c in cell)
+                    {
+                        GH_Brep gh_brep = null;
+                        if (!GH_Convert.ToGHBrep_Primary(c, ref gh_brep)) { continue; }
+                        gh_cell.Add(gh_brep);
+                    }
+
+                    var path = new GH_Path(i, j);
+                    tree.AppendRange(gh_cell, path);
+                }
+            }
+
+            return tree;
         }
 
         public static List<Point3d> OrderQuadByPulledPoint(List<Point3d> quad, int pulledPointType)
@@ -124,19 +155,21 @@ namespace yunggh.Components.Panelization
             return quadByType;
         }
 
-        public static List<Brep> GetSecantPlanePanels(List<List<List<Point3d>>> quadsByRow, Brep brep, Vector3d pulledPointPointiness, int pulledPointType)
+        public static List<List<List<Brep>>> GetSecantPlanePanels(List<List<List<Point3d>>> quadsByRow, Brep brep, Vector3d pulledPointPointiness, int pulledPointType)
         {
             //guard statements
             if (pulledPointType > 3) { pulledPointType = 0; }
             if (pulledPointType < 0) { pulledPointType = 0; }
 
-            var output = new List<Brep>();
+            var allOutput = new List<List<List<Brep>>>();
 
             for (int r = 0; r < quadsByRow.Count; r++)
             {
+                var rowOutput = new List<List<Brep>>();
                 var row = quadsByRow[r];
                 for (int j = 0; j < row.Count; j++)
                 {
+                    var panels = new List<Brep>();
                     var quad = row[j];
                     //TODO: create inheritance class
                     //test if quad is a triangle
@@ -163,13 +196,15 @@ namespace yunggh.Components.Panelization
                     //create triangles
                     var trPnl1 = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[1], quadByType[4]);
                     var trPnl2 = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[3], quadByType[4]);
-                    output.Add(quadPnl.ToBrep());
-                    output.Add(trPnl1.ToBrep());
-                    output.Add(trPnl2.ToBrep());
+                    panels.Add(quadPnl.ToBrep());
+                    panels.Add(trPnl1.ToBrep());
+                    panels.Add(trPnl2.ToBrep());
+                    rowOutput.Add(panels);
                 }
+                allOutput.Add(rowOutput);
             }
 
-            return output;
+            return allOutput;
         }
     }
 }

@@ -85,8 +85,51 @@ namespace yunggh.Components.Panelization
             DA.SetDataList(0, panels);
         }
 
+        public static List<Point3d> OrderQuadByPulledPoint(List<Point3d> quad, int pulledPointType)
+        {
+            //get variables
+            var originaPulledPoint = new Point3d(quad[pulledPointType]);
+            var quadByType = quad.ToList();
+
+            var pt0 = new Point3d(quad[0]);
+            var pt1 = new Point3d(quad[1]);
+            var pt2 = new Point3d(quad[2]);
+            var pt3 = new Point3d(quad[3]);
+
+            //assume 0 as the default, only check things above that
+            if (pulledPointType == 1)
+            {
+                quadByType[0] = pt1;
+                quadByType[1] = pt2;
+                quadByType[2] = pt3;
+                quadByType[3] = pt0;
+            }
+            else if (pulledPointType == 2)
+            {
+                quadByType[0] = pt2;
+                quadByType[1] = pt3;
+                quadByType[2] = pt0;
+                quadByType[3] = pt1;
+            }
+            else if (pulledPointType == 3)
+            {
+                quadByType[0] = pt3;
+                quadByType[1] = pt0;
+                quadByType[2] = pt1;
+                quadByType[3] = pt2;
+            }
+
+            //add original point and return
+            quadByType[4] = originaPulledPoint;
+            return quadByType;
+        }
+
         public static List<Brep> GetSecantPlanePanels(List<List<List<Point3d>>> quadsByRow, Brep brep, Vector3d pulledPointPointiness, int pulledPointType)
         {
+            //guard statements
+            if (pulledPointType > 3) { pulledPointType = 0; }
+            if (pulledPointType < 0) { pulledPointType = 0; }
+
             var output = new List<Brep>();
 
             for (int r = 0; r < quadsByRow.Count; r++)
@@ -102,31 +145,27 @@ namespace yunggh.Components.Panelization
                         continue; //continue because quad is triangle
                     }
 
-                    //get pulled point
-                    if (pulledPointType < 4)
-                    {
-                        var originaPulledPoint = quad[pulledPointType];
-                        var quadByType = quad.ToList();
+                    //order quad by pulledpoint type
+                    var quadByType = OrderQuadByPulledPoint(quad, pulledPointType);
 
-                        //create plane and project Pulled Point
-                        var plane = new Plane(quadByType[1], quadByType[2], quadByType[3]);
-                        var pulledPoint = plane.ClosestPoint(originaPulledPoint);
+                    //create plane and project Pulled Point
+                    var plane = new Plane(quadByType[1], quadByType[2], quadByType[3]);
+                    var pulledPoint = plane.ClosestPoint(quadByType[0]);
 
-                        //apply pulled point Pointiness
-                        var moveVec = plane.XAxis * pulledPointPointiness.X + plane.YAxis * pulledPointPointiness.Y;
-                        var xform = Transform.Translation(moveVec);
-                        pulledPoint.Transform(xform);
+                    //apply pulled point Pointiness
+                    var moveVec = plane.XAxis * pulledPointPointiness.X + plane.YAxis * pulledPointPointiness.Y;
+                    var xform = Transform.Translation(moveVec);
+                    pulledPoint.Transform(xform);
 
-                        //create quad
-                        var quadPnl = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[1], quadByType[2], quadByType[3]);
+                    //create quad
+                    var quadPnl = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[1], quadByType[2], quadByType[3]);
 
-                        //create triangles
-                        var trPnl1 = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[1], originaPulledPoint);
-                        var trPnl2 = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[3], originaPulledPoint);
-                        output.Add(quadPnl.ToBrep());
-                        output.Add(trPnl1.ToBrep());
-                        output.Add(trPnl2.ToBrep());
-                    }
+                    //create triangles
+                    var trPnl1 = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[1], quadByType[4]);
+                    var trPnl2 = NurbsSurface.CreateFromCorners(pulledPoint, quadByType[3], quadByType[4]);
+                    output.Add(quadPnl.ToBrep());
+                    output.Add(trPnl1.ToBrep());
+                    output.Add(trPnl2.ToBrep());
                 }
             }
 

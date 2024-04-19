@@ -10,14 +10,12 @@ using Rhino.Geometry;
 
 namespace yunggh.Components.Panelization
 {
-    public class SecantPlanePanelization : GH_Component
+    public class SecantPlanePanelization : PanelizationBase
     {
         #region UI
 
         public SecantPlanePanelization()
-          : base("Secant Plane Panelization", "SECPNL",
-              "Panelize Surface with Secant Plane type panelization method.",
-              "yung gh", "Panelization")
+          : base("Secant Plane Panelization", "SECPNL", "Panelize Surface with Secant Plane type panelization method.")
         {
         }
 
@@ -29,61 +27,31 @@ namespace yunggh.Components.Panelization
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddBrepParameter("Surface", "S", "Panelization Surface (can be double curved)", GH_ParamAccess.item);
-            pManager.AddCurveParameter("U Curves", "U", "'U' Curves", GH_ParamAccess.list);
-            pManager.AddCurveParameter("V Curves", "V", "'V' Curves", GH_ParamAccess.list);
+            base.RegisterInputParams(pManager);
             pManager.AddVectorParameter("Pointiness", "V", "Pulled Corner Location Offset as Vector (uses X,Y).", GH_ParamAccess.item, Vector3d.Zero);
             pManager.AddIntegerParameter("Pulled Point Logic", "L", "Determine which point to pull", GH_ParamAccess.item, 0);
-            pManager.AddBooleanParameter("Flip U Curves", "FU", "Flip 'U' Curves", GH_ParamAccess.item, false);
-            pManager.AddBooleanParameter("Flip V Curves", "FV", "Flip 'V' Curves", GH_ParamAccess.item, false);
-            pManager[0].Optional = true;
-            pManager[4].Optional = true;
             pManager[5].Optional = true;
             pManager[6].Optional = true;
         }
 
-        protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
-        {
-            pManager.AddBrepParameter("Secant Plane Panels", "P", "Pyramid Panels", GH_ParamAccess.tree);
-        }
-
         #endregion UI
 
-        protected override void SolveInstance(IGH_DataAccess DA)
+        public override List<List<List<Brep>>> GetPanels(List<List<List<Point3d>>> quads, Brep brep, IGH_DataAccess DA)
         {
-            //inputs
-            var brep = new Brep();
-            var uCrvs = new List<Curve>();
-            var vCrvs = new List<Curve>();
+            //get variables
             var pulledPointPointiness = Vector3d.Zero;
             var pulledPointType = 0;
-            var uFlip = false;
-            var vFlip = false;
-            if (!DA.GetData(0, ref brep)) return;
-            if (!DA.GetDataList(1, uCrvs)) return;
-            if (!DA.GetDataList(2, vCrvs)) return;
-            DA.GetData(3, ref pulledPointPointiness);
-            DA.GetData(4, ref pulledPointType);
-            DA.GetData(5, ref uFlip);
-            DA.GetData(6, ref vFlip);
-
-            //main
-            var uCrvsSorted = new List<Curve>();
-            var vCrvsSorted = new List<Curve>();
-            var uIndicesSorted = new List<int>();
-            var vIndicesSorted = new List<int>();
-            SortCurvesBySurface.Sort(uCrvs, vCrvs, uFlip, vFlip
-                , ref uCrvsSorted
-                , ref uIndicesSorted
-                , ref vCrvsSorted
-                , ref vIndicesSorted);
-
-            //get quad corners
-            var quads = SurfaceQuadPoints.GetQuadCorners(uCrvsSorted, vCrvsSorted);
+            DA.GetData(5, ref pulledPointPointiness);
+            DA.GetData(6, ref pulledPointType);
 
             //create secant panels
             var panels = GetSecantPlanePanels(quads, brep, pulledPointPointiness, pulledPointType);
 
+            return panels;
+        }
+
+        public override void SetOuput(List<List<List<Brep>>> panels, IGH_DataAccess DA)
+        {
             //sort secant panels into data tree by row
             var dataTree = ListListListToTree(panels);
 
@@ -119,13 +87,13 @@ namespace yunggh.Components.Panelization
         public static List<Point3d> OrderQuadByPulledPoint(List<Point3d> quad, int pulledPointType)
         {
             //find lowest point and use that as pulled point index
-            if(pulledPointType == 4)
+            if (pulledPointType == 4)
             {
                 var lowestZ = double.PositiveInfinity;
-                for(int i = 0; i < quad.Count;i++)
+                for (int i = 0; i < quad.Count; i++)
                 {
                     if (quad[i] == Point3d.Unset) { continue; }
-                    if(lowestZ < quad[i].Z){ continue;}
+                    if (lowestZ < quad[i].Z) { continue; }
                     lowestZ = quad[i].Z;
                     pulledPointType = i;
                 }

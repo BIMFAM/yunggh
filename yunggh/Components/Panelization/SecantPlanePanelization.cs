@@ -118,6 +118,30 @@ namespace yunggh.Components.Panelization
 
         public static List<Point3d> OrderQuadByPulledPoint(List<Point3d> quad, int pulledPointType)
         {
+            //find lowest point and use that as pulled point index
+            if(pulledPointType == 4)
+            {
+                var lowestZ = double.PositiveInfinity;
+                for(int i = 0; i < quad.Count;i++)
+                {
+                    if (quad[i] == Point3d.Unset) { continue; }
+                    if(lowestZ < quad[i].Z){ continue;}
+                    lowestZ = quad[i].Z;
+                    pulledPointType = i;
+                }
+            }
+            else if (pulledPointType == 5)
+            {
+                var highestZ = double.NegativeInfinity;
+                for (int i = 0; i < quad.Count; i++)
+                {
+                    if (quad[i] == Point3d.Unset) { continue; }
+                    if (highestZ > quad[i].Z) { continue; }
+                    highestZ = quad[i].Z;
+                    pulledPointType = i;
+                }
+            }
+
             //get variables
             var originaPulledPoint = new Point3d(quad[pulledPointType]);
             var quadByType = quad.ToList();
@@ -158,7 +182,7 @@ namespace yunggh.Components.Panelization
         public static List<List<List<Brep>>> GetSecantPlanePanels(List<List<List<Point3d>>> quadsByRow, Brep brep, Vector3d pulledPointPointiness, int pulledPointType)
         {
             //guard statements
-            if (pulledPointType > 3) { pulledPointType = 0; }
+            if (pulledPointType > 5) { pulledPointType = 0; }
             if (pulledPointType < 0) { pulledPointType = 0; }
 
             var allOutput = new List<List<List<Brep>>>();

@@ -51,83 +51,6 @@ namespace yunggh.Components.Panelization
             return panels;
         }
 
-        public override void SetOuput(List<List<List<Brep>>> panels, IGH_DataAccess DA)
-        {
-            //sort output into DataTree
-            //panels = SortDiagonally(panels);
-            //var dataTree = ListListToTree(panels);
-            var output = FlattenList(panels);
-
-            //output
-            DA.SetDataList(0, output);
-        }
-
-        public static GH_Structure<GH_Brep> ListListToTree(List<List<Brep>> listList)
-        {
-            var tree = new GH_Structure<GH_Brep>();
-
-            for (int j = 0; j < listList.Count; j++)
-            {
-                var cell = listList[j];
-                var gh_cell = new List<GH_Brep>();
-                foreach (var c in cell)
-                {
-                    GH_Brep gh_brep = null;
-                    if (!GH_Convert.ToGHBrep_Primary(c, ref gh_brep)) { continue; }
-                    gh_cell.Add(gh_brep);
-                }
-
-                var path = new GH_Path(j);
-                tree.AppendRange(gh_cell, path);
-            }
-
-            return tree;
-        }
-
-        public static List<List<GeometryBase>> SortDiagonally(List<List<GeometryBase>> inputList)
-        {
-            int rowCount = inputList.Count;
-            int colCount = inputList.Max(row => row.Count);
-
-            // Initialize the outputList
-            var outputList = new List<List<GeometryBase>>();
-
-            // Iterate through diagonals starting from the top-left corner
-            for (int diagonalSum = 0; diagonalSum < rowCount + colCount - 1; diagonalSum++)
-            {
-                var diagonal = new List<GeometryBase>();
-
-                // Iterate through rows of the inputList
-                for (int row = 0; row < rowCount; row++)
-                {
-                    int col = diagonalSum - row;
-
-                    // If the column index is within the bounds of the current row
-                    if (col >= 0 && col < inputList[row].Count)
-                    {
-                        // Add the element to the diagonal list
-                        diagonal.Add(inputList[row][col]);
-                    }
-                }
-
-                // Add the diagonal list to the outputList
-                outputList.Add(diagonal);
-            }
-
-            return outputList;
-        }
-
-        public static List<Brep> FlattenList(List<List<List<Brep>>> listOfLists)
-        {
-            // Flatten the list of lists of lists into a single list of strings
-            List<Brep> flattenedList = listOfLists
-                .SelectMany(innerList => innerList
-                    .SelectMany(innerInnerList => innerInnerList))
-                .ToList();
-
-            return flattenedList;
-        }
-
         public static List<List<List<Brep>>> GetPyramidPanels(List<List<List<Point3d>>> quadsByRow, Brep brep, double height, double truncation)
         {
             var output = new List<List<List<Brep>>>();
@@ -220,6 +143,58 @@ namespace yunggh.Components.Panelization
             }
 
             return output;
+        }
+
+        public override GH_Structure<GH_Brep> ToDataTree(List<List<List<Brep>>> panels)
+        {
+            //var sortedPanels = SortDiagonally(panels);
+            //return ListListToTree(sortedPanels);
+            return ListListListToTree(panels);
+        }
+
+        public static List<List<Brep>> SortDiagonally(List<List<List<Brep>>> inputList)
+        {
+            int rowCount = inputList.Count;
+            int colCount = inputList.Max(row => row.Count);
+
+            // Initialize the outputList
+            var outputList = new List<List<Brep>>();
+
+            // Iterate through diagonals starting from the top-left corner
+            for (int diagonalSum = 0; diagonalSum < rowCount + colCount - 1; diagonalSum++)
+            {
+                var diagonal = new List<Brep>();
+
+                // Iterate through rows of the inputList
+                for (int row = 0; row < rowCount; row++)
+                {
+                    int col = diagonalSum - row;
+
+                    // If the column index is within the bounds of the current row
+                    if (col >= 0 && col < inputList[row].Count)
+                    {
+                        // Treat the first two elements of each inner list separately
+                        if (col < 2)
+                        {
+                            // Add the first element (index 0) to the diagonal list
+                            diagonal.Add(inputList[row][col][0]);
+
+                            // Add the second element (index 1) to the diagonal list
+                            diagonal.Add(inputList[row][col][1]);
+                        }
+                        else
+                        {
+                            // Add the elements 2 and 3 to the other list
+                            diagonal.AddRange(inputList[row][col].Skip(2));
+                        }
+                    }
+                }
+
+                // Add the diagonal list to the outputList
+                outputList.Add(diagonal);
+            }
+
+            return outputList;
         }
     }
 }

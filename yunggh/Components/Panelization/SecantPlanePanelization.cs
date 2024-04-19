@@ -50,40 +50,6 @@ namespace yunggh.Components.Panelization
             return panels;
         }
 
-        public override void SetOuput(List<List<List<Brep>>> panels, IGH_DataAccess DA)
-        {
-            //sort secant panels into data tree by row
-            var dataTree = ListListListToTree(panels);
-
-            //output
-            DA.SetDataTree(0, dataTree);
-        }
-
-        public static GH_Structure<GH_Brep> ListListListToTree(List<List<List<Brep>>> listListList)
-        {
-            var tree = new GH_Structure<GH_Brep>();
-            for (int i = 0; i < listListList.Count; i++)
-            {
-                var row = listListList[i];
-                for (int j = 0; j < row.Count; j++)
-                {
-                    var cell = row[j];
-                    var gh_cell = new List<GH_Brep>();
-                    foreach (var c in cell)
-                    {
-                        GH_Brep gh_brep = null;
-                        if (!GH_Convert.ToGHBrep_Primary(c, ref gh_brep)) { continue; }
-                        gh_cell.Add(gh_brep);
-                    }
-
-                    var path = new GH_Path(i, j);
-                    tree.AppendRange(gh_cell, path);
-                }
-            }
-
-            return tree;
-        }
-
         public static List<Point3d> OrderQuadByPulledPoint(List<Point3d> quad, int pulledPointType)
         {
             //find lowest point and use that as pulled point index
@@ -197,6 +163,11 @@ namespace yunggh.Components.Panelization
             }
 
             return allOutput;
+        }
+
+        public override GH_Structure<GH_Brep> ToDataTree(List<List<List<Brep>>> panels)
+        {
+            return ListListListToTree(panels);
         }
     }
 }

@@ -80,11 +80,72 @@ namespace yunggh.Components.Panelization
             var panels = GetPanels(quads, brep, DA);
 
             //output
-            SetOuput(panels, DA);
+            var dataTree = ToDataTree(panels);
+
+            //output
+            DA.SetDataTree(0, dataTree);
         }
 
         public abstract List<List<List<Brep>>> GetPanels(List<List<List<Point3d>>> quads, Brep brep, IGH_DataAccess DA);
 
-        public abstract void SetOuput(List<List<List<Brep>>> panels, IGH_DataAccess DA);
+        public abstract GH_Structure<GH_Brep> ToDataTree(List<List<List<Brep>>> panels);
+
+        public static List<Brep> FlattenList(List<List<List<Brep>>> listOfLists)
+        {
+            // Flatten the list of lists of lists into a single list of strings
+            List<Brep> flattenedList = listOfLists
+                .SelectMany(innerList => innerList
+                    .SelectMany(innerInnerList => innerInnerList))
+                .ToList();
+
+            return flattenedList;
+        }
+
+        public static GH_Structure<GH_Brep> ListListToTree(List<List<Brep>> listList)
+        {
+            var tree = new GH_Structure<GH_Brep>();
+
+            for (int j = 0; j < listList.Count; j++)
+            {
+                var cell = listList[j];
+                var gh_cell = new List<GH_Brep>();
+                foreach (var c in cell)
+                {
+                    GH_Brep gh_brep = null;
+                    if (!GH_Convert.ToGHBrep_Primary(c, ref gh_brep)) { continue; }
+                    gh_cell.Add(gh_brep);
+                }
+
+                var path = new GH_Path(j);
+                tree.AppendRange(gh_cell, path);
+            }
+
+            return tree;
+        }
+
+        public static GH_Structure<GH_Brep> ListListListToTree(List<List<List<Brep>>> listListList)
+        {
+            var tree = new GH_Structure<GH_Brep>();
+            for (int i = 0; i < listListList.Count; i++)
+            {
+                var row = listListList[i];
+                for (int j = 0; j < row.Count; j++)
+                {
+                    var cell = row[j];
+                    var gh_cell = new List<GH_Brep>();
+                    foreach (var c in cell)
+                    {
+                        GH_Brep gh_brep = null;
+                        if (!GH_Convert.ToGHBrep_Primary(c, ref gh_brep)) { continue; }
+                        gh_cell.Add(gh_brep);
+                    }
+
+                    var path = new GH_Path(i, j);
+                    tree.AppendRange(gh_cell, path);
+                }
+            }
+
+            return tree;
+        }
     }
 }

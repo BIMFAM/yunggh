@@ -59,13 +59,9 @@ namespace yunggh.Components.Panelization
             return allOutput;
         }
 
-        public override void SetOuput(List<List<List<Brep>>> panels, IGH_DataAccess DA)
+        public override GH_Structure<GH_Brep> ToDataTree(List<List<List<Brep>>> panels)
         {
-            //sort secant panels into data tree by row
-            var dataTree = SecantPlanePanelization.ListListListToTree(panels);
-
-            //output
-            DA.SetDataTree(0, dataTree);
+            return ListListListToTree(panels);
         }
     }
 }

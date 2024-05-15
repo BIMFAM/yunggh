@@ -126,6 +126,7 @@
     <Compile Include="Components\Machine Learning\ShortestWalk\ListByPattern.cs" />
     <Compile Include="Components\Machine Learning\ShortestWalk\NodeAddress.cs" />
     <Compile Include="Components\Machine Learning\ShortestWalk\PathMethods.cs" />
+    <Compile Include="Components\Panelization\APeriodicFoldedPlatePanelization.cs" />
     <Compile Include="Components\Panelization\ContinuousPanels.cs" />
     <Compile Include="Components\Panelization\PanelizationBase.cs" />
     <Compile Include="Components\Panelization\PyramidPanelization.cs" />

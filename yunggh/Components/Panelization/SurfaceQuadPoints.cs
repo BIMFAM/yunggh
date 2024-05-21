@@ -130,10 +130,19 @@ namespace yunggh.Components.Panelization
                 for (int v = 0; v < output[u].Count; v++)
                 {
                     var quad = output[u][v];
-                    if (quad[0] != quad[1] && quad[2] != quad[3]) { continue; }
-                    if (quad[0].DistanceTo(quad[1]) > 0.001 && quad[2].DistanceTo(quad[3]) > 0.001) { continue; }
-                    quad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
-                    output[u][v] = quad;
+                    if (quad[0] == quad[1] && quad[2] == quad[3])
+                    {
+                        quad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                        output[u][v] = quad;
+                    }
+                    else
+                    {
+                        if (quad[0].DistanceTo(quad[1]) < 0.001 && quad[2].DistanceTo(quad[3]) < 0.001)
+                        {
+                            quad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                            output[u][v] = quad;
+                        }
+                    }
                 }
             }
 
@@ -288,9 +297,28 @@ namespace yunggh.Components.Panelization
                 //if there aren't any intersections then we have to continue
                 if (topLeft == Point3d.Unset && topRight == Point3d.Unset) { continue; }
 
+                //not sure why, but we have to test this twice
+                if (topLeft == Point3d.Unset)
+                {
+                    quad[0] = topUCrv.PointAtStart;
+                    quad[1] = topRight;
+                    quad[2] = rightVCrv.PointAtStart;
+                }
+                else if (topRight == Point3d.Unset)
+                {
+                    quad[0] = topLeft;
+                    quad[1] = topUCrv.PointAtEnd;
+                    quad[3] = leftVCrv.PointAtStart;
+                }
+
                 //test if intersection is the same as the VCrv start point (start is towards bottom)
-                if (topLeft == leftVCrv.PointAtStart) { continue; }
-                if (topRight == rightVCrv.PointAtStart) { continue; }
+                if (topLeft == leftVCrv.PointAtEnd
+                    || topLeft.DistanceTo(leftVCrv.PointAtEnd) < 0.001
+                    || topRight == rightVCrv.PointAtEnd
+                    || topRight.DistanceTo(rightVCrv.PointAtEnd) < 0.001)
+                {
+                    continue;
+                }
 
                 //check if it's triangle
                 if (topLeft == Point3d.Unset)
@@ -312,6 +340,13 @@ namespace yunggh.Components.Panelization
                     quad[2] = rightVCrv.PointAtStart;
                     quad[3] = leftVCrv.PointAtStart;
                 }
+                //*/
+                if (quad[0] == leftVCrv.PointAtEnd
+                    && quad[1] == rightVCrv.PointAtEnd
+                    && quad[2] == rightVCrv.PointAtStart
+                    && quad[3] == leftVCrv.PointAtStart) { continue; }
+                if (topLeft.DistanceTo(leftVCrv.PointAtEnd) < 0.001) { continue; }
+                if (topRight.DistanceTo(rightVCrv.PointAtEnd) < 0.001) { continue; }
                 bottomRow[v] = quad;
 
                 //here we test for the right most column
@@ -330,7 +365,9 @@ namespace yunggh.Components.Panelization
                         bottomRow[bottomRow.Count - 1] = endQuad;
                     }
                 }
+                //*/
             }
+
             output[0] = bottomRow;
         }
 
@@ -367,9 +404,23 @@ namespace yunggh.Components.Panelization
                 // If there aren't any intersections then we have to continue
                 if (topLeft == Point3d.Unset && topRight == Point3d.Unset) { continue; }
 
+                // Check if it's a triangle
+                if (topLeft == Point3d.Unset)
+                {
+                    quad[1] = topUCrv.PointAtStart;
+                    quad[0] = topRight;
+                    quad[3] = rightVCrv.PointAtEnd;
+                }
+                else if (topRight == Point3d.Unset)
+                {
+                    quad[1] = topLeft;
+                    quad[0] = topUCrv.PointAtEnd;
+                    quad[2] = leftVCrv.PointAtEnd;
+                }
+
                 // Test if intersection is the same as the VCrv start point (start is towards bottom)
-                if (topLeft == leftVCrv.PointAtEnd) { continue; }
-                if (topRight == rightVCrv.PointAtEnd) { continue; }
+                if (topLeft == leftVCrv.PointAtStart || topLeft.DistanceTo(leftVCrv.PointAtStart) < 0.001) { continue; }
+                if (topRight == rightVCrv.PointAtStart || topRight.DistanceTo(rightVCrv.PointAtStart) < 0.001) { continue; }
 
                 // Check if it's a triangle
                 if (topLeft == Point3d.Unset)

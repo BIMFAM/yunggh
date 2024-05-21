@@ -118,6 +118,9 @@ namespace yunggh.Components.Panelization
             //get bottom most rows
             GetTopRow(uCrvs, vCrvs, output);
 
+            //get bottom most rows
+            GetStartColumn(uCrvs, vCrvs, output);
+
             //find any pentagons by comparing all quad edges with the edges of adjacent quads
 
             return output;
@@ -315,6 +318,128 @@ namespace yunggh.Components.Panelization
                 }
             }
             output[output.Count - 1] = topRow;
+        }
+
+        private static void GetStartColumn(List<Curve> uCrvs, List<Curve> vCrvs, List<List<List<Point3d>>> output)
+        {
+            for (int u = 1; u < output.Count - 1; u++) //we can skip the bottommost row, we've already gotten that
+            {
+                var row = output[u];
+                if (row.Count < 3) { continue; }
+                var startQuad = row[0];
+                var endQuad = row[row.Count - 1];
+                var LeftQuad = row[1];
+                var RightQuad = row[row.Count - 2];
+                var topUCrv = uCrvs[u];
+                var botUCrv = uCrvs[u - 1];
+                var leftVCrv = vCrvs[0];
+                var rightVCrv = vCrvs[vCrvs.Count - 1];
+                //quad definition
+                //0,1
+                //3,2
+
+                //get start quad
+                if (LeftQuad[2] != Point3d.Unset && LeftQuad[3] != Point3d.Unset)
+                {
+                    var topLeft = GetIntersection(leftVCrv, topUCrv);
+                    var bottomLeft = GetIntersection(leftVCrv, botUCrv);
+
+                    if (topLeft != Point3d.Unset || bottomLeft != Point3d.Unset)
+                    {
+                        if (topLeft != startQuad[1] && topLeft != Point3d.Unset)
+                        {
+                            startQuad[1] = topLeft;
+                            startQuad[0] = topUCrv.PointAtStart;
+                        }
+                        if (bottomLeft != startQuad[2] && bottomLeft != Point3d.Unset)
+                        {
+                            startQuad[2] = bottomLeft;
+                            startQuad[3] = botUCrv.PointAtStart;
+                        }
+
+                        if (startQuad[2] == Point3d.Unset) { startQuad[2] = leftVCrv.PointAtStart; }
+                        if (startQuad[1] == Point3d.Unset) { startQuad[1] = leftVCrv.PointAtEnd; }
+
+                        row[0] = startQuad;
+                    }
+                }
+
+                //get end quad
+                if (RightQuad[2] != Point3d.Unset && RightQuad[3] != Point3d.Unset)
+                {
+                    row[row.Count - 1] = endQuad;
+                }
+                output[u] = row;
+                /*/
+                var leftQuad = row[0]; // First index is the left quad
+                var rightUCrv = uCrvs[u]; // Current U curve
+                var topVCrv = vCrvs[0]; // Top V curve
+                var bottomVCrv = vCrvs[vCrvs.Count - 1]; // Bottom V curve
+
+                var topRight = GetIntersection(rightUCrv, topVCrv);
+                var bottomRight = GetIntersection(rightUCrv, bottomVCrv);
+
+                // Test for the topmost row
+                if (u == 1 && topRight != Point3d.Unset)
+                {
+                    if (topRight != rightUCrv.PointAtStart)
+                    {
+                        var startQuad = new List<Point3d>
+                        {
+                            topRight,
+                            Point3d.Unset,
+                            rightUCrv.PointAtStart,
+                            bottomRight
+                        };
+                        row[0] = startQuad;
+                    }
+                }
+
+                // If there aren't any intersections then we have to continue
+                if (topRight == Point3d.Unset && bottomRight == Point3d.Unset) { continue; }
+
+                // Test if intersection is the same as the VCrv start point (start is towards left)
+                if (topRight == topVCrv.PointAtEnd) { continue; }
+                if (bottomRight == bottomVCrv.PointAtEnd) { continue; }
+
+                // Check if it's a triangle
+                if (topRight == Point3d.Unset)
+                {
+                    leftQuad[0] = rightUCrv.PointAtStart;
+                    leftQuad[1] = bottomVCrv.PointAtStart;
+                    leftQuad[2] = bottomRight;
+                }
+                else if (bottomRight == Point3d.Unset)
+                {
+                    leftQuad[0] = topRight;
+                    leftQuad[1] = rightUCrv.PointAtEnd;
+                    leftQuad[2] = topVCrv.PointAtStart;
+                }
+                else
+                {
+                    leftQuad[0] = topRight;
+                    leftQuad[1] = rightUCrv.PointAtEnd;
+                    leftQuad[2] = bottomRight;
+                }
+                row[0] = leftQuad;
+
+                // Test for the bottom row
+                if (u == output.Count - 2 && bottomRight != Point3d.Unset)
+                {
+                    if (bottomRight != rightUCrv.PointAtEnd)
+                    {
+                        var endQuad = new List<Point3d>
+                {
+                    Point3d.Unset,
+                    bottomRight,
+                    rightUCrv.PointAtEnd,
+                    Point3d.Unset
+                };
+                        row[row.Count - 1] = endQuad;
+                    }
+                }
+                //*/
+            }
         }
 
         public static List<List<List<Point3d>>> FlipQuadCorners(List<List<List<Point3d>>> quads, bool uFlip, bool vFlip)

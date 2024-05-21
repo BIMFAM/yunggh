@@ -122,8 +122,87 @@ namespace yunggh.Components.Panelization
             GetStartEndColumns(uCrvs, vCrvs, output);
 
             //find any pentagons by comparing all quad edges with the edges of adjacent quads
+            GetPentagons(uCrvs, vCrvs, output);
 
             return output;
+        }
+
+        private static void GetPentagons(List<Curve> uCrvs, List<Curve> vCrvs, List<List<List<Point3d>>> output)
+        {
+            for (int u = 1; u < output.Count - 1; u++) //we can skip the bottommost row, we've already gotten that
+            {
+                var row = output[u];
+                for (int v = 1; v < row.Count; v++)
+                {
+                    var leftQuad = row[v - 1];
+                    var rightQuad = row[v];
+
+                    //if sides already touch
+                    if (leftQuad[1] == rightQuad[0] && leftQuad[2] == rightQuad[3]) { continue; }
+                    if (leftQuad[1].DistanceTo(rightQuad[0]) < 0.001 && leftQuad[2].DistanceTo(rightQuad[3]) < 0.001) { continue; }
+                    //we have to find out which point isn't touching
+                    if (leftQuad[1] == rightQuad[0]) //point left 2 and right 3 aren't touching
+                    {
+                        //find out which point is on a U Crv
+                        var leftDist = GetClosestDistance(leftQuad[2], vCrvs);
+                        var rightDist = GetClosestDistance(rightQuad[3], vCrvs);
+                        if (leftDist < rightDist)
+                        {
+                            Point3d temp = rightQuad[3];
+                            rightQuad[3] = leftQuad[2];
+                            rightQuad[4] = temp;
+                            row[v] = rightQuad;
+                        }
+                        else
+                        {
+                            Point3d temp = leftQuad[2];
+                            leftQuad[2] = rightQuad[3];
+                            leftQuad[4] = temp;
+                            row[v - 1] = leftQuad;
+                        }
+                    }
+                    else //point left 1 and right 0 aren't touching
+                    {
+                        //find out which point is on a U Crv
+                        //find out which point is on a U Crv
+                        var leftDist = GetClosestDistance(leftQuad[1], vCrvs);
+                        var rightDist = GetClosestDistance(rightQuad[0], vCrvs);
+                        if (leftDist < rightDist)
+                        {
+                            Point3d temp = rightQuad[0];
+                            rightQuad[0] = leftQuad[1];
+                            rightQuad[4] = temp;
+                            row[v] = rightQuad;
+                        }
+                        else
+                        {
+                            Point3d temp = leftQuad[1];
+                            leftQuad[1] = rightQuad[0];
+                            leftQuad[4] = temp;
+                            row[v - 1] = leftQuad;
+                        }
+                    }
+                }
+                output[u] = row;
+            }
+        }
+
+        public static double GetClosestDistance(Point3d pt, List<Curve> crvs)
+        {
+            double minDistance = double.MaxValue;
+
+            foreach (var crv in crvs)
+            {
+                double t;
+                crv.ClosestPoint(pt, out t);
+                Point3d cp = crv.PointAt(t);
+                double distance = cp.DistanceTo(pt);
+                if (distance > minDistance) { continue; }
+
+                minDistance = distance;
+            }
+
+            return minDistance;
         }
 
         private static void GetInnerQuads(List<Curve> uCrvs, List<Curve> vCrvs, List<List<List<Point3d>>> output)

@@ -246,70 +246,70 @@ namespace yunggh.Components.Panelization
             for (int v = 1; v < topRow.Count - 1; v++)
             {
                 var quad = topRow[v];
-                var bottomUCrv = uCrvs[uCrvs.Count - 1];
+                var topUCrv = uCrvs[uCrvs.Count - 1];
                 var leftVCrv = vCrvs[v - 1];
                 var rightVCrv = vCrvs[v];
 
-                var bottomLeft = GetIntersection(bottomUCrv, leftVCrv);
-                var bottomRight = GetIntersection(bottomUCrv, rightVCrv);
+                var topLeft = GetIntersection(topUCrv, leftVCrv);
+                var topRight = GetIntersection(topUCrv, rightVCrv);
 
                 // Test for the leftmost column
-                if (v == 1 && bottomLeft != Point3d.Unset)
+                if (v == 1 && topLeft != Point3d.Unset)
                 {
-                    if (bottomLeft != bottomUCrv.PointAtStart)
+                    if (topLeft != topUCrv.PointAtStart)
                     {
                         var startQuad = new List<Point3d>
-                {
-                    bottomLeft,
-                    bottomUCrv.PointAtStart,
-                    leftVCrv.PointAtStart,
-                    Point3d.Unset
-                };
+                        {
+                            topLeft,
+                            topUCrv.PointAtStart,
+                            leftVCrv.PointAtStart,
+                            Point3d.Unset
+                        };
                         topRow[0] = startQuad;
                     }
                 }
 
                 // If there aren't any intersections then we have to continue
-                if (bottomLeft == Point3d.Unset && bottomRight == Point3d.Unset) { continue; }
+                if (topLeft == Point3d.Unset && topRight == Point3d.Unset) { continue; }
 
                 // Test if intersection is the same as the VCrv start point (start is towards bottom)
-                if (bottomLeft == leftVCrv.PointAtEnd) { continue; }
-                if (bottomRight == rightVCrv.PointAtEnd) { continue; }
+                if (topLeft == leftVCrv.PointAtEnd) { continue; }
+                if (topRight == rightVCrv.PointAtEnd) { continue; }
 
                 // Check if it's a triangle
-                if (bottomLeft == Point3d.Unset)
+                if (topLeft == Point3d.Unset)
                 {
-                    quad[1] = bottomUCrv.PointAtEnd;
-                    quad[0] = bottomRight;
+                    quad[1] = topUCrv.PointAtStart;
+                    quad[0] = topRight;
                     quad[3] = rightVCrv.PointAtEnd;
                 }
-                else if (bottomRight == Point3d.Unset)
+                else if (topRight == Point3d.Unset)
                 {
-                    quad[1] = bottomLeft;
-                    quad[0] = bottomUCrv.PointAtStart;
+                    quad[1] = topLeft;
+                    quad[0] = topUCrv.PointAtEnd;
                     quad[2] = leftVCrv.PointAtEnd;
                 }
                 else
                 {
-                    quad[1] = bottomLeft;
-                    quad[0] = bottomRight;
+                    quad[1] = topLeft;
+                    quad[0] = topRight;
                     quad[3] = rightVCrv.PointAtEnd;
                     quad[2] = leftVCrv.PointAtEnd;
                 }
                 topRow[v] = quad;
 
                 // Test for the rightmost column
-                if (v == topRow.Count - 2 && bottomRight != Point3d.Unset)
+                if (v == topRow.Count - 2 && topRight != Point3d.Unset)
                 {
-                    if (bottomRight != bottomUCrv.pointats)
+                    if (topRight != topUCrv.PointAtEnd)
                     {
                         var endQuad = new List<Point3d>
-                {
-                    bottomRight,
-                    bottomUCrv.PointAtEnd,
-                    Point3d.Unset,
-                    rightVCrv.PointAtStart
-                };
+                        {
+                            topRight,
+                            topUCrv.PointAtEnd,
+                            Point3d.Unset,
+                            rightVCrv.PointAtEnd
+                        };
                         topRow[topRow.Count - 1] = endQuad;
                     }
                 }

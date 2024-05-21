@@ -124,6 +124,19 @@ namespace yunggh.Components.Panelization
             //find any pentagons by comparing all quad edges with the edges of adjacent quads
             GetPentagons(uCrvs, vCrvs, output);
 
+            //remove lines (when two corners equal the other two corners
+            for (int u = 0; u < output.Count; u++)
+            {
+                for (int v = 0; v < output[u].Count; v++)
+                {
+                    var quad = output[u][v];
+                    if (quad[0] != quad[1] && quad[2] != quad[3]) { continue; }
+                    if (quad[0].DistanceTo(quad[1]) > 0.001 && quad[2].DistanceTo(quad[3]) > 0.001) { continue; }
+                    quad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                    output[u][v] = quad;
+                }
+            }
+
             return output;
         }
 

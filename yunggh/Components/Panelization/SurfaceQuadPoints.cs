@@ -125,28 +125,77 @@ namespace yunggh.Components.Panelization
             GetPentagons(uCrvs, vCrvs, output);
 
             //remove lines (when two corners equal the other two corners
+            CleanQuads(output);
+
+            return output;
+        }
+
+        private static void CleanQuads(List<List<List<Point3d>>> output)
+        {
             for (int u = 0; u < output.Count; u++)
             {
                 for (int v = 0; v < output[u].Count; v++)
                 {
                     var quad = output[u][v];
-                    if (quad[0] == quad[1] && quad[2] == quad[3])
+
+                    // Count unique points (excluding Point3d.Unset)
+                    var withoutUnset = quad.Where(p => p != Point3d.Unset).ToList();
+                    var uniquePoints = quad.Where(p => p != Point3d.Unset).Distinct().ToList();
+
+                    if (uniquePoints.Count == 0 || uniquePoints.Count == 2 || withoutUnset.Count != uniquePoints.Count) //no unique points
                     {
                         quad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
                         output[u][v] = quad;
+                        continue; // Move to the next quad
                     }
-                    else
+                    else if (uniquePoints.Count == 3) //triangle quad
                     {
-                        if (quad[0].DistanceTo(quad[1]) < 0.001 && quad[2].DistanceTo(quad[3]) < 0.001)
+                        // If there are three unique points,
+                        // check if two points are the same
+                        int unsetCount = uniquePoints.Count(p => p == Point3d.Unset);
+                        if (unsetCount == 2)
                         {
+                            // If two points are the same, set the quad to Unset
                             quad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
                             output[u][v] = quad;
+                            continue; // Move to the next quad
                         }
                     }
+                    //*/
+                    // Check for any combination of points being equal
+                    bool[] unsetFlags = new bool[4];
+                    for (int i = 0; i < 4; i++)
+                    {
+                        for (int j = i + 1; j < 4; j++)
+                        {
+                            if (quad[i] != Point3d.Unset && quad[j] != Point3d.Unset && quad[i].DistanceTo(quad[j]) < 0.001)
+                            {
+                                unsetFlags[i] = true;
+                                unsetFlags[j] = true;
+                            }
+                        }
+                    }
+
+                    // Unset flagged points
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (unsetFlags[i])
+                        {
+                            quad[i] = Point3d.Unset;
+                        }
+                    }
+                    //*/
+
+                    var unsetPoints = quad.Where(p => p == Point3d.Unset).ToList();
+                    if (unsetPoints.Count >= 3)
+                    {
+                        quad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                        output[u][v] = quad;
+                        continue; // Move to the next quad
+                    }
+                    output[u][v] = quad;
                 }
             }
-
-            return output;
         }
 
         private static void GetPentagons(List<Curve> uCrvs, List<Curve> vCrvs, List<List<List<Point3d>>> output)

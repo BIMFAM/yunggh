@@ -70,7 +70,7 @@ namespace yunggh.Components.Panelization
             var vCrvsSorted = new List<Curve>();
             var uIndicesSorted = new List<int>();
             var vIndicesSorted = new List<int>();
-            SortCurvesBySurface.Sort(uCrvs, vCrvs, uFlip, vFlip
+            SortCurvesBySurface.Sort(uCrvs, vCrvs, false, false //flip was messing up the quad corner algorithm, so we'll flip after
                 , ref uCrvsSorted
                 , ref uIndicesSorted
                 , ref vCrvsSorted
@@ -78,6 +78,9 @@ namespace yunggh.Components.Panelization
 
             //get quad corners
             var quads = GetQuadCorners(uCrvsSorted, vCrvsSorted);
+
+            //flip quad corners
+            quads = FlipQuadCorners(quads, uFlip, vFlip);
 
             //output
             var quadTree = ToDataTree(quads);
@@ -217,6 +220,37 @@ namespace yunggh.Components.Panelization
             //find any pentagons by comparing all quad edges with the edges of adjacent quads
 
             return output;
+        }
+
+        public static List<List<List<Point3d>>> FlipQuadCorners(List<List<List<Point3d>>> quads, bool uFlip, bool vFlip)
+        {
+            // Create a new list to store the flipped quads
+            var flippedQuads = new List<List<List<Point3d>>>();
+
+            // If uFlip is true, reverse the outer list
+            if (uFlip)
+            {
+                quads.Reverse();
+            }
+
+            // Iterate through each row (U direction)
+            foreach (var row in quads)
+            {
+                // Create a new row to store the flipped columns
+                var flippedRow = new List<List<Point3d>>(row);
+
+                // If vFlip is true, reverse the current row
+                if (vFlip)
+                {
+                    flippedRow.Reverse();
+                }
+
+                // Add the (potentially flipped) row to the flippedQuads list
+                flippedQuads.Add(flippedRow);
+            }
+
+            // Return the final flipped quads
+            return flippedQuads;
         }
 
         private static List<Point3d> FixQuad(List<Point3d> quad, Curve topUCrv, Curve botUCrv, Curve leftVCrv, Curve rightVCrv)

@@ -552,6 +552,22 @@ namespace yunggh.Components.Panelization
                         if (startQuad[2] == Point3d.Unset) { startQuad[2] = leftVCrv.PointAtStart; }
                         if (startQuad[1] == Point3d.Unset) { startQuad[1] = leftVCrv.PointAtEnd; }
 
+                        //make sure it's not spanning along hte U
+                        if (startQuad[0] == topUCrv.PointAtStart
+                            && startQuad[1] == topUCrv.PointAtEnd
+                            && startQuad[2] == botUCrv.PointAtEnd
+                            && startQuad[3] == botUCrv.PointAtStart)
+                        {
+                            startQuad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                        }
+                        if (startQuad[0].DistanceTo(topUCrv.PointAtStart) < 0.001
+                            && startQuad[1].DistanceTo(topUCrv.PointAtEnd) < 0.001
+                            && startQuad[2].DistanceTo(botUCrv.PointAtEnd) < 0.001
+                            && startQuad[3].DistanceTo(botUCrv.PointAtStart) < 0.001)
+                        {
+                            startQuad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                        }
+
                         row[0] = startQuad;
                     }
                 }
@@ -577,6 +593,22 @@ namespace yunggh.Components.Panelization
 
                         if (endQuad[3] == Point3d.Unset) { endQuad[2] = rightVCrv.PointAtStart; }
                         if (endQuad[0] == Point3d.Unset) { endQuad[1] = rightVCrv.PointAtEnd; }
+
+                        //make sure it's not spanning along hte U
+                        if (endQuad[0] == topUCrv.PointAtStart
+                            && endQuad[1] == topUCrv.PointAtEnd
+                            && endQuad[2] == botUCrv.PointAtEnd
+                            && endQuad[3] == botUCrv.PointAtStart)
+                        {
+                            endQuad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                        }
+                        if (endQuad[0].DistanceTo(topUCrv.PointAtStart) < 0.001
+                            && endQuad[1].DistanceTo(topUCrv.PointAtEnd) < 0.001
+                            && endQuad[2].DistanceTo(botUCrv.PointAtEnd) < 0.001
+                            && endQuad[3].DistanceTo(botUCrv.PointAtStart) < 0.001)
+                        {
+                            endQuad = new List<Point3d>() { Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset, Point3d.Unset };
+                        }
 
                         row[row.Count - 1] = endQuad;
                     }

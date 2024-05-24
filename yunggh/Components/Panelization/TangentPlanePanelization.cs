@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
@@ -47,11 +48,87 @@ namespace yunggh.Components.Panelization
 
             //split each panel using it's neighbor's planes
             var allOutput = new List<List<List<Brep>>>();
+            for (int u = 1; u < quadsByRow.Count - 1; u++)
+            {
+                var preRow = quadsByRow[u - 1];
+                var curRow = quadsByRow[u];
+                var nextRow = quadsByRow[u + 1];
+
+                var outputRow = new List<List<Brep>>();
+
+                for (int v = 1; v < curRow.Count - 1; v++)
+                {
+                    var quad = curRow[v];
+
+                    var neighborQuads = new List<List<Point3d>>();
+                    //previous row
+                    neighborQuads.Add(preRow[v - 1]);
+                    neighborQuads.Add(preRow[v]);
+                    neighborQuads.Add(preRow[v + 1]);
+
+                    //next row
+                    neighborQuads.Add(nextRow[v - 1]);
+                    neighborQuads.Add(nextRow[v]);
+                    neighborQuads.Add(nextRow[v + 1]);
+
+                    //current row
+                    neighborQuads.Add(curRow[v - 1]);
+                    neighborQuads.Add(curRow[v + 1]);
+
+                    //create planes
+                    var inputPlane = PlaneFromQuad(quad, brep);
+                    var clippingPlanes = new List<Plane>();
+                    foreach (var q in neighborQuads)
+                    {
+                        var clippingPlane = PlaneFromQuad(q, brep);
+                        if(clippingPlane == Plane.Unset) { continue; }
+                        clippingPlanes.Add(clippingPlane);
+                    }
+                    if(clippingPlanes.Count == 0) 
+                    { 
+                        outputRow.Add(new List<Brep>() {});
+                        continue;
+                    }
+
+                    //create panel
+                    var pnl = ClipPlane(inputPlane, clippingPlanes);
+
+                    outputRow.Add(new List<Brep>() { pnl });
+                }
+
+                allOutput.Add(outputRow);
+            }
 
             return allOutput;
         }
 
-        private Brep ClipPlane(Plane inputPlane, List<Plane> clippingPlanes)
+        private static Plane PlaneFromQuad(List<Point3d> quad, Brep brep)
+        {
+            double count = 0;
+            double x = 0;
+            double y = 0;
+            double z = 0;
+            foreach (Point3d p in quad)
+            {
+                if (p == Point3d.Unset) { continue; }
+                x += p.X;
+                y += p.Y;
+                z += p.Z;
+                count++;
+            }
+            if(count == 0) { return Plane.Unset; }
+
+            var center = new Point3d(x / count, y / count, z / count);
+            Point3d cp;
+            double s, c;
+            Vector3d normal;
+            ComponentIndex ci;
+            brep.ClosestPoint(center, out cp, out ci, out s, out c, double.MaxValue, out normal);
+
+            return new Plane(center, normal);
+        }
+
+        private static Brep ClipPlane(Plane inputPlane, List<Plane> clippingPlanes)
         {
             //find panel size
             double size = double.NegativeInfinity; //also holds distance

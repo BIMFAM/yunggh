@@ -67,7 +67,7 @@ namespace yunggh.Components.Panelization
             var vCrvsSorted = new List<Curve>();
             var uIndicesSorted = new List<int>();
             var vIndicesSorted = new List<int>();
-            SortCurvesBySurface.Sort(uCrvs, vCrvs, uFlip, vFlip
+            SortCurvesBySurface.Sort(uCrvs, vCrvs, false, false
                 , ref uCrvsSorted
                 , ref uIndicesSorted
                 , ref vCrvsSorted
@@ -75,6 +75,9 @@ namespace yunggh.Components.Panelization
 
             //get quad corners
             var quads = SurfaceQuadPoints.GetQuadCorners(uCrvsSorted, vCrvsSorted);
+
+            //flip quad corners
+            quads = SurfaceQuadPoints.FlipQuadCorners(quads, uFlip, vFlip);
 
             //create panels
             var panels = GetPanels(quads, brep, DA);

@@ -64,7 +64,8 @@ namespace yunggh
                     var meshes = Mesh.CreateFromBrep(brep, mesh_params);
                     foreach (var m in meshes)
                     {
-                        m.SetTextureCoordinates(textureMapping, xform, false);
+                        if(textureMapping != null)
+                            m.SetTextureCoordinates(textureMapping, xform, false);
                         mesh.Append(m);
                     }
                 }
@@ -73,7 +74,8 @@ namespace yunggh
                     Surface srf = geo as Surface;
                     var mesh_params = MeshingParameters.Default;
                     var m = Mesh.CreateFromSurface(srf, mesh_params);
-                    m.SetTextureCoordinates(textureMapping, xform, false);
+                    if (textureMapping != null)
+                        m.SetTextureCoordinates(textureMapping, xform, false);
                     mesh.Append(m);
                 }
             }

@@ -78,6 +78,8 @@ namespace yunggh
                 Brep brep = B[j];
                 if (brep == null) { continue; }
 
+                //guard statement to ignore single surfaces
+                if (brep.Surfaces.Count < 2) { continue; }
                 GH_Path path = new GH_Path(j);
                 List<Point3d> unrolledPts = new List<Point3d>();
                 List<Point3d> existing = new List<Point3d>();
@@ -219,6 +221,24 @@ namespace yunggh
                 if (!GH_Convert.ToGHCurve_Primary(c, ref ghC)) { continue; }
                 curvesGH.Add(ghC);
             }
+            return curvesGH;
+        }
+
+        public static List<GH_Rectangle> ConvertToGH(List<Rectangle3d> curves)
+        {
+            var curvesGH = new List<GH_Rectangle>();
+
+            for (int i = 0; i < curves.Count; i++)
+            {
+                var c = curves[i];
+
+                var ghC = new GH_Rectangle();
+
+                if (!GH_Convert.ToGHRectangle_Primary(c, ref ghC)) { continue; }
+
+                curvesGH.Add(ghC);
+            }
+
             return curvesGH;
         }
 

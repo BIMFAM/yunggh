@@ -227,18 +227,13 @@ namespace yunggh
         public static List<GH_Rectangle> ConvertToGH(List<Rectangle3d> curves)
         {
             var curvesGH = new List<GH_Rectangle>();
-
             for (int i = 0; i < curves.Count; i++)
             {
                 var c = curves[i];
-
                 var ghC = new GH_Rectangle();
-
                 if (!GH_Convert.ToGHRectangle_Primary(c, ref ghC)) { continue; }
-
                 curvesGH.Add(ghC);
             }
-
             return curvesGH;
         }
 

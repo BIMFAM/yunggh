@@ -17,7 +17,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -81,9 +81,17 @@ namespace yunggh.Components.Geometry
             Curve offset0 = C.Offset(Plane.WorldXY, -widthHalf, tolerance, CurveOffsetCornerStyle.Smooth)[0];
             Curve offset1 = C.Offset(Plane.WorldXY, widthHalf, tolerance, CurveOffsetCornerStyle.Smooth)[0];
 
-            List<object> bricks = new List<object>(); //output list to keep brick polylines
-                                                      //bricks.Add(offset0);
-                                                      //bricks.Add(offset1);
+            List<object> bricks = ArrayLinesOnCurve(C, L, length, ref totalBrickLength, widthHalf, offset0, offset1);
+
+            //set output
+            DA.SetDataList(0, bricks);
+        }
+
+        private static List<object> ArrayLinesOnCurve(Curve C, double L, double length, ref double totalBrickLength, double widthHalf, Curve offset0, Curve offset1)
+        {
+            double tolerance = 0.001; //constant tolerance for curve intersections
+
+            List<object> bricks = new List<object>();
 
             double lastParam = 0;
             Point3d start = C.PointAtStart;
@@ -139,8 +147,7 @@ namespace yunggh.Components.Geometry
                 lastParam = param; //make sure we don't duplicate the last brick
             }
 
-            //set output
-            DA.SetDataList(0, bricks);
+            return bricks;
         }
 
         /// <summary>

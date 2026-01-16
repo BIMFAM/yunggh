@@ -36,7 +36,7 @@ namespace yunggh
         public MultiUnroll()
           : base("Multi Unroll", "MultiUnroll",
               "Unroll multiple planar surfaces without duplicating edge points.",
-              "yung gh", "Geometry")
+              "yung gh", "Fabricate")
         {
         }
 
@@ -80,7 +80,6 @@ namespace yunggh
 
                 //guard statement to ignore single surfaces
                 if (brep.Surfaces.Count < 2) { continue; }
-
                 GH_Path path = new GH_Path(j);
                 List<Point3d> unrolledPts = new List<Point3d>();
                 List<Point3d> existing = new List<Point3d>();

@@ -159,6 +159,7 @@
     <Compile Include="Components\Data\WriteCSV.cs" />
     <Compile Include="Components\Data\WriteGoogleSheet.cs" />
     <Compile Include="Components\Shape\StraightSkeleton.cs" />
+    <Compile Include="Components\Geometry\ToArcs.cs" />
     <Compile Include="Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

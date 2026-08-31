@@ -86,19 +86,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='RH8|AnyCPU'">
-    <PackageReference Include="Grasshopper" Version="8.0.23304.9001" ExcludeAssets="all" />
-    <Reference Include="RhinoCommon">
-      <HintPath>C:\Program Files\Rhino 8\System\RhinoCommon.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Grasshopper">
-      <HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GH_IO">
-      <HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <!-- Compile against the 8.0 NuGet package rather than the locally installed
+         Rhino, so yak tags the package rh8_0 (installable on any Rhino 8) instead
+         of pinning it to whatever service release this machine happens to have.
+         ExcludeAssets="runtime" keeps RhinoCommon/Grasshopper/GH_IO out of the
+         build output - Rhino supplies them at load time. -->
+    <PackageReference Include="Grasshopper" Version="8.0.23304.9001" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>

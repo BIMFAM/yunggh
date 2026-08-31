@@ -1,0 +1,15 @@
+name: yunggh
+version: 0.0.1
+authors:
+  - archgame
+description: >
+  An open source library of useful Grasshopper components for computational
+  designers, covering data, geometry, document, selection, formatting, mesh,
+  shape, and machine learning workflows.
+url: "https://github.com/BIMFAM/yunggh"
+keywords:
+  - grasshopper
+  - computational-design
+  - geometry
+  - automation
+icon: yunggh.png

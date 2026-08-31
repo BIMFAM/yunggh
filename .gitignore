@@ -347,3 +347,10 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+# yak publishing (dist/publish-rhino8.bat) - generated build artifacts
+dist/_build/
+dist/Rhino 8/*.gha
+dist/Rhino 8/*.dll
+dist/Rhino 8/*.yak
+dist/Rhino 8/*.pdb

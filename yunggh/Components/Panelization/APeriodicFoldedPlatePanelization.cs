@@ -46,49 +46,62 @@ namespace yunggh.Components.Panelization
             DA.GetData(5, ref offset);
             DA.GetData(6, ref offsetType);
 
-            //create pyramid panels
-            var panels = GetAperiodicPanels(quads, brep.Surfaces[0], offset, offsetType);
+            //get the point grid the same way the original definition does:
+            //intersect every (sorted) U curve with every (sorted) V curve.
+            //NOTE: the quad corners can't be used here, they contain Point3d.Unset
+            //and substituted curve end points, which led to failed plane intersections
+            //and ridge points being placed at the world origin
+            var uCrvs = new List<Curve>();
+            var vCrvs = new List<Curve>();
+            var uFlip = false;
+            var vFlip = false;
+            DA.GetDataList(1, uCrvs);
+            DA.GetDataList(2, vCrvs);
+            DA.GetData(3, ref uFlip);
+            DA.GetData(4, ref vFlip);
+
+            var uCrvsSorted = new List<Curve>();
+            var vCrvsSorted = new List<Curve>();
+            var uIndicesSorted = new List<int>();
+            var vIndicesSorted = new List<int>();
+            SortCurvesBySurface.Sort(uCrvs, vCrvs, uFlip, vFlip
+                , ref uCrvsSorted
+                , ref uIndicesSorted
+                , ref vCrvsSorted
+                , ref vIndicesSorted);
+
+            var pointRows = GetPointRows(uCrvsSorted, vCrvsSorted);
+
+            //create aperiodic panels
+            var panels = GetAperiodicPanels(pointRows, brep.Surfaces[0], offset, offsetType);
 
             return panels;
         }
 
-        private List<List<Point3d>> GetPointRows(List<List<List<Point3d>>> quads)
+        private static List<List<Point3d>> GetPointRows(List<Curve> uCrvs, List<Curve> vCrvs)
         {
-            //convert quads into rows of points
+            double tol = Rhino.RhinoDoc.ActiveDoc != null ? Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance : 0.001;
             var pointRows = new List<List<Point3d>>();
-            for (int i = 1; i < quads.Count; i++)
+            foreach (var uCrv in uCrvs)
             {
                 var row = new List<Point3d>();
-                var quadsRow = quads[i];
-                for (int j = 1; j < quadsRow.Count; j++) //for each quad in quadrow
+                foreach (var vCrv in vCrvs)
                 {
-                    row.Add(quadsRow[j][0]);
+                    var crvXs = Rhino.Geometry.Intersect.Intersection.CurveCurve(uCrv, vCrv, tol, tol);
+                    if (crvXs == null) { continue; }
+                    foreach (var x in crvXs)
+                    {
+                        row.Add(x.PointA);
+                    }
                 }
-                //row.Add(quadsRow[quadsRow.Count - 1][3]);
-
-                //add to output
                 pointRows.Add(row);
             }
-
-            /*/
-            //get last row
-            var lastRow = new List<Point3d>();
-            var lastQuadRow = quads[quads.Count - 1];
-            foreach (var quad in lastQuadRow) //for each quad in quadrow
-            {
-                lastRow.Add(quad[1]);
-            }
-            lastRow.Add(lastQuadRow[lastQuadRow.Count - 1][2]);
-            pointRows.Add(lastRow); //add to output
-            //*/
             return pointRows;
         }
 
-        private List<List<List<Brep>>> GetAperiodicPanels(List<List<List<Point3d>>> quads, Surface SRF, double offset, int type)
+        private List<List<List<Brep>>> GetAperiodicPanels(List<List<Point3d>> pointRows, Surface SRF, double offset, int type)
         {
             //if(T == null){T = 1;}
-
-            var pointRows = GetPointRows(quads);
 
             var panels = new List<List<List<Brep>>>();
             for (int p = 1; p < pointRows.Count; p++)
@@ -130,6 +143,14 @@ namespace yunggh.Components.Panelization
                     Point3d s1 = pts1[i - 1];
                     Point3d e1 = pts1[i];
 
+                    //skip if any corner is missing
+                    if (!s0.IsValid || !e0.IsValid || !s1.IsValid || !e1.IsValid || !sR.IsValid)
+                    {
+                        panelRow0.Add(panelCell0);
+                        panelRow1.Add(panelCell1);
+                        continue;
+                    }
+
                     //construct second ridge point
                     Point3d eR = GetSecondRidgePoint(sR, s0, e0, s1, e1, SRF, type);
 
@@ -161,18 +182,28 @@ namespace yunggh.Components.Panelization
 
         public Point3d GetSecondRidgePoint(Point3d rS, Point3d s0, Point3d e0, Point3d s1, Point3d e1, Surface surface, int type)
         {
-            //setup planes
-            Plane pln0 = new Plane(rS, s0, e0);
-            Plane pln1 = new Plane(rS, s1, e1);
-            Line line;
-            Rhino.Geometry.Intersect.Intersection.PlanePlane(pln0, pln1, out line);
-
             //mid point between end points
             double x = (e0.X + e1.X) / 2.00;
             double y = (e0.Y + e1.Y) / 2.00;
             double z = (e0.Z + e1.Z) / 2.00;
             Point3d mid = new Point3d(x, y, z);
             Point3d third = mid;
+
+            //fallback when the ridge can't be solved (degenerate or parallel planes):
+            //carry the ridge across parallel to the edge instead of returning
+            //an uninitialized line, which would put the point at the world origin
+            Point3d startMid = (s0 + s1) / 2.0;
+            Point3d fallback = rS + (mid - startMid);
+
+            //setup planes
+            Plane pln0 = new Plane(rS, s0, e0);
+            Plane pln1 = new Plane(rS, s1, e1);
+            if (!pln0.IsValid || !pln1.IsValid) { return fallback; }
+            Line line;
+            if (!Rhino.Geometry.Intersect.Intersection.PlanePlane(pln0, pln1, out line) || !line.IsValid)
+            {
+                return fallback;
+            }
 
             //create plane using surface normal
             double u; double v;
@@ -182,8 +213,10 @@ namespace yunggh.Components.Panelization
             third.Transform(xform);
             Plane pln2 = new Plane(e0, e1, third);
             double p;
-            Rhino.Geometry.Intersect.Intersection.LinePlane(line, pln2, out p);
-            third = line.PointAt(p);
+            if (pln2.IsValid && Rhino.Geometry.Intersect.Intersection.LinePlane(line, pln2, out p))
+            {
+                third = line.PointAt(p);
+            }
 
             //get point
             Point3d rE = line.ClosestPoint(e0, false);
@@ -195,6 +228,7 @@ namespace yunggh.Components.Panelization
             {
                 rE = line.ClosestPoint(third, false);
             }
+            if (!rE.IsValid) { return fallback; }
             return rE;
         }
 

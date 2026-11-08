@@ -56,7 +56,7 @@ namespace yunggh.Components.Panelization
             if (pulledPointType == 4)
             {
                 var lowestZ = double.PositiveInfinity;
-                for (int i = 0; i < quad.Count; i++)
+                for (int i = 0; i < 4; i++) //only the 4 corners, index 4 is not a corner
                 {
                     if (quad[i] == Point3d.Unset) { continue; }
                     if (lowestZ < quad[i].Z) { continue; }
@@ -67,7 +67,7 @@ namespace yunggh.Components.Panelization
             else if (pulledPointType == 5)
             {
                 var highestZ = double.NegativeInfinity;
-                for (int i = 0; i < quad.Count; i++)
+                for (int i = 0; i < 4; i++) //only the 4 corners, index 4 is not a corner
                 {
                     if (quad[i] == Point3d.Unset) { continue; }
                     if (highestZ > quad[i].Z) { continue; }
@@ -140,8 +140,11 @@ namespace yunggh.Components.Panelization
                     var quadByType = OrderQuadByPulledPoint(quad, pulledPointType);
 
                     //create plane and project Pulled Point
+                    //an invalid plane (collinear/duplicate corners) projects to the world origin, so skip it
                     var plane = new Plane(quadByType[1], quadByType[2], quadByType[3]);
+                    if (!plane.IsValid) { continue; }
                     var pulledPoint = plane.ClosestPoint(quadByType[0]);
+                    if (!pulledPoint.IsValid) { continue; }
 
                     //apply pulled point Pointiness
                     var moveVec = plane.XAxis * pulledPointPointiness.X + plane.YAxis * pulledPointPointiness.Y;

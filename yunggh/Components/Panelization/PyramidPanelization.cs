@@ -45,103 +45,159 @@ namespace yunggh.Components.Panelization
             DA.GetData(5, ref height);
             DA.GetData(6, ref truncation);
 
+            //NOTE: the quad corner grid isn't used here. Like the original definition,
+            //the surface is split by the U and V curves and each face is panelized
+            //from its own boundary corners
+            var uCrvs = new List<Curve>();
+            var vCrvs = new List<Curve>();
+            DA.GetDataList(1, uCrvs);
+            DA.GetDataList(2, vCrvs);
+            var cutters = uCrvs.Concat(vCrvs).Where(c => c != null).ToList();
+
             //create pyramid panels
-            var panels = GetPyramidPanels(quads, brep, height, truncation);
+            var panels = GetPyramidPanels(brep, cutters, height, truncation);
 
             return panels;
         }
 
-        public static List<List<List<Brep>>> GetPyramidPanels(List<List<List<Point3d>>> quadsByRow, Brep brep, double height, double truncation)
+        public static List<List<List<Brep>>> GetPyramidPanels(Brep brep, List<Curve> cutters, double height, double truncation)
         {
+            double tol = Rhino.RhinoDoc.ActiveDoc != null ? Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance : 0.001;
             var output = new List<List<List<Brep>>>();
+            var row = new List<List<Brep>>();
+            output.Add(row);
+            if (brep == null || brep.Faces.Count == 0) { return output; }
 
-            for (int r = 0; r < quadsByRow.Count; r++)
+            //split surface into faces
+            var baseFace = brep.Faces[0];
+            var split = baseFace.Split(cutters, tol);
+            if (split == null) { return output; }
+
+            foreach (var face in split.Faces)
             {
-                var rowOutput = new List<List<Brep>>();
-                var row = quadsByRow[r];
-                for (int j = 0; j < row.Count; j++)
+                var cell = new List<Brep>();
+                var corners = GetFaceCorners(face, tol);
+
+                if (corners.Count == 4)
                 {
-                    var pyramidOutput = new List<Brep>();
-                    var quad = row[j];
-                    //TODO: test if quad is a pentagon
-                    //test if quad is a triangle
-                    if (quad[0] == Point3d.Unset || quad[1] == Point3d.Unset || quad[2] == Point3d.Unset || quad[3] == Point3d.Unset)
-                    {
-                        //find out how many points are unset
-                        int unsetPtCount = 0;
-                        foreach (var pt in quad)
-                        {
-                            if (pt != Point3d.Unset) { continue; }
-                            unsetPtCount++;
-                        }
-                        if (unsetPtCount > 1) { continue; } //continue if not enough points for triangle
-
-                        //create single quad triangle panel
-                        //Debug.WriteLine("D" + r + "-" + j);
-                        if (quad[0] == Point3d.Unset)
-                        {
-                            var pnl = NurbsSurface.CreateFromCorners(quad[1], quad[2], quad[3]);
-                            if (pnl == null) { continue; }
-                            pyramidOutput.Add(pnl.ToBrep());
-                        }
-                        else if (quad[1] == Point3d.Unset)
-                        {
-                            var pnl = NurbsSurface.CreateFromCorners(quad[0], quad[2], quad[3]);
-                            if (pnl == null) { continue; }
-                            pyramidOutput.Add(pnl.ToBrep());
-                        }
-                        else if (quad[2] == Point3d.Unset)
-                        {
-                            var pnl = NurbsSurface.CreateFromCorners(quad[0], quad[1], quad[3]);
-                            if (pnl == null) { continue; }
-                            pyramidOutput.Add(pnl.ToBrep());
-                        }
-                        else if (quad[3] == Point3d.Unset)
-                        {
-                            var pnl = NurbsSurface.CreateFromCorners(quad[0], quad[1], quad[2]);
-                            if (pnl == null) { continue; }
-                            pyramidOutput.Add(pnl.ToBrep());
-                        }
-                        //Debug.WriteLine("C" + r + "-" + j);
-                        continue; //continue because quad is triangle
-                    }
-
-                    //get pyramid tip
-                    var center = (quad[0] + quad[1] + quad[2] + quad[3]) / 4.00;
-                    var srf = brep.Surfaces[0];
-                    double u, v;
-                    srf.ClosestPoint(center, out u, out v);
-                    var normal = srf.NormalAt(u, v);
-                    center += normal * height;
-
-                    //create pyramid panels
-                    quad.RemoveAt(quad.Count - 1); //at this point we assume there is no need for a pentagon
-                    for (int i = 1; i <= quad.Count; i++)
-                    {
-                        var pt0 = quad[i - 1];
-                        var pt1 = Point3d.Unset;
-                        if (i == quad.Count)
-                        {
-                            pt1 = quad[0];
-                        }
-                        else
-                        {
-                            pt1 = quad[i];
-                        }
-                        //Debug.WriteLine("A" + r + "-" + j + "-" + i);
-                        var pnl = NurbsSurface.CreateFromCorners(pt0, pt1, center);
-                        if (pnl == null) { continue; }
-                        //Debug.WriteLine("B");
-                        pyramidOutput.Add(pnl.ToBrep());
-                        //Debug.WriteLine("C");
-                    }
-
-                    rowOutput.Add(pyramidOutput);
+                    cell.AddRange(GetPyramid(face, corners, height, truncation));
+                }
+                else if (corners.Count >= 3)
+                {
+                    //not a quad, so make a flat panel (like the Delaunay branch of the definition)
+                    cell.AddRange(GetFlatPanel(corners, tol));
                 }
 
-                output.Add(rowOutput);
+                row.Add(cell);
             }
 
+            return output;
+        }
+
+        private static List<Point3d> GetFaceCorners(BrepFace face, double tol)
+        {
+            var corners = new List<Point3d>();
+            var loop = face.OuterLoop;
+            if (loop == null) { return corners; }
+            var boundary = loop.To3dCurve();
+            if (boundary == null) { return corners; }
+
+            //explode boundary into segments, a corner is the start of each segment
+            var segments = boundary.DuplicateSegments();
+            if (segments == null || segments.Length == 0) { segments = new Curve[] { boundary }; }
+            foreach (var seg in segments)
+            {
+                var pt = seg.PointAtStart;
+                if (corners.Count > 0 && corners[corners.Count - 1].DistanceTo(pt) < tol) { continue; }
+                corners.Add(pt);
+            }
+            if (corners.Count > 1 && corners[0].DistanceTo(corners[corners.Count - 1]) < tol)
+            {
+                corners.RemoveAt(corners.Count - 1);
+            }
+            return corners;
+        }
+
+        private static List<Brep> GetPyramid(BrepFace face, List<Point3d> corners, double height, double truncation)
+        {
+            var output = new List<Brep>();
+
+            //flat base through the 4 corners
+            var baseSrf = NurbsSurface.CreateFromCorners(corners[0], corners[1], corners[2], corners[3]);
+            if (baseSrf == null) { return output; }
+
+            //get base normal at the center of the corners
+            var center = (corners[0] + corners[1] + corners[2] + corners[3]) / 4.00;
+            double u, v;
+            baseSrf.ClosestPoint(center, out u, out v);
+            var normal = baseSrf.NormalAt(u, v);
+
+            //make sure the normal agrees with the surface being panelized
+            double fu, fv;
+            face.ClosestPoint(center, out fu, out fv);
+            var faceNormal = face.NormalAt(fu, fv);
+            if (face.OrientationIsReversed) { faceNormal.Reverse(); }
+            if (normal * faceNormal < 0) { normal.Reverse(); }
+
+            //get pyramid tip
+            normal.Unitize();
+            var tip = center + normal * height;
+
+            //no pyramid, just the flat base
+            if (truncation <= 0 || height == 0)
+            {
+                output.Add(baseSrf.ToBrep());
+                return output;
+            }
+            if (truncation > 1) { truncation = 1; }
+
+            //truncated points along each corner-to-tip edge
+            var truncated = corners.Select(c => c + (tip - c) * truncation).ToList();
+            bool isTruncated = truncation < 1;
+
+            //create pyramid panels
+            for (int i = 0; i < 4; i++)
+            {
+                var pt0 = corners[i];
+                var pt1 = corners[(i + 1) % 4];
+                NurbsSurface pnl;
+                if (isTruncated)
+                {
+                    pnl = NurbsSurface.CreateFromCorners(pt0, pt1, truncated[(i + 1) % 4], truncated[i]);
+                }
+                else
+                {
+                    pnl = NurbsSurface.CreateFromCorners(pt0, pt1, tip);
+                }
+                if (pnl == null) { continue; }
+                output.Add(pnl.ToBrep());
+            }
+
+            return output;
+        }
+
+        private static List<Brep> GetFlatPanel(List<Point3d> corners, double tol)
+        {
+            var output = new List<Brep>();
+            if (corners.Count == 3)
+            {
+                var tri = NurbsSurface.CreateFromCorners(corners[0], corners[1], corners[2]);
+                if (tri != null) { output.Add(tri.ToBrep()); }
+                return output;
+            }
+
+            //triangulate the polygon and join the triangles
+            var pts = new List<Point3d>(corners) { corners[0] };
+            var mesh = Rhino.Geometry.Mesh.CreateFromClosedPolyline(new Polyline(pts));
+            if (mesh == null) { return output; }
+            var triangles = new List<Brep>();
+            foreach (var f in mesh.Faces)
+            {
+                var srf = NurbsSurface.CreateFromCorners(mesh.Vertices[f.A], mesh.Vertices[f.B], mesh.Vertices[f.C]);
+                if (srf != null) { triangles.Add(srf.ToBrep()); }
+            }
+            var joined = Brep.JoinBreps(triangles, tol);
+            output.AddRange(joined ?? triangles.ToArray());
             return output;
         }
 

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Version>2023.09.02</Version>
     <Title>yunggh</Title>
@@ -53,14 +53,28 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+  <!-- Rhino 8 target: plain net7.0, NOT net7.0-windows.
+
+       net7.0-windows produces a Windows-only assembly, which is why the package
+       could only ever be published as '-win' and never showed up in the Package
+       Manager on macOS. Plain net7.0 builds one .gha that loads on Rhino 8 for
+       both Windows and Mac, so yak can publish it for the 'any' platform.
+
+       The WinForms code in the plugin (component right-click menus) still works:
+       Rhino 8 ships its own System.Windows.Forms and System.Drawing
+       implementations on macOS. We only need the *reference* assemblies at
+       compile time - see the RH8 ItemGroup below. -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RH8|AnyCPU'">
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <OutputPath>C:\Users\$(USERNAME)\AppData\Roaming\Grasshopper\6\Libraries\yunggh\</OutputPath>
     <StartProgram>C:\Program Files\Rhino 8\System\Rhino.exe</StartProgram>
     <StartArguments></StartArguments>
     <StartAction>Program</StartAction>
     <DebugType>portable</DebugType>
-    <UseWindowsForms>true</UseWindowsForms>
+    <!-- The Grasshopper 8.0 package only ships lib/net48. Consuming those
+         reference assemblies from net7.0 is what Rhino 8 plugins are expected
+         to do; NU1701 just notes the framework mismatch. -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='RH7|AnyCPU'">
@@ -92,6 +106,18 @@
          ExcludeAssets="runtime" keeps RhinoCommon/Grasshopper/GH_IO out of the
          build output - Rhino supplies them at load time. -->
     <PackageReference Include="Grasshopper" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+
+    <!-- System.Windows.Forms and System.Drawing are not part of the plain net7.0
+         framework, but Rhino 8 provides both at runtime on Windows *and* macOS.
+         So we reference them for compilation only and ship neither:
+           ExcludeAssets="runtime" - don't copy System.Drawing.Common.dll
+           ExcludeAssets="all"     - don't copy anything from the ref pack
+           Private="False"         - don't copy System.Windows.Forms.dll
+         Pulling the WinForms ref assembly out of Microsoft.WindowsDesktop.App.Ref
+         is the approach McNeel recommends for cross-platform Rhino 8 plugins. -->
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.WindowsDesktop.App.Ref" Version="7.0.0" GeneratePathProperty="true" ExcludeAssets="all" />
+    <Reference Include="$(PkgMicrosoft_WindowsDesktop_App_Ref)\ref\net7.0\System.Windows.Forms.dll" Private="False" />
   </ItemGroup>
 
   <ItemGroup>

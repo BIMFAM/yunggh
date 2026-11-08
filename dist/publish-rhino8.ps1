@@ -4,6 +4,9 @@
     Builds yunggh for Rhino 8, packages it as a .yak alongside its manifest.yml,
     and (after an explicit confirmation) pushes it to the Rhino Package Manager.
 
+    The RH8 configuration targets plain net7.0, so one .gha serves Rhino 8 on
+    both Windows and Mac and the package is published for the 'any' platform.
+
     Launched by publish-rhino8.bat -- double-click that, not this.
 #>
 
@@ -23,7 +26,8 @@ $Configuration = 'RH8'
 # Assemblies supplied by Rhino/Grasshopper itself -- never ship these.
 $ExcludedDlls = @(
     'RhinoCommon.dll', 'Grasshopper.dll', 'GH_IO.dll',
-    'Eto.dll', 'Rhino.UI.dll', 'GrasshopperIO.dll'
+    'Eto.dll', 'Rhino.UI.dll', 'GrasshopperIO.dll',
+    'System.Resources.Extensions.dll'
 )
 
 # --- helpers ----------------------------------------------------------------
@@ -192,7 +196,9 @@ Write-Step 5 'Creating the .yak package'
 
 Push-Location $PackageDir
 try {
-    & $YakPath build --platform win
+    # 'any' - the net7.0 .gha loads on Rhino 8 for Windows and for Mac.
+    # Tagging this 'win' is what kept the package off the Mac Package Manager.
+    & $YakPath build --platform any
     $yakExit = $LASTEXITCODE
 } finally {
     Pop-Location
@@ -210,6 +216,11 @@ Write-Host "  Package: $($yakFile.Name)  ($sizeMb MB)" -ForegroundColor Green
 Write-Host "  Folder : $PackageDir"
 if ($yakFile.Name -notmatch 'rh8') {
     Write-Host "  WARNING: the filename does not contain 'rh8' -- check which Yak.exe ran." -ForegroundColor DarkYellow
+}
+if ($yakFile.Name -match '-(win|mac)\.yak$') {
+    Write-Host '  WARNING: this package is platform-specific and will NOT appear in the' -ForegroundColor DarkYellow
+    Write-Host "           Package Manager on the other platform. Expected an '-any' package --" -ForegroundColor DarkYellow
+    Write-Host '           check the RH8 TargetFramework in yunggh.csproj is net7.0, not net7.0-windows.' -ForegroundColor DarkYellow
 }
 
 # --- 6. login ---------------------------------------------------------------

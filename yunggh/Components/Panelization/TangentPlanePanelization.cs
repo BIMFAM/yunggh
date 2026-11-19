@@ -77,6 +77,11 @@ namespace yunggh.Components.Panelization
 
                     //create planes
                     var inputPlane = PlaneFromQuad(quad, brep);
+                    if (!inputPlane.IsValid) //empty cell (hole or outside the trim)
+                    {
+                        outputRow.Add(new List<Brep>());
+                        continue;
+                    }
                     var clippingPlanes = new List<Plane>();
                     foreach (var q in neighborQuads)
                     {
@@ -93,7 +98,7 @@ namespace yunggh.Components.Panelization
                     //create panel
                     var pnl = ClipPlane(inputPlane, clippingPlanes);
 
-                    outputRow.Add(new List<Brep>() { pnl });
+                    outputRow.Add(pnl == null ? new List<Brep>() : new List<Brep>() { pnl });
                 }
 
                 allOutput.Add(outputRow);
@@ -146,17 +151,21 @@ namespace yunggh.Components.Panelization
             Interval interval = new Interval(-size, size);
             Interval intervalCutter = new Interval(-size * 10, size * 10);
             Rectangle3d rect = new Rectangle3d(inputPlane, interval, interval);
-            Brep panel = Brep.CreatePlanarBreps(rect.ToNurbsCurve(), tol)[0];
+            var planar = Brep.CreatePlanarBreps(rect.ToNurbsCurve(), tol);
+            if (planar == null || planar.Length == 0) { return null; }
+            Brep panel = planar[0];
 
             //Cut initial panel with each clipping Plane
             List<Brep> cutters = new List<Brep>();
             foreach (Plane pln in clippingPlanes)
             {
                 Rectangle3d rectCutter = new Rectangle3d(pln, intervalCutter, intervalCutter);
-                Brep cutter = Brep.CreatePlanarBreps(rectCutter.ToNurbsCurve(), tol)[0];
-                cutters.Add(cutter);
+                var cutter = Brep.CreatePlanarBreps(rectCutter.ToNurbsCurve(), tol);
+                if (cutter == null || cutter.Length == 0) { continue; }
+                cutters.Add(cutter[0]);
             }
             Brep[] cuts = panel.Split(cutters, tol);
+            if (cuts == null || cuts.Length == 0) { return panel; }
 
             double panelDist = double.PositiveInfinity;
             foreach (Brep cut in cuts)

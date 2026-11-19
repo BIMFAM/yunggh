@@ -49,8 +49,8 @@ namespace yunggh.Components.Panelization
                     //create triangles
                     var trPnl1 = NurbsSurface.CreateFromCorners(quad[0], quad[1], quad[2]);
                     var trPnl2 = NurbsSurface.CreateFromCorners(quad[0], quad[2], quad[3]);
-                    panels.Add(trPnl1.ToBrep());
-                    panels.Add(trPnl2.ToBrep());
+                    if (trPnl1 != null) { panels.Add(trPnl1.ToBrep()); }
+                    if (trPnl2 != null) { panels.Add(trPnl2.ToBrep()); }
                     rowOutput.Add(panels);
                 }
                 allOutput.Add(rowOutput);

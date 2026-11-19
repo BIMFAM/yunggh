@@ -74,7 +74,9 @@ namespace yunggh.Components.Panelization
                 , ref vIndicesSorted);
 
             //get quad corners
-            var quads = SurfaceQuadPoints.GetQuadCorners(uCrvsSorted, vCrvsSorted);
+            //the curves can be broken into pieces by holes or trims, so the grid lines and
+            //cells are found from the curve intersections and the split surface
+            var quads = SurfaceGrid.Build(uCrvsSorted, vCrvsSorted).QuadCorners(brep);
 
             //flip quad corners
             quads = SurfaceQuadPoints.FlipQuadCorners(quads, uFlip, vFlip);

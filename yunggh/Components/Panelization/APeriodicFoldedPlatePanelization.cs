@@ -47,7 +47,7 @@ namespace yunggh.Components.Panelization
             DA.GetData(6, ref offsetType);
 
             //get the point grid the same way the original definition does:
-            //intersect every (sorted) U curve with every (sorted) V curve.
+            //the intersections of the U curves with the V curves.
             //NOTE: the quad corners can't be used here, they contain Point3d.Unset
             //and substituted curve end points, which led to failed plane intersections
             //and ridge points being placed at the world origin
@@ -64,39 +64,22 @@ namespace yunggh.Components.Panelization
             var vCrvsSorted = new List<Curve>();
             var uIndicesSorted = new List<int>();
             var vIndicesSorted = new List<int>();
-            SortCurvesBySurface.Sort(uCrvs, vCrvs, uFlip, vFlip
+            SortCurvesBySurface.Sort(uCrvs, vCrvs, false, false
                 , ref uCrvsSorted
                 , ref uIndicesSorted
                 , ref vCrvsSorted
                 , ref vIndicesSorted);
 
-            var pointRows = GetPointRows(uCrvsSorted, vCrvsSorted);
+            //curves can be broken into pieces by holes or trims, so points are placed by the
+            //grid line they are on, with Point3d.Unset where the lines don't meet
+            var pointRows = SurfaceGrid.Build(uCrvsSorted, vCrvsSorted).PointGrid();
+            if (uFlip) { pointRows.Reverse(); }
+            if (vFlip) { foreach (var row in pointRows) { row.Reverse(); } }
 
             //create aperiodic panels
             var panels = GetAperiodicPanels(pointRows, brep.Surfaces[0], offset, offsetType);
 
             return panels;
-        }
-
-        private static List<List<Point3d>> GetPointRows(List<Curve> uCrvs, List<Curve> vCrvs)
-        {
-            double tol = Rhino.RhinoDoc.ActiveDoc != null ? Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance : 0.001;
-            var pointRows = new List<List<Point3d>>();
-            foreach (var uCrv in uCrvs)
-            {
-                var row = new List<Point3d>();
-                foreach (var vCrv in vCrvs)
-                {
-                    var crvXs = Rhino.Geometry.Intersect.Intersection.CurveCurve(uCrv, vCrv, tol, tol);
-                    if (crvXs == null) { continue; }
-                    foreach (var x in crvXs)
-                    {
-                        row.Add(x.PointA);
-                    }
-                }
-                pointRows.Add(row);
-            }
-            return pointRows;
         }
 
         private List<List<List<Brep>>> GetAperiodicPanels(List<List<Point3d>> pointRows, Surface SRF, double offset, int type)
@@ -116,17 +99,8 @@ namespace yunggh.Components.Panelization
                 int ptCount = pts0.Count;
                 if (pts1.Count < ptCount) { ptCount = pts1.Count; }
 
-                //get initial ridge point
-                double x = (pts0[0].X + pts1[0].X) / 2.00;
-                double y = (pts0[0].Y + pts1[0].Y) / 2.00;
-                double z = (pts0[0].Z + pts1[0].Z) / 2.00;
-                Point3d sR = new Point3d(x, y, z);
-                double u; double v;
-                SRF.ClosestPoint(sR, out u, out v);
-                Vector3d normal = SRF.NormalAt(u, v);
-                normal = normal * offset;
-                Transform xform = Transform.Translation(normal);
-                sR.Transform(xform);
+                //the ridge point is started at the first cell and again after every gap
+                Point3d sR = Point3d.Unset;
 
                 //setup outputs
                 var panelRow0 = new List<List<Brep>>();
@@ -143,13 +117,17 @@ namespace yunggh.Components.Panelization
                     Point3d s1 = pts1[i - 1];
                     Point3d e1 = pts1[i];
 
-                    //skip if any corner is missing
-                    if (!s0.IsValid || !e0.IsValid || !s1.IsValid || !e1.IsValid || !sR.IsValid)
+                    //skip if any corner is missing (hole or outside the trim)
+                    if (!s0.IsValid || !e0.IsValid || !s1.IsValid || !e1.IsValid)
                     {
                         panelRow0.Add(panelCell0);
                         panelRow1.Add(panelCell1);
+                        sR = Point3d.Unset; //don't carry the ridge across the gap
                         continue;
                     }
+
+                    //get initial ridge point
+                    if (!sR.IsValid) { sR = GetFirstRidgePoint(s0, s1, SRF, offset); }
 
                     //construct second ridge point
                     Point3d eR = GetSecondRidgePoint(sR, s0, e0, s1, e1, SRF, type);
@@ -178,6 +156,16 @@ namespace yunggh.Components.Panelization
                 panels.Add(panelRow1);
             }
             return panels;
+        }
+
+        private static Point3d GetFirstRidgePoint(Point3d s0, Point3d s1, Surface SRF, double offset)
+        {
+            Point3d sR = (s0 + s1) / 2.00;
+            double u; double v;
+            SRF.ClosestPoint(sR, out u, out v);
+            Vector3d normal = SRF.NormalAt(u, v);
+            sR.Transform(Transform.Translation(normal * offset));
+            return sR;
         }
 
         public Point3d GetSecondRidgePoint(Point3d rS, Point3d s0, Point3d e0, Point3d s1, Point3d e1, Surface surface, int type)

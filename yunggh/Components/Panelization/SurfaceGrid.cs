@@ -396,9 +396,19 @@ namespace yunggh.Components.Panelization
         private int SideOfEdge(BrepFace cell, Point3d mid, Vector3d dir, double edgeLength)
         {
             if (!dir.IsValid) { return 0; }
+
+            //step across the edge, getting smaller: a long thin cell (a sliver along a
+            //trim) is narrower than a step based on its edge length, so a big step lands
+            //outside it on both sides
             double step = Math.Max(edgeLength * 0.05, _tol * 10);
-            if (IsOnFace(cell, mid + dir * step)) { return 1; }
-            if (IsOnFace(cell, mid - dir * step)) { return -1; }
+            for (int k = 0; k < 4; k++)
+            {
+                bool plus = IsOnFace(cell, mid + dir * step);
+                bool minus = IsOnFace(cell, mid - dir * step);
+                if (plus != minus) { return plus ? 1 : -1; }
+                if (step <= _tol * 10) { break; }
+                step = Math.Max(step * 0.2, _tol * 10);
+            }
             return 0;
         }
 

@@ -176,7 +176,7 @@ namespace yunggh.Components.Panelization
             return output;
         }
 
-        private static List<Brep> GetFlatPanel(List<Point3d> corners, double tol)
+        internal static List<Brep> GetFlatPanel(List<Point3d> corners, double tol)
         {
             var output = new List<Brep>();
             if (corners.Count == 3)

@@ -332,9 +332,21 @@ namespace yunggh.Components.Panelization
                 double len = edge.GetLength();
                 if (len < _tol * 2) { continue; }
 
+                //Split pulls the curves onto the surface, so an edge can sit well off its
+                //input curve when the curves aren't exactly on the surface. Match the edge to
+                //the closer family, within a distance that scales with the edge length
+                //(an edge on the other family is about half a cell away)
+                double maxDist = Math.Max(_tol * 10, len * 0.25);
+                double dU, dV;
+                int i = ClosestPiece(UCurves, mid, maxDist, out dU);
+                int j = ClosestPiece(VCurves, mid, maxDist, out dV);
+                if (i >= 0 && j >= 0)
+                {
+                    if (dU <= dV) { j = -1; } else { i = -1; }
+                }
+
                 if (row == int.MinValue)
                 {
-                    int i = ClosestPiece(UCurves, mid);
                     if (i >= 0 && URow[i] >= 0)
                     {
                         //step towards the next U line (along the V curves)
@@ -345,7 +357,6 @@ namespace yunggh.Components.Panelization
                 }
                 if (col == int.MinValue)
                 {
-                    int j = ClosestPiece(VCurves, mid);
                     if (j >= 0 && VCol[j] >= 0)
                     {
                         //step towards the next V line (along the U curves)
@@ -359,10 +370,10 @@ namespace yunggh.Components.Panelization
             return false;
         }
 
-        private int ClosestPiece(List<Curve> crvs, Point3d pt)
+        private static int ClosestPiece(List<Curve> crvs, Point3d pt, double maxDist, out double bestDist)
         {
             int best = -1;
-            double bestDist = _tol * 10;
+            bestDist = maxDist;
             for (int i = 0; i < crvs.Count; i++)
             {
                 double t;
